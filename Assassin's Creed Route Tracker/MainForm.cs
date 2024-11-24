@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using ProcessMemory;
 
@@ -10,7 +11,7 @@ namespace Assassin_s_Creed_Route_Tracker
     {
         private ProcessMemoryHandler processMemoryHandler;
         private string currentProcess;
-        private MultilevelPointer percentagePointer;
+        private MultilevelPointer percentPtr;
 
         public MainForm()
         {
@@ -81,12 +82,12 @@ namespace Assassin_s_Creed_Route_Tracker
         private void PercentageButton_Click(object sender, EventArgs e)
         {
             Label percentageLabel = (Label)this.Controls[4];
-            if (processMemoryHandler != null && currentProcess == "AC4BFSP.exe" && percentagePointer != null)
+            if (processMemoryHandler != null && currentProcess == "AC4BFSP.exe")
             {
                 try
                 {
-                    int percentage = percentagePointer.DerefInt(0x284);
-                    percentageLabel.Text = $"Completion Percentage: {percentage}%";
+                    int percent = percentPtr.DerefInt(0x284);
+                    percentageLabel.Text = $"Completion Percentage: {percent}%";
                 }
                 catch (Exception ex)
                 {
@@ -112,20 +113,20 @@ namespace Assassin_s_Creed_Route_Tracker
                     if (processMemoryHandler != null && currentProcess == "AC4BFSP.exe")
                     {
                         // Set up the percentage pointer for AC4
-                        percentagePointer = new MultilevelPointer(processMemoryHandler,
-                            (nint*)process.MainModule?.BaseAddress + 0x049D9774);
+                        MultilevelPointer percentPtr = new MultilevelPointer(processMemoryHandler, 
+                            (nint*)(process.MainModule?.BaseAddress + 0x49D9774));
                     }
                 }
                 else
                 {
                     processMemoryHandler = null;
-                    percentagePointer = null;
+                    percentPtr = null;
                 }
             }
             catch (Exception)
             {
                 processMemoryHandler = null;
-                percentagePointer = null;
+                percentPtr = null;
             }
         }
     }
