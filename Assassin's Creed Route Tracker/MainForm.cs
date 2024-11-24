@@ -85,7 +85,7 @@ namespace Assassin_s_Creed_Route_Tracker
             {
                 try
                 {
-                    int percentage = percentagePointer;
+                    int percentage = percentagePointer.DerefInt(0x284);
                     percentageLabel.Text = $"Completion Percentage: {percentage}%";
                 }
                 catch (Exception ex)
