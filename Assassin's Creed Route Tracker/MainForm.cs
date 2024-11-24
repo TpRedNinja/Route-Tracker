@@ -12,6 +12,7 @@ namespace Assassin_s_Creed_Route_Tracker
         private ProcessMemoryHandler processMemoryHandler;
         private string currentProcess;
         private MultilevelPointer percentPtr;
+        private MultilevelPointer percentFloatPtr;
 
         public MainForm()
         {
@@ -87,7 +88,10 @@ namespace Assassin_s_Creed_Route_Tracker
                 try
                 {
                     int percent = percentPtr.DerefInt(0x284);
-                    percentageLabel.Text = $"Completion Percentage: {percent}%";
+                    float percentFloat = percentFloatPtr.DerefInt(0x74);
+                    percentageLabel.Text = $"Completion Percentage: {percent}%\n" +
+                        $"Float Percentage: {percentFloat:F5}";
+
                 }
                 catch (Exception ex)
                 {
@@ -113,20 +117,24 @@ namespace Assassin_s_Creed_Route_Tracker
                     if (processMemoryHandler != null && currentProcess == "AC4BFSP.exe")
                     {
                         // Set up the percentage pointer for AC4
-                        MultilevelPointer percentPtr = new MultilevelPointer(processMemoryHandler, 
+                       percentPtr = new MultilevelPointer(processMemoryHandler, 
                             (nint*)(process.MainModule?.BaseAddress + 0x49D9774));
+                        percentFloatPtr = new MultilevelPointer(processMemoryHandler,
+                            (nint*)(process.MainModule?.BaseAddress + 0x049F1EE8));
                     }
                 }
                 else
                 {
                     processMemoryHandler = null;
                     percentPtr = null;
+                    percentFloatPtr = null;
                 }
             }
             catch (Exception)
             {
                 processMemoryHandler = null;
                 percentPtr = null;
+                percentFloatPtr = null;
             }
         }
     }
