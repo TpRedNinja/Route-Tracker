@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using ProcessMemory;
+using Windows.Win32.Foundation;
 
 namespace Assassin_s_Creed_Route_Tracker
 {
@@ -12,7 +13,17 @@ namespace Assassin_s_Creed_Route_Tracker
         private ProcessMemoryHandler processMemoryHandler;
         private string currentProcess;
         private MultilevelPointer percentPtr;
-        private MultilevelPointer percentFloatPtr;
+        private MultilevelPointer ViewpointsPtr;
+        private MultilevelPointer MyanPtr;
+        private MultilevelPointer TreasurePtr;
+        private MultilevelPointer FragmentsPtr;
+        private MultilevelPointer WaterChestsPtr;
+        private MultilevelPointer UnchartedChestsPtr;
+        private MultilevelPointer AssassinPtr;
+        private MultilevelPointer NavalPtr;
+        private MultilevelPointer LettersPtr;
+        private MultilevelPointer ManuscriptsPtr;
+        private MultilevelPointer MusicPtr;
 
         public MainForm()
         {
@@ -87,10 +98,32 @@ namespace Assassin_s_Creed_Route_Tracker
             {
                 try
                 {
+                    //The pointers
                     int percent = percentPtr.DerefInt(0x284);
-                    float percentFloat = percentFloatPtr.DerefInt(0x74);
+                    int Viewpoints = ViewpointsPtr.DerefInt(0x18);
+                    int Myan = MyanPtr.DerefInt(0x18);
+                    int Treasure = TreasurePtr.DerefInt(0xBF8);
+                    int Fragments = FragmentsPtr.DerefInt(0x18);
+                    int WaterChests = WaterChestsPtr.DerefInt(0x18);
+                    int UnchartedChests = UnchartedChestsPtr.DerefInt(0x18);
+                    int Assassin = AssassinPtr.DerefInt(0x778);
+                    int Naval = NavalPtr.DerefInt(0x18);
+                    int Letters = LettersPtr.DerefInt(0x678);
+                    int Manuscripts = ManuscriptsPtr.DerefInt(0x18);
+                    int Music = MusicPtr.DerefInt(0x18);
+
                     percentageLabel.Text = $"Completion Percentage: {percent}%\n" +
-                        $"Float Percentage: {percentFloat:F5}";
+                        $"Viewpoints Completed: {Viewpoints}\n" +
+                        $"Myan Stones Collected: {Myan}\n" +
+                        $"Buried Treasure Collected: {Treasure}\n" +
+                        $"AnimusFragments Collected: {Fragments}\n" +
+                        $"WaterChests Collected: {WaterChests}\n" +
+                        $"UnchatredChests Collected: {UnchartedChests}\n" +
+                        $"AssassinContracts Completed: {Assassin}\n" +
+                        $"NavalContracts Completed: {Naval}\n" +
+                        $"LetterBottles Collected: {Letters}\n" +
+                        $"Manuscripts Collected: {Manuscripts}\n" +
+                        $"Music Sheets Collected: {Music}";
 
                 }
                 catch (Exception ex)
@@ -117,25 +150,32 @@ namespace Assassin_s_Creed_Route_Tracker
                     if (processMemoryHandler != null && currentProcess == "AC4BFSP.exe")
                     {
                         // Set up the percentage pointer for AC4
-                       percentPtr = new MultilevelPointer(processMemoryHandler, 
-                            (nint*)(process.MainModule?.BaseAddress + 0x49D9774));
-                        percentFloatPtr = new MultilevelPointer(processMemoryHandler,
-                            (nint*)(process.MainModule?.BaseAddress + 0x049F1EE8));
+                        percentPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x49D9774));
+                        ViewpointsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0002E8D0), 0x1A8, 0x28);
+                        MyanPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0002E8D0), 0x1A8, 0x3C);
+                        TreasurePtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x01817920), 0x3AC);
+                        FragmentsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0002E8D0), 0x1A8, 0x0);
+                        WaterChestsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0002E8D0), 0x1A8, 0x64);
+                        UnchartedChestsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0153A9DC), 0x158, 0x654);
+                        AssassinPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x018FF260), 0x38C);
+                        NavalPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0002E8D0), 0x1A8, 0x168);
+                        LettersPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x014218E8), 0x140);
+                        ManuscriptsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0051D814), 0x6C, 0xA14);
+                        MusicPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x016B6A7C), 0x54, 0x58C);
                     }
                 }
                 else
                 {
                     processMemoryHandler = null;
                     percentPtr = null;
-                    percentFloatPtr = null;
                 }
             }
             catch (Exception)
             {
                 processMemoryHandler = null;
                 percentPtr = null;
-                percentFloatPtr = null;
             }
         }
+
     }
 }
