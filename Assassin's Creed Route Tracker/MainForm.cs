@@ -1,10 +1,5 @@
-using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Windows.Forms;
 using ProcessMemory;
-using Windows.Win32.Foundation;
 
 namespace Assassin_s_Creed_Route_Tracker
 {
@@ -106,7 +101,7 @@ namespace Assassin_s_Creed_Route_Tracker
                     int Fragments = FragmentsPtr.DerefInt(0x18);
                     int WaterChests = WaterChestsPtr.DerefInt(0x18);
                     int UnchartedChests = UnchartedChestsPtr.DerefInt(0x18);
-                    int Assassin = AssassinPtr.DerefInt(0x778);
+                    int Assassin = AssassinPtr.DerefInt(0x498);
                     int Naval = NavalPtr.DerefInt(0x18);
                     int Letters = LettersPtr.DerefInt(0x678);
                     int Manuscripts = ManuscriptsPtr.DerefInt(0x18);
@@ -157,7 +152,7 @@ namespace Assassin_s_Creed_Route_Tracker
                         FragmentsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0002E8D0), 0x1A8, 0x0);
                         WaterChestsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0002E8D0), 0x1A8, 0x64);
                         UnchartedChestsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0153A9DC), 0x158, 0x654);
-                        AssassinPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x018FF260), 0x38C);
+                        AssassinPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x01817920), 0x38C);
                         NavalPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0002E8D0), 0x1A8, 0x168);
                         LettersPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x014218E8), 0x140);
                         ManuscriptsPtr = new MultilevelPointer(processMemoryHandler, (nint*)(process.MainModule?.BaseAddress + 0x0051D814), 0x6C, 0xA14);
