@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using Assassin_s_Creed_Route_Tracker.Properties;
 
