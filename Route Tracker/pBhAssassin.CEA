@@ -1,0 +1,323 @@
+{ Game   : <game>.exe
+  Version:
+  Date   : 2020-05-04
+  Author : <author>
+
+  Collects ptrs for main script & Tools...
+  (BhvAssassin = EAX)
+}
+
+[ENABLE]
+{$lua}
+
+  -- FreeRoam mr Id...
+  nRoamId = 88619
+  --nHealthId = 257054
+  aTimer = { [99889922] = 'System',  [nRoamId] = 'Free Roam' }
+
+  local startAddr = getAddress(myGame)
+  local endAddr = startAddr + getModuleSize(process)
+  print(string.format('%X ~> %X',startAddr,endAddr))
+
+
+{$asm}
+// +1C; CharacterAI .. +70  .. +20: Data structure name 'CSrvPlayerHealth'
+// +1C .. +5C .. +0 (..8): LogicalInventory
+// InventoryItemSettings ?   ...  InventoryItemCategorization ?
+
+// structname: +14 .. +0C
+// +8 .. +E8: BhvAssassin
+// +8: Entity ..+5C: World ..+688:NotoritieManager
+// +8: Entity ..+5C: World ..+20 .. +80:NotoritieManager
+// +8: Entity ..+5C: World ..+20 .. +74 .. +15C:NotoritieManager
+// +10: CharacterAI ..+C: StatechartDesc
+//                  ..+20: CharacterAI
+//                  ..+58 .. +0: PlayerDataItem
+//                  ..+58 .. +C: InventoryDataItem .. +10 .. +0~xx: (resp items): InventoryRechargeableContainer
+//                                                            0~ money
+// +10 +58 +8: SharedDataItem
+// +78 +30 +40: CSrvPlayerHealth
+// +78 +30 +14: C+78CLPlayerDeath ~ CLNPCDeath
+// +78 +30 +28: CSrvGroupMember
+// +10 .. +4C .. +18 .. +178 (StatechartState) .. +1C: CSrvPlayerHealth
+// +14: PhysicWorkspace
+// +18: Human
+// +24: EventListener
+// +28: BhvAssassin
+// +68: CharacterAI
+// +78: CharacterAI
+
+// eax = BhvAssassin
+// collecting pointers for main script...
+aobscanmodule(BhvAssassin,$process,8B 82 E8 00 00 00 8B 48 1C 53)
+registersymbol(BhvAssassin)
+alloc(newmem,$100,$process)
+
+// collecting pointers for Tools...
+// gets MapIconWorldManager: .. +C: .. +0: +34 = 8 ~ MapIconFastTravel
+//                           .. +24 .. +0: MapIconTreasure
+aobscanmodule(CheckTools,$process,8B 00 C1 F9 1F 23 C1 74 19 8B 70 08)
+registersymbol(CheckTools)
+alloc(newmem5,$100,$process)
+
+
+globalalloc(pBhvAssassin,4,$process)
+globalalloc(pEntity,4,$process)
+globalalloc(pHealth,4,$process)
+globalalloc(pInventory,4,$process)
+globalalloc(pSharedData,4,$process)
+globalalloc(pNotoriety,4,$process)
+globalalloc(bGodmode,1,$process)
+globalalloc(bUseGodmode,1,$process)
+globalalloc(bInvisible,1,$process)
+globalalloc(bFullBreath,1,$process)
+
+// used in teleporting routiens ~ mr_id...
+globalalloc(nFallId,4,$process)
+globalalloc(nGodId,4,$process)
+
+// Speed acceleration...
+globalalloc(pSpeedSystem,4,$process)
+
+bGodmode:
+db 0
+bInvisible:
+db 0
+bFullBreath:
+db 0
+bUseGodmode:
+db 0
+
+nFallId:
+dd #92025                           // # = (int)
+nGodId:
+dd #106
+
+// Error stats...
+globalalloc(nCrash1,4,$process)
+globalalloc(nCrash2,4,$process)
+globalalloc(nCrash3,4,$process)
+globalalloc(nCrash4,4,$process)
+globalalloc(nCrash5,4,$process)
+
+// get game version...
+globalalloc(pVersion,4,$process)
+globalalloc(sVersion,50,$process)
+
+nCrash1:
+dd 0
+
+nCrash2:
+dd 0
+
+nCrash3:
+dd 0
+
+nCrash4:
+dd 0
+
+nCrash5:
+dd 0
+
+
+// 'Player Coordinates' script
+// x64 pointers are 8-bytes long
+globalalloc(pStructCrdBase,4,$process)
+globalalloc(pStructCrdOffset,4,$process)
+// AC2FreeCam...
+globalalloc(pFreeRoam1,4,$process)
+
+// fill in offset here ~ see table coordinates...
+pStructCrdOffset:
+dd 40
+
+// see [Maintenance scripts ~ 'special' scripts] (x3)..
+globalalloc(bInverseXY,1,$process)
+// restore coordinates...
+globalalloc(bFreeChoice,1,$process)
+
+bInverseXY:
+db 0
+bFreeChoice:
+db 0
+
+// ptrs for Tools...
+globalalloc(pCheckTools,4,$process)
+globalalloc(pCheckIcons,4,$process)
+globalalloc(pCheckViewP,4,$process)
+
+pCheckIcons:
+dd 0
+pCheckViewP:
+dd 0
+
+// Accomplishments...
+globalalloc(pAccomplishm,4,$process)
+globalalloc(pAccomplVFT,4,$process)
+
+// AnimusDatabase...
+globalalloc(pAnimusDB,4,$process)
+
+// progressmgr... (switch char)
+globalalloc(pProgressionMgr,4,$process)
+globalalloc(pPlayerSelect,4,$process)
+globalalloc(pPlayerDefault,4,$process)
+globalalloc(pSwitchCharSave,4,$process)
+
+
+// collecting pointers for main script...
+label(code)
+label(code2)
+label(code3)
+label(return)
+
+newmem:
+{$try}
+  mov eax,[edx+000000E8]
+@@:
+  push eax
+  push ebx
+  push ecx
+  test eax,eax
+  je code3
+  mov [pBhvAssassin],eax
+  // dis-enable invisibility...
+  mov bl,[bInvisible]
+  mov byte ptr [eax+28],bl
+  // get Entity...
+  mov ebx,[eax+08]
+  mov [pEntity],ebx
+  // get CSrvPlayerHealth...
+  mov ebx,[eax+1C]
+  mov ebx,[ebx+70]
+  mov ebx,[ebx+20]
+  test ebx,ebx
+  je code3
+  mov [pHealth],ebx
+  // dis-enable godmode...
+  mov cl,[bGodmode]
+  mov byte ptr [ebx+62],cl
+  // dis-enable Fullbreath
+  cmp [bFullBreath],1
+  jne code2
+  mov dword ptr [ebx+80],(float)1
+code2:
+  // inventory...
+  mov ebx,[eax+1C]
+  mov ebx,[ebx+5C]
+  mov ebx,[ebx+0]
+  //add ebx,0x8                          // LogicalInventory
+  mov [pInventory],ebx
+code3:
+  pop ecx
+  pop ebx
+  pop eax
+  jmp code
+{$except}
+  inc [nCrash1]
+code:
+  jmp return
+
+BhvAssassin:
+  jmp newmem
+  db 90
+return:
+
+// collecting pointers for Tools...
+label(code5)
+label(return5)
+
+newmem5:
+  push ebx
+  mov ebx,[eax+8]
+  cmp ebx,0x80000002
+  jne code5
+  mov ebx,[eax]
+  mov [pCheckTools],ebx
+code5:
+  pop ebx
+@@:
+  mov eax,[eax]
+  sar ecx,1F
+  jmp return5
+
+CheckTools:
+  jmp newmem5
+return5:
+
+
+[DISABLE]
+
+BhvAssassin:
+  db 8B 82 E8 00 00 00
+
+unregistersymbol(BhvAssassin)
+dealloc(newmem)
+
+// collecting pointers for Tools...
+CheckTools:
+  db 8B 00 C1 F9 1F
+
+unregistersymbol(CheckTools)
+dealloc(newmem5)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: "AC4BFSP_Win.exe"+18F93C1
+
+"AC4BFSP_Win.exe"+18F93AC: CC                       -  int 3
+"AC4BFSP_Win.exe"+18F93AD: CC                       -  int 3
+"AC4BFSP_Win.exe"+18F93AE: CC                       -  int 3
+"AC4BFSP_Win.exe"+18F93AF: CC                       -  int 3
+"AC4BFSP_Win.exe"+18F93B0: 55                       -  push ebp
+"AC4BFSP_Win.exe"+18F93B1: 8B EC                    -  mov ebp,esp
+"AC4BFSP_Win.exe"+18F93B3: 83 EC 18                 -  sub esp,18
+"AC4BFSP_Win.exe"+18F93B6: 8B 01                    -  mov eax,[ecx]
+"AC4BFSP_Win.exe"+18F93B8: 8B 88 08 01 00 00        -  mov ecx,[eax+00000108]
+"AC4BFSP_Win.exe"+18F93BE: 8B 51 04                 -  mov edx,[ecx+04]
+// ---------- INJECTING HERE ----------
+"AC4BFSP_Win.exe"+18F93C1: 8B 82 E8 00 00 00        -  mov eax,[edx+000000E8]
+// ---------- DONE INJECTING  ----------
+"AC4BFSP_Win.exe"+18F93C7: 8B 48 1C                 -  mov ecx,[eax+1C]
+"AC4BFSP_Win.exe"+18F93CA: 53                       -  push ebx
+"AC4BFSP_Win.exe"+18F93CB: 8D 55 F8                 -  lea edx,[ebp-08]
+"AC4BFSP_Win.exe"+18F93CE: 89 4D F4                 -  mov [ebp-0C],ecx
+"AC4BFSP_Win.exe"+18F93D1: 33 DB                    -  xor ebx,ebx
+"AC4BFSP_Win.exe"+18F93D3: 52                       -  push edx
+"AC4BFSP_Win.exe"+18F93D4: 8D 4D F4                 -  lea ecx,[ebp-0C]
+"AC4BFSP_Win.exe"+18F93D7: 89 5D F8                 -  mov [ebp-08],ebx
+"AC4BFSP_Win.exe"+18F93DA: E8 71 87 AA FE           -  call AC4BFSP_Win.exe+3A1B50
+"AC4BFSP_Win.exe"+18F93DF: 39 5D F8                 -  cmp [ebp-08],ebx
+}
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: "AC4BFSP_CN_Win.exe"+C6765B
+
+"AC4BFSP_CN_Win.exe"+C67643: 51                    -  push ecx
+"AC4BFSP_CN_Win.exe"+C67644: 53                    -  push ebx
+"AC4BFSP_CN_Win.exe"+C67645: C7 45 FC 00 00 00 00  -  mov [ebp-04],00000000
+"AC4BFSP_CN_Win.exe"+C6764C: 8B 41 30              -  mov eax,[ecx+30]
+"AC4BFSP_CN_Win.exe"+C6764F: 56                    -  push esi
+"AC4BFSP_CN_Win.exe"+C67650: 57                    -  push edi
+"AC4BFSP_CN_Win.exe"+C67651: 85 C0                 -  test eax,eax
+"AC4BFSP_CN_Win.exe"+C67653: 74 28                 -  je AC4BFSP_CN_Win.exe+C6767D
+"AC4BFSP_CN_Win.exe"+C67655: 8B 40 04              -  mov eax,[eax+04]
+"AC4BFSP_CN_Win.exe"+C67658: 8B 48 08              -  mov ecx,[eax+08]
+// ---------- INJECTING HERE ----------
+"AC4BFSP_CN_Win.exe"+C6765B: 8B 00                 -  mov eax,[eax]
+"AC4BFSP_CN_Win.exe"+C6765D: C1 F9 1F              -  sar ecx,1F
+// ---------- DONE INJECTING  ----------
+"AC4BFSP_CN_Win.exe"+C67660: 23 C1                 -  and eax,ecx
+"AC4BFSP_CN_Win.exe"+C67662: 74 19                 -  je AC4BFSP_CN_Win.exe+C6767D
+"AC4BFSP_CN_Win.exe"+C67664: 8B 70 08              -  mov esi,[eax+08]
+"AC4BFSP_CN_Win.exe"+C67667: BB 01 00 00 00        -  mov ebx,00000001
+"AC4BFSP_CN_Win.exe"+C6766C: 89 75 FC              -  mov [ebp-04],esi
+"AC4BFSP_CN_Win.exe"+C6766F: 8D 46 04              -  lea eax,[esi+04]
+"AC4BFSP_CN_Win.exe"+C67672: 8B CB                 -  mov ecx,ebx
+"AC4BFSP_CN_Win.exe"+C67674: F0 0F C1 08           - lock  xadd [eax],ecx
+"AC4BFSP_CN_Win.exe"+C67678: 8B 4D FC              -  mov ecx,[ebp-04]
+"AC4BFSP_CN_Win.exe"+C6767B: EB 10                 -  jmp AC4BFSP_CN_Win.exe+C6768D
+}
+
+
