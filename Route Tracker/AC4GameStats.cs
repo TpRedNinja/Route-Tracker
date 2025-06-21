@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.DataFormats;
 
 namespace Route_Tracker
 {
@@ -99,6 +100,30 @@ namespace Route_Tracker
         private const int TavernEndOffset = 0x3228;
 
         // ==========FORMAL COMMENT=========
+        // Memory offsets for resource expenditure tracking
+        // These point to counters that track total resources spent
+        // ==========MY NOTES==============
+        // These track how much money, wood, and metal have been spent
+        // Help detect specific upgrade purchases based on resource use patterns
+        private const int RESOURCES_FIRST_OFFSET = 0x104;
+        private readonly int[] moneySpentOffsets = [0xB0, 0xC, 0x58, 0x26C];
+        private readonly int[] woodSpentOffsets = [0xA0, 0x3C, 0x80, 0x10C];
+        private readonly int[] metalSpentOffsets = [0xB8, 0x4, 0x28, 0xAC];
+
+        // Base address for resource tracking
+        private readonly nint resourcesBaseAddress;
+
+        // Fields for tracking resources and upgrade progress
+        private int lastMoneySpent = 0;
+        private int lastWoodSpent = 0;
+        private int lastMetalSpent = 0;
+        private int lastHeroUpgradeValue = 0;
+        private int totalUpgrades = 0;
+
+        // Upgrade tracking - each entry corresponds to upgrades in the route
+        private readonly bool[] upgradePurchased = new bool[38]; // 38 total upgrades in the route
+
+        // ==========FORMAL COMMENT=========
         // Initializes a new game statistics tracker for Assassin's Creed 4
         // Configures memory access and calculates the base address for collectibles
         // ==========MY NOTES==============
@@ -108,6 +133,7 @@ namespace Route_Tracker
     : base(processHandle, baseAddress)
         {
             this.collectiblesBaseAddress = (nint)baseAddress + 0x026BEAC0;
+            this.resourcesBaseAddress = (nint)baseAddress + 0x00E88810;
         }
 
         #region Public Methods
@@ -142,9 +168,18 @@ namespace Route_Tracker
             int music = ReadCollectible(MusicThirdOffset);
             int taverns = CountCollectibles(TavernStartOffset, TavernEndOffset);
             int totalChests = CountCollectibles(ChestStartOffset, ChestEndOffset);
+            int heroupgrades = ReadCollectible(HeroUpgradeThirdOffset);
+
+            // Read resource spent values
+            int moneySpent = ReadResourceSpent(moneySpentOffsets);
+            int woodSpent = ReadResourceSpent(woodSpentOffsets);
+            int metalSpent = ReadResourceSpent(metalSpentOffsets);
 
             // Detect percentage-based activities
             HandlePercentageCases(percentFloat, loading);
+
+            // Detect upgrades using the resource values
+            HandleUpgradeCases(heroupgrades, moneySpent, woodSpent, metalSpent);
 
             // Return all the stats (including the basic ones that we got from memory)
             return (percent, percentFloat, viewpoints, myan, treasure, fragments, assassin, naval,
@@ -163,9 +198,56 @@ namespace Route_Tracker
         {
             return (completedStoryMissions, completedTemplarHunts, defeatedLegendaryShips);
         }
+
+        // ==========FORMAL COMMENT=========
+        // Returns the total number of upgrades purchased
+        // Used by the route tracker to mark completed upgrades
+        // ==========MY NOTES==============
+        // Exposes how many total upgrades have been purchased
+        // UI uses this to check off items in the route
+        public int GetUpgradeCount()
+        {
+            return totalUpgrades;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Returns details about which specific upgrades have been purchased
+        // Provides upgrade-by-upgrade tracking for the route
+        // ==========MY NOTES==============
+        // More detailed than just a counter, shows exactly which upgrades are done
+        // Helps track progress through the specific upgrade path
+        public bool[] GetPurchasedUpgrades()
+        {
+            return upgradePurchased;
+        }
+
         #endregion
 
         #region Private Helper Methods
+
+        // ==========FORMAL COMMENT=========
+        // Helper method to read resource expenditure values
+        // Follows pointer paths to track spent resources
+        // ==========MY NOTES==============
+        // Similar to ReadCollectible but for resources spent
+        // Combines the shared first offset with resource-specific offsets
+        private int ReadResourceSpent(int[] uniqueOffsets)
+        {
+            // Combine the shared first offset with resource-specific offsets
+            int[] fullOffsets = new int[uniqueOffsets.Length + 1];
+            fullOffsets[0] = RESOURCES_FIRST_OFFSET;
+            Array.Copy(uniqueOffsets, 0, fullOffsets, 1, uniqueOffsets.Length);
+
+            try
+            {
+                return Read<int>(resourcesBaseAddress, fullOffsets);
+            }
+            catch (Exception)
+            {
+                return 0; // Return 0 if reading fails
+            }
+        }
+
         // ==========FORMAL COMMENT=========
         // Helper method to read collectibles using shared memory pattern
         // Uses common base address and offset structure with specific third offset
@@ -242,17 +324,159 @@ namespace Route_Tracker
             }
         }
 
-        // ==========FORMAL COMMENT=========
-        // TO DO: Process ship and character upgrade detection from memory values
-        // Will identify purchased upgrades to track progression through the upgrade tree
-        // Will require additional memory pointers for ship and character stats
-        // ==========MY NOTES==============
-        // TO DO: Will track ship and Edward's upgrades when purchased
-        // Need to find memory addresses for all the different upgrade types
-        // Will help track which improvements have been purchased during a run
-        private void HandleUpgradeCases()
+        // Implement HandleUpgradeCases:
+        private void HandleUpgradeCases(int currentHeroUpgrade, int moneySpent, int woodSpent, int metalSpent)
         {
-            //for future use when pointers needed are added
+            // Debug info
+            if (moneySpent != lastMoneySpent || woodSpent != lastWoodSpent || metalSpent != lastMetalSpent)
+            {
+                Debug.WriteLine($"Resource changes - Money: {moneySpent - lastMoneySpent}, " +
+                                $"Wood: {woodSpent - lastWoodSpent}, Metal: {metalSpent - lastMetalSpent}");
+            }
+
+            // First call - establish baseline
+            if (lastMoneySpent == 0)
+            {
+                lastMoneySpent = moneySpent;
+                lastWoodSpent = woodSpent;
+                lastMetalSpent = metalSpent;
+                lastHeroUpgradeValue = currentHeroUpgrade;
+                return;
+            }
+
+            // Detect hero upgrades
+            if (currentHeroUpgrade > lastHeroUpgradeValue)
+            {
+                int newUpgrades = currentHeroUpgrade - lastHeroUpgradeValue;
+
+                // Mark upgrades based on hero upgrade number
+                // Using the upgrade list from upgrades.txt
+                for (int i = 0; i < newUpgrades && lastHeroUpgradeValue + i < 8; i++)
+                {
+                    int upgradeIndex = -1;
+
+                    // Map hero upgrade value to the correct upgrade in the list
+                    switch (lastHeroUpgradeValue + i + 1) // +1 because hero upgrades start at 1
+                    {
+                        case 1: upgradeIndex = 0; break;  // Pistol Holster 2/Health 1
+                        case 2: upgradeIndex = 1; break;  // Pistol Holster 2/Health 1 (second option)
+                        case 3: upgradeIndex = 27; break; // Pistol Holster 3
+                        case 4: upgradeIndex = 28; break; // Pistol Holster 4
+                        case 5: upgradeIndex = 29; break; // Smoke Bomb Pouch 1
+                        case 6: upgradeIndex = 30; break; // Smoke Bomb Pouch 2
+                        case 7: upgradeIndex = 31; break; // Dart Pouch 1
+                        case 8: upgradeIndex = 32; break; // Dart Pouch 2
+                    }
+
+                    if (upgradeIndex >= 0 && upgradeIndex < upgradePurchased.Length && !upgradePurchased[upgradeIndex])
+                    {
+                        upgradePurchased[upgradeIndex] = true;
+                        totalUpgrades++;
+                        Debug.WriteLine($"Hero upgrade detected: {upgradeIndex + 1}");
+                    }
+                }
+
+                lastHeroUpgradeValue = currentHeroUpgrade;
+            }
+
+            // Check for specific resource expenditure patterns
+            int moneyDelta = moneySpent - lastMoneySpent;
+            int woodDelta = woodSpent - lastWoodSpent;
+            int metalDelta = metalSpent - lastMetalSpent;
+
+            // Only process if there's been a change
+            if (moneyDelta > 0 || woodDelta > 0 || metalDelta > 0)
+            {
+                // Check for specific upgrade patterns based on resource costs
+                // Hull 1 (upgrade #3) - 1000 money
+                if (moneyDelta >= 1000 && !upgradePurchased[2])
+                {
+                    upgradePurchased[2] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Hull 1 upgrade");
+                }
+
+                // Round Shot Strength 1 (upgrade #4) - 900 money
+                else if (moneyDelta >= 900 && !upgradePurchased[3])
+                {
+                    upgradePurchased[3] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Round Shot Strength 1 upgrade");
+                }
+
+                // Round Shot Strength 2 (upgrade #5) - 4000 money
+                else if (moneyDelta >= 4000 && !upgradePurchased[4])
+                {
+                    upgradePurchased[4] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Round Shot Strength 2 upgrade");
+                }
+
+                // Mortar 1 (upgrade #6) - 800 money
+                else if (moneyDelta >= 800 && !upgradePurchased[5])
+                {
+                    upgradePurchased[5] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Mortar 1 upgrade");
+                }
+
+                // Heavy Shot 1 (upgrade #7) - 900 money
+                else if (moneyDelta >= 900 && !upgradePurchased[6])
+                {
+                    upgradePurchased[6] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Heavy Shot 1 upgrade");
+                }
+
+                // Heavy Shot 2 (upgrade #8) - 6000 money
+                else if (moneyDelta >= 6000 && !upgradePurchased[7])
+                {
+                    upgradePurchased[7] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Heavy Shot 2 upgrade");
+                }
+
+                // Mortar Storage 1 (upgrade #9) - 800 money
+                else if (moneyDelta >= 800 && !upgradePurchased[8])
+                {
+                    upgradePurchased[8] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Mortar Storage 1 upgrade");
+                }
+
+                // Mortar Storage 2 (upgrade #10) - 2000 money
+                else if (moneyDelta >= 2000 && !upgradePurchased[9])
+                {
+                    upgradePurchased[9] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Mortar Storage 2 upgrade");
+                }
+
+                // Cannons 1 (upgrade #11) - 70 metal
+                else if (metalDelta >= 70 && !upgradePurchased[10])
+                {
+                    upgradePurchased[10] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Cannons 1 upgrade");
+                }
+
+                // Continue with pattern matching for other upgrades...
+                // Round Shot Strength 3 (upgrade #12) - 12000 money
+                else if (moneyDelta >= 12000 && !upgradePurchased[11])
+                {
+                    upgradePurchased[11] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Round Shot Strength 3 upgrade");
+                }
+
+                // Add the remaining upgrade detections following the same pattern
+                // We can add all of them based on the upgrade.txt file
+
+                // Update the last spent values
+                lastMoneySpent = moneySpent;
+                lastWoodSpent = woodSpent;
+                lastMetalSpent = metalSpent;
+            }
         }
         #endregion
     }
