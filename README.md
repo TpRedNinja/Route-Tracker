@@ -14,6 +14,7 @@ Route Tracker is a standalone application that reads game memory in real-time to
 
 - **God of War (2018)**
 - **God of War Ragnarok**
+- **Tomb Raider Reboot Trilogy of games**
 - Additional games to be announced
 
 ## Features
@@ -28,6 +29,11 @@ Route Tracker is a standalone application that reads game memory in real-time to
   - Story Mission completion detection
   - Templar Hunt tracking
   - Legendary Ship battles
+
+- **Upgrades Progress** (still developing)
+  - Buying Weapons
+  - Buying Ship upgrades
+  - Buying hero upgrades
 
 ### Important Notes
 
