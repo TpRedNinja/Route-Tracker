@@ -647,7 +647,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>708</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -660,7 +660,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>99C</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -686,7 +686,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>76C</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -720,7 +720,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>870</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -733,7 +733,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>974</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -746,7 +746,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>6B8</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -767,7 +767,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>780</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -780,7 +780,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>A28</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -793,7 +793,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>820</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -853,7 +853,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>6F4</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -866,7 +866,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>67C</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -887,7 +887,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>960</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -900,7 +900,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>7A8</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -926,7 +926,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>6E0</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -947,7 +947,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>9B0</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -973,7 +973,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Offsets>
                 <Offset>18</Offset>
                 <Offset>924</Offset>
-                <Offset>2BC</Offset>
+                <Offset>8BC</Offset>
                 <Offset>2D0</Offset>
               </Offsets>
             </CheatEntry>
@@ -2408,7 +2408,7 @@ LuaCall(cycleFullCompact(nil,false))
                     <Element Offset="656" Vartype="Pointer" Bytesize="4" OffsetHex="00000290" DisplayMethod="unsigned integer"/>
                     <Element Offset="660" Vartype="4 Bytes" Bytesize="4" RLECount="4" OffsetHex="00000294" DisplayMethod="unsigned integer"/>
                     <Element Offset="676" Vartype="Pointer" Bytesize="4" RLECount="6" OffsetHex="000002A4" DisplayMethod="unsigned integer"/>
-                    <Element Offset="700" Vartype="4 Bytes" Bytesize="4" RLECount="3" OffsetHex="000002BC" DisplayMethod="unsigned integer"/>
+                    <Element Offset="700" Vartype="4 Bytes" Bytesize="4" RLECount="3" OffsetHex="000008BC" DisplayMethod="unsigned integer"/>
                     <Element Offset="712" Vartype="Pointer" Bytesize="4" OffsetHex="000002C8" DisplayMethod="unsigned integer"/>
                     <Element Offset="716" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000002CC" DisplayMethod="unsigned integer"/>
                     <Element Offset="724" Vartype="Pointer" Bytesize="4" RLECount="3" OffsetHex="000002D4" DisplayMethod="unsigned integer"/>
@@ -2778,7 +2778,7 @@ LuaCall(cycleFullCompact(nil,false))
                     <Element Offset="664" Vartype="4 Bytes" Bytesize="4" RLECount="6" OffsetHex="00000298" DisplayMethod="unsigned integer"/>
                     <Element Offset="688" Vartype="Pointer" Bytesize="4" OffsetHex="000002B0" DisplayMethod="unsigned integer"/>
                     <Element Offset="692" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000002B4" DisplayMethod="unsigned integer"/>
-                    <Element Offset="700" Vartype="Pointer" Bytesize="4" RLECount="2" OffsetHex="000002BC" DisplayMethod="unsigned integer"/>
+                    <Element Offset="700" Vartype="Pointer" Bytesize="4" RLECount="2" OffsetHex="000008BC" DisplayMethod="unsigned integer"/>
                     <Element Offset="708" Vartype="4 Bytes" Bytesize="4" RLECount="7" OffsetHex="000002C4" DisplayMethod="unsigned integer"/>
                     <Element Offset="736" Vartype="Pointer" Bytesize="4" RLECount="3" OffsetHex="000002E0" DisplayMethod="unsigned integer"/>
                     <Element Offset="748" Vartype="4 Bytes" Bytesize="4" OffsetHex="000002EC" DisplayMethod="unsigned integer"/>
@@ -4610,7 +4610,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Element Offset="8876" Vartype="Pointer" Bytesize="4" OffsetHex="000022AC" DisplayMethod="unsigned integer"/>
               <Element Offset="8880" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022B0" DisplayMethod="unsigned integer"/>
               <Element Offset="8888" Vartype="Pointer" Bytesize="4" OffsetHex="000022B8" DisplayMethod="unsigned integer"/>
-              <Element Offset="8892" Vartype="4 Bytes" Bytesize="4" OffsetHex="000022BC" DisplayMethod="hexadecimal"/>
+              <Element Offset="8892" Vartype="4 Bytes" Bytesize="4" OffsetHex="000028BC" DisplayMethod="hexadecimal"/>
               <Element Offset="8896" Vartype="4 Bytes" Bytesize="4" RLECount="10" OffsetHex="000022C0" DisplayMethod="unsigned integer"/>
               <Element Offset="8936" Vartype="Pointer" Bytesize="4" OffsetHex="000022E8" DisplayMethod="unsigned integer"/>
               <Element Offset="8940" Vartype="4 Bytes" Bytesize="4" OffsetHex="000022EC" DisplayMethod="hexadecimal"/>
@@ -5723,7 +5723,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Element Offset="8868" Vartype="4 Bytes" Bytesize="4" RLECount="4" OffsetHex="000022A4" DisplayMethod="hexadecimal"/>
               <Element Offset="8884" Vartype="Float" Bytesize="4" OffsetHex="000022B4" DisplayMethod="unsigned integer"/>
               <Element Offset="8888" Vartype="String" Bytesize="4" OffsetHex="000022B8" DisplayMethod="unsigned integer"/>
-              <Element Offset="8892" Vartype="Pointer" Bytesize="4" OffsetHex="000022BC" DisplayMethod="unsigned integer"/>
+              <Element Offset="8892" Vartype="Pointer" Bytesize="4" OffsetHex="000028BC" DisplayMethod="unsigned integer"/>
               <Element Offset="8896" Vartype="4 Bytes" Bytesize="4" OffsetHex="000022C0" DisplayMethod="hexadecimal"/>
               <Element Offset="8900" Vartype="String" Bytesize="4" OffsetHex="000022C4" DisplayMethod="unsigned integer"/>
               <Element Offset="8904" Vartype="Pointer" Bytesize="4" OffsetHex="000022C8" DisplayMethod="unsigned integer"/>
@@ -6533,8 +6533,8 @@ LuaCall(cycleFullCompact(nil,false))
         <Element Offset="692" Vartype="Pointer" Bytesize="4" RLECount="2" OffsetHex="000002B4" DisplayMethod="unsigned integer"/>
         <Element Offset="696" Vartype="Pointer" Bytesize="4" OffsetHex="000002B8" DisplayMethod="unsigned integer"/>
         <Element Offset="696" Vartype="Pointer" Bytesize="4" RLECount="2" OffsetHex="000002B8" DisplayMethod="unsigned integer"/>
-        <Element Offset="700" Vartype="Pointer" Bytesize="4" OffsetHex="000002BC" DisplayMethod="unsigned integer"/>
-        <Element Offset="700" Vartype="Pointer" Bytesize="4" OffsetHex="000002BC" DisplayMethod="unsigned integer"/>
+        <Element Offset="700" Vartype="Pointer" Bytesize="4" OffsetHex="000008BC" DisplayMethod="unsigned integer"/>
+        <Element Offset="700" Vartype="Pointer" Bytesize="4" OffsetHex="000008BC" DisplayMethod="unsigned integer"/>
         <Element Offset="704" Vartype="4 Bytes" Bytesize="4" OffsetHex="000002C0" DisplayMethod="unsigned integer"/>
         <Element Offset="704" Vartype="4 Bytes" Bytesize="4" OffsetHex="000002C0" DisplayMethod="unsigned integer"/>
         <Element Offset="704" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000002C0" DisplayMethod="unsigned integer"/>
@@ -8643,7 +8643,7 @@ LuaCall(cycleFullCompact(nil,false))
         <Element Offset="4784" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000012B0" DisplayMethod="hexadecimal"/>
         <Element Offset="4788" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000012B4" DisplayMethod="hexadecimal"/>
         <Element Offset="4792" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000012B8" DisplayMethod="hexadecimal"/>
-        <Element Offset="4796" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000012BC" DisplayMethod="hexadecimal"/>
+        <Element Offset="4796" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000018BC" DisplayMethod="hexadecimal"/>
         <Element Offset="4800" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000012C0" DisplayMethod="hexadecimal"/>
         <Element Offset="4804" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000012C4" DisplayMethod="hexadecimal"/>
         <Element Offset="4808" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000012C8" DisplayMethod="hexadecimal"/>
@@ -10020,7 +10020,7 @@ LuaCall(cycleFullCompact(nil,false))
         <Element Offset="8880" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022B0" DisplayMethod="hexadecimal"/>
         <Element Offset="8884" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022B4" DisplayMethod="hexadecimal"/>
         <Element Offset="8888" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022B8" DisplayMethod="hexadecimal"/>
-        <Element Offset="8892" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022BC" DisplayMethod="hexadecimal"/>
+        <Element Offset="8892" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000028BC" DisplayMethod="hexadecimal"/>
         <Element Offset="8896" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022C0" DisplayMethod="hexadecimal"/>
         <Element Offset="8900" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022C4" DisplayMethod="hexadecimal"/>
         <Element Offset="8904" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022C8" DisplayMethod="hexadecimal"/>
@@ -10548,7 +10548,7 @@ LuaCall(cycleFullCompact(nil,false))
               <Element Offset="688" Vartype="Pointer" Bytesize="4" OffsetHex="000002B0" DisplayMethod="unsigned integer"/>
               <Element Offset="692" Vartype="4 Bytes" Bytesize="4" OffsetHex="000002B4" DisplayMethod="hexadecimal"/>
               <Element Offset="696" Vartype="4 Bytes" Bytesize="4" OffsetHex="000002B8" DisplayMethod="unsigned integer"/>
-              <Element Offset="700" Vartype="Pointer" Bytesize="4" RLECount="4" OffsetHex="000002BC" DisplayMethod="unsigned integer"/>
+              <Element Offset="700" Vartype="Pointer" Bytesize="4" RLECount="4" OffsetHex="000008BC" DisplayMethod="unsigned integer"/>
               <Element Offset="716" Vartype="4 Bytes" Bytesize="4" OffsetHex="000002CC" DisplayMethod="unsigned integer"/>
               <Element Offset="720" Vartype="4 Bytes" Bytesize="4" OffsetHex="000002D0" DisplayMethod="hexadecimal"/>
               <Element Offset="724" Vartype="Pointer" Bytesize="4" RLECount="2" OffsetHex="000002D4" DisplayMethod="unsigned integer"/>
@@ -11759,7 +11759,7 @@ LuaCall(cycleFullCompact(nil,false))
         <Element Offset="8873" Vartype="Byte" Bytesize="1" RLECount="3" OffsetHex="000022A9" DisplayMethod="unsigned integer"/>
         <Element Offset="8876" Vartype="Pointer" Bytesize="4" RLECount="2" OffsetHex="000022AC" DisplayMethod="unsigned integer"/>
         <Element Offset="8884" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022B4" DisplayMethod="unsigned integer"/>
-        <Element Offset="8892" Vartype="String" Bytesize="4" OffsetHex="000022BC" DisplayMethod="unsigned integer"/>
+        <Element Offset="8892" Vartype="String" Bytesize="4" OffsetHex="000028BC" DisplayMethod="unsigned integer"/>
         <Element Offset="8896" Vartype="Pointer" Bytesize="4" RLECount="3" OffsetHex="000022C0" DisplayMethod="unsigned integer"/>
         <Element Offset="8908" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="000022CC" DisplayMethod="unsigned integer"/>
         <Element Offset="8916" Vartype="String" Bytesize="5" OffsetHex="000022D4" DisplayMethod="unsigned integer"/>
