@@ -70,7 +70,8 @@ namespace Route_Tracker
         private const int TreasureThirdOffset = -0xBB8;
         private const int FragmentsThirdOffset = -0x1B58;
         private const int AssassinThirdOffset = -0xDD4;
-        private const int NavalThirdOffset = -0x19F0;
+        private const int NavalThirdOffset = 0x1950;
+        private const int HeroUpgradeThirdOffset = -0x19F0; // Not used yet, but defined for future use
         private const int LettersThirdOffset = -0x04EC;
         private const int ManuscriptsThirdOffset = -0x334;
         private const int MusicThirdOffset = 0x424;
