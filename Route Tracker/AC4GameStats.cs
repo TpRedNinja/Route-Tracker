@@ -460,7 +460,6 @@ namespace Route_Tracker
                     Debug.WriteLine("Detected Cannons 1 upgrade");
                 }
 
-                // Continue with pattern matching for other upgrades...
                 // Round Shot Strength 3 (upgrade #12) - 12000 money
                 else if (moneyDelta >= 12000 && !upgradePurchased[11])
                 {
@@ -469,8 +468,167 @@ namespace Route_Tracker
                     Debug.WriteLine("Detected Round Shot Strength 3 upgrade");
                 }
 
-                // Add the remaining upgrade detections following the same pattern
-                // We can add all of them based on the upgrade.txt file
+                // Chain Shot Strength 1 (upgrade #13) - 2500 money
+                else if (moneyDelta >= 2500 && !upgradePurchased[12])
+                {
+                    upgradePurchased[12] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Chain Shot Strength 1 upgrade");
+                }
+
+                // Chain Shot Strength 2 (upgrade #14) - 6000 money
+                else if (moneyDelta >= 6000 && !upgradePurchased[13])
+                {
+                    upgradePurchased[13] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Chain Shot Strength 2 upgrade");
+                }
+
+                // Fire Barrel Strength 1 (upgrade #15) - 3000 money
+                else if (moneyDelta >= 3000 && !upgradePurchased[14])
+                {
+                    upgradePurchased[14] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Fire Barrel Strength 1 upgrade");
+                }
+
+                // Heavy Shot Storage 1 (upgrade #16) - 500 money
+                else if (moneyDelta >= 500 && !upgradePurchased[15])
+                {
+                    upgradePurchased[15] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Heavy Shot Storage 1 upgrade");
+                }
+
+                // Heavy Shot Storage 2 (upgrade #17) - 1500 money
+                else if (moneyDelta >= 1500 && !upgradePurchased[16])
+                {
+                    upgradePurchased[16] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Heavy Shot Storage 2 upgrade");
+                }
+
+                // Mortar 2 (upgrade #18) - 3500 money, 200 metal
+                else if (moneyDelta >= 3500 && metalDelta >= 200 && !upgradePurchased[17])
+                {
+                    upgradePurchased[17] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Mortar 2 upgrade");
+                }
+
+                // Swivel Strength 1 (upgrade #19) - 700 money
+                else if (moneyDelta >= 700 && !upgradePurchased[18])
+                {
+                    upgradePurchased[18] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Swivel Strength 1 upgrade");
+                }
+
+                // Officers Rapiers (upgrade #20) - 14000 money
+                else if (moneyDelta >= 14000 && !upgradePurchased[19])
+                {
+                    upgradePurchased[19] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Officers Rapiers upgrade");
+                }
+
+                // Cannon-Barrel Pistols (upgrade #21) - 9000 money
+                else if (moneyDelta >= 9000 && !upgradePurchased[20])
+                {
+                    upgradePurchased[20] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Cannon-Barrel Pistols upgrade");
+                }
+
+                // Rabbit Pelt (upgrade #22) - 1400 money (700 × 2)
+                else if (moneyDelta >= 1400 && !upgradePurchased[21])
+                {
+                    upgradePurchased[21] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Rabbit Pelt upgrade");
+                }
+
+                // Hutia Pelt (upgrade #23) - 1700 money (850 × 2)
+                else if (moneyDelta >= 1700 && !upgradePurchased[22])
+                {
+                    upgradePurchased[22] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Hutia Pelt upgrade");
+                }
+
+                // Howler Monkey Skin (upgrade #24) - 2000 money (1000 × 2)
+                else if (moneyDelta >= 2000 && !upgradePurchased[23])
+                {
+                    upgradePurchased[23] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Howler Monkey Skin upgrade");
+                }
+
+                // Crocodile Leather (upgrade #25) - 4000 money (2000 × 2)
+                else if (moneyDelta >= 4000 && !upgradePurchased[24])
+                {
+                    upgradePurchased[24] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Crocodile Leather upgrade");
+                }
+
+                // Killer Whale Skin (upgrade #26) - 6300 money (3150 × 2)
+                else if (moneyDelta >= 6300 && !upgradePurchased[25])
+                {
+                    upgradePurchased[25] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Killer Whale Skin upgrade");
+                }
+
+                // Humpback Whale Skin (upgrade #27) - 7000 money (3500 × 2)
+                else if (moneyDelta >= 7000 && !upgradePurchased[26])
+                {
+                    upgradePurchased[26] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Humpback Whale Skin upgrade");
+                }
+
+                // Note: Hero upgrades #28-33 are handled earlier in the hero upgrade detection section
+
+                // Hull Armor 2 (upgrade #34) - 4000 money, 100 metal, 200 wood
+                else if (moneyDelta >= 4000 && metalDelta >= 100 && woodDelta >= 200 && !upgradePurchased[33])
+                {
+                    upgradePurchased[33] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Hull Armor 2 upgrade");
+                }
+
+                // Diving Bell (upgrade #35) - 5000 money
+                else if (moneyDelta >= 5000 && !upgradePurchased[34])
+                {
+                    upgradePurchased[34] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Diving Bell upgrade");
+                }
+
+                // Mortar Storage 3 (upgrade #36) - 5000 money
+                else if (moneyDelta >= 5000 && !upgradePurchased[35])
+                {
+                    upgradePurchased[35] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Mortar Storage 3 upgrade");
+                }
+
+                // Ram Strength 1 (upgrade #37) - 500 money, 25 wood
+                else if (moneyDelta >= 500 && woodDelta >= 25 && !upgradePurchased[36])
+                {
+                    upgradePurchased[36] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Ram Strength 1 upgrade");
+                }
+
+                // Ram Strength 2 (upgrade #38) - 5000 money, 150 metal, 250 wood
+                else if (moneyDelta >= 5000 && metalDelta >= 150 && woodDelta >= 250 && !upgradePurchased[37])
+                {
+                    upgradePurchased[37] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Ram Strength 2 upgrade");
+                }
 
                 // Update the last spent values
                 lastMoneySpent = moneySpent;
