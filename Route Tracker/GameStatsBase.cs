@@ -57,12 +57,11 @@ namespace Route_Tracker
     // The core class that powers the entire tracking functionality
     public abstract unsafe class GameStatsBase : IGameStats
     {
-
-        // Update constructor to accept architecture info
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290: Use primary constructure",
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
         Justification = "because i said so")]
+        // Update constructor to accept architecture info
         public GameStatsBase(IntPtr processHandle, IntPtr baseAddress)
         {
             this.processHandle = processHandle;
@@ -78,6 +77,20 @@ namespace Route_Tracker
         private bool _isUpdating = false;
         private readonly int _updateIntervalMs = 2500; // Default update interval of 1 second
         private System.Threading.Timer? _updateTimer; // Timer that controls the periodic stat updates
+        
+        // for updating stats?
+        private readonly Dictionary<string, (DateTime Timestamp, object Value)> _memoryCache = [];
+        private readonly TimeSpan _cacheDuration = TimeSpan.FromMilliseconds(500); // Half-second cache
+
+        //for performance optimizations
+        private readonly int _activeUpdateIntervalMs = 500;  // Fast updates during active gameplay
+        private readonly int _idleUpdateIntervalMs = 2500;   // Slower updates when idle
+        private DateTime _lastActivityTime = DateTime.Now;
+        private bool _inActiveGameplay = true;
+        private (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,
+            int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music,
+            int Forts, int Taverns, int TotalChests) _previousStats;
+
 
         // Event that fires whenever game statistics change
         // UI components can subscribe to this to get real-time updates
@@ -173,6 +186,42 @@ namespace Route_Tracker
         }
 
         // ==========FORMAL COMMENT=========
+        // Detects changes in game statistics compared to previous readings
+        // Updates the stored previous state and returns whether changes were detected
+        // Used to identify meaningful stat changes that indicate active gameplay
+        // ==========MY NOTES==============
+        // Compares new stats with previous ones to see if anything changed
+        // Stores the current stats for next time
+        // Returns true if at least one value changed
+        private bool HasStatsChanged((int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,
+    int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music,
+    int Forts, int Taverns, int TotalChests) currentStats)
+        {
+            bool changed = currentStats != _previousStats;
+            _previousStats = currentStats;
+            return changed;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Adjusts update frequency based on recent player activity
+        // Increases polling rate during active gameplay and reduces it during idle periods
+        // Optimizes resource usage while maintaining responsiveness
+        // ==========MY NOTES==============
+        // Smart timer that speeds up when the player is active
+        // Checks if anything has changed in the last 10 seconds
+        // Saves resources when nothing is happening in the game
+        private void UpdateAdaptiveTimer()
+        {
+            bool shouldBeActive = (DateTime.Now - _lastActivityTime).TotalSeconds < 10;
+
+            if (shouldBeActive != _inActiveGameplay)
+            {
+                _inActiveGameplay = shouldBeActive;
+                _updateTimer?.Change(0, _inActiveGameplay ? _activeUpdateIntervalMs : _idleUpdateIntervalMs);
+            }
+        }
+
+        // ==========FORMAL COMMENT=========
         // Callback method invoked by the update timer at regular intervals
         // Reads current game statistics and raises the StatsUpdated event
         // Includes error handling to prevent timer disruption
@@ -187,13 +236,22 @@ namespace Route_Tracker
                 if (!_isUpdating || _updateTimer == null)
                     return;
 
-                (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure, int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music, int Forts, int Taverns, int TotalChests) = GetStats(); // This now calls the derived class implementation
+                var stats = GetStats();
+
+                // If we detect changes, reset activity timer
+                if (HasStatsChanged(stats))
+                {
+                    _lastActivityTime = DateTime.Now;
+                }
+
+                // Update timer frequency based on activity
+                UpdateAdaptiveTimer();
 
                 StatsUpdated?.Invoke(this, new StatsUpdatedEventArgs(
-                    Percent, PercentFloat, Viewpoints, Myan,
-                    Treasure, Fragments, Assassin, Naval,
-                    Letters, Manuscripts, Music, Forts,
-                    Taverns, TotalChests));
+                    stats.Percent, stats.PercentFloat, stats.Viewpoints, stats.Myan,
+                    stats.Treasure, stats.Fragments, stats.Assassin, stats.Naval,
+                    stats.Letters, stats.Manuscripts, stats.Music, stats.Forts,
+                    stats.Taverns, stats.TotalChests));
             }
             catch (Exception ex)
             {
@@ -224,6 +282,81 @@ namespace Route_Tracker
         }
         #endregion
 
+        #region Memory Cache Management
+        // ==========FORMAL COMMENT=========
+        // Reads memory values with caching to reduce redundant memory access
+        // Implements a short-term cache for frequently accessed memory addresses
+        // Returns cached values when available to improve performance
+        // ==========MY NOTES==============
+        // This is like Read<T> but faster since it avoids repeated reads
+        // Stores values for half a second before getting fresh ones
+        // Great for reducing overhead when checking stats rapidly
+        protected T ReadWithCache<T>(string cacheKey, nint baseAddress, int[] offsets) where T : unmanaged
+        {
+            // Check if we have a recent cached value
+            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
+                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
+                cachedData.Value is T value)
+            {
+                return value;
+            }
+
+            // Read fresh value from memory
+            T result = Read<T>(baseAddress, offsets);
+            _memoryCache[cacheKey] = (DateTime.Now, result);
+            return result;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Attempts to retrieve a cached value without accessing memory
+        // Returns true and outputs the value if a valid cache entry exists
+        // Prevents unnecessary memory reads when values haven't changed
+        // ==========MY NOTES==============
+        // Quick way to check if we already have the value cached
+        // Returns false if cache miss, true if hit
+        // Avoids memory reads completely when we have recent data
+        protected bool TryGetCachedValue<T>(string cacheKey, out T value) where T : unmanaged
+        {
+            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
+                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
+                cachedData.Value is T typedValue)
+            {
+                value = typedValue;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Manually stores a value in the memory cache
+        // Associates the value with a timestamp for cache expiration
+        // Useful for pre-populating cache with known values
+        // ==========MY NOTES==============
+        // Force a value into the cache
+        // Useful when I already have a value and don't want to re-read it
+        // Helps avoid redundant memory access
+        protected void StoreInCache(string cacheKey, object value)
+        {
+            _memoryCache[cacheKey] = (DateTime.Now, value);
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Invalidates all cached memory values
+        // Forces fresh reads from game memory on next access
+        // Useful when game state changes significantly
+        // ==========MY NOTES==============
+        // Wipes out all cached values
+        // Use when connecting to a new game or when cache might be wrong
+        // Forces everything to be re-read from memory
+        public void ClearCache()
+        {
+            _memoryCache.Clear();
+        }
+        #endregion
+
+        #region whatever the heck this is
         // ==========FORMAL COMMENT=========
         // Windows API import for reading data from the memory of another process
         // Required for accessing the game's memory space
@@ -243,7 +376,7 @@ namespace Route_Tracker
             nint nSize,
             out nint lpNumberOfBytesRead);
     }
-
+    #endregion
 
 }
 

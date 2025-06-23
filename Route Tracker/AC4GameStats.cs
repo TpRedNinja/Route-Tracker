@@ -150,7 +150,81 @@ namespace Route_Tracker
             this.resourcesBaseAddress = (nint)baseAddress + 0x00E88810;
         }
 
-        #region Public Methods
+        #region Memory Reading Methods
+
+        // ==========FORMAL COMMENT=========
+        // Helper method to read collectibles using shared memory pattern
+        // Uses common base address and offset structure with specific third offset
+        // ==========MY NOTES==============
+        // Simplifies reading collectibles that follow the standard pattern
+        // Makes the code cleaner by removing duplicated memory reading logic
+        private int ReadCollectible(int thirdOffset)
+        {
+            string cacheKey = $"collectible_{thirdOffset}";
+            return ReadWithCache<int>(cacheKey, collectiblesBaseAddress, [FirstOffset, SecondOffset, thirdOffset, LastOffset]);
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Helper method to read resource expenditure values
+        // Follows pointer paths to track spent resources
+        // ==========MY NOTES==============
+        // Similar to ReadCollectible but for resources spent
+        // Combines the shared first offset with resource-specific offsets
+        private int ReadResourceSpent(int[] uniqueOffsets)
+        {
+            string cacheKey = $"resource_{string.Join("_", uniqueOffsets)}";
+
+            // Try to get from cache
+            if (TryGetCachedValue(cacheKey, out int cachedValue))
+            {
+                return cachedValue;
+            }
+
+            // Combine the shared first offset with resource-specific offsets
+            int[] fullOffsets = new int[uniqueOffsets.Length + 1];
+            fullOffsets[0] = RESOURCES_FIRST_OFFSET;
+            Array.Copy(uniqueOffsets, 0, fullOffsets, 1, uniqueOffsets.Length);
+
+            try
+            {
+                // Read and cache
+                int result = Read<int>(resourcesBaseAddress, fullOffsets);
+                StoreInCache(cacheKey, result);
+                return result;
+            }
+            catch (Exception)
+            {
+                return 0; // Return 0 if reading fails
+            }
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Helper method to count collectibles that are stored as individual flags
+        // Iterates through a range of third offsets and sums their values
+        // ==========MY NOTES==============
+        // Used for things like chests and taverns that have many individual locations
+        // Each location has its own memory address with a predictable pattern
+        private int CountCollectibles(int startOffset, int endOffset)
+        {
+            string cacheKey = $"count_{startOffset}_{endOffset}";
+
+            // Try to get from cache using the base class method
+            if (TryGetCachedValue(cacheKey, out int cachedCount))
+            {
+                return cachedCount;
+            }
+
+            // Count if not in cache
+            int count = 0;
+            for (int thirdOffset = startOffset; thirdOffset <= endOffset; thirdOffset += OffsetStep)
+            {
+                count += ReadCollectible(thirdOffset);
+            }
+
+            // Store in cache
+            StoreInCache(cacheKey, count);
+            return count;
+        }
 
         // ==========FORMAL COMMENT=========
         // Retrieves current game statistics by reading from multiple memory locations
@@ -165,14 +239,14 @@ namespace Route_Tracker
             int Forts, int Taverns, int TotalChests) GetStats()
         {
             // Reading collectibles using existing methods
-            int percent = Read<int>((nint)baseAddress + 0x49D9774, percentPtrOffsets);
-            float percentFloat = Read<float>((nint)baseAddress + 0x049F1EE8, percentFtPtrOffsets);
-            int forts = Read<int>((nint)baseAddress + 0x026C0A28, fortsPtrOffsets);
+            int percent = ReadWithCache<int>("percent",(nint)baseAddress + 0x49D9774, percentPtrOffsets);
+            float percentFloat = ReadWithCache<float>("percentFloat", (nint)baseAddress + 0x049F1EE8, percentFtPtrOffsets);
+            int forts = ReadWithCache<int>("forts", (nint)baseAddress + 0x026C0A28, fortsPtrOffsets);
 
             // for other functions
-            int mainmenu = Read<int>((nint)baseAddress + 0x49D2204, mainMenuPtrOffsets);
-            bool loading = Read<bool>((nint)baseAddress + 0x04A1A6CC, loadingPtrOffsets);
-            int character = Read<int>((nint)baseAddress + 0x23485C0, characterPtrOffsets);
+            int mainmenu = ReadWithCache<int>("mainmenu", (nint)baseAddress + 0x49D2204, mainMenuPtrOffsets);
+            bool loading = ReadWithCache<bool>("loading", (nint)baseAddress + 0x04A1A6CC, loadingPtrOffsets);
+            int character = ReadWithCache<int>("character", (nint)baseAddress + 0x23485C0, characterPtrOffsets);
 
             // Read all other collectibles
             int viewpoints = ReadCollectible(ViewpointsThirdOffset);
@@ -209,101 +283,16 @@ namespace Route_Tracker
             return (percent, percentFloat, viewpoints, myan, treasure, fragments, assassin, naval,
                 letters, manuscripts, music, forts, taverns, totalChests);
         }
-
-        // ==========FORMAL COMMENT=========
-        // Returns the current counters for special activities detected through percentage changes
-        // Provides access to story mission, templar hunt, and legendary ship completion counts
-        // Used by route tracking system to mark these activities as completed
-        // ==========MY NOTES==============
-        // Tells the route tracker how many special activities we've completed
-        // This is how the UI knows when to check off story missions and legendary ships
-        // Returns a tuple with all three counter values at once
-        public (int StoryMissions, int TemplarHunts, int LegendaryShips) GetSpecialActivityCounts()
-        {
-            return (completedStoryMissions, completedTemplarHunts, defeatedLegendaryShips);
-        }
-
-        public (bool IsLoading, bool IsMainMenu) GetGameStatus()
-        {
-            return (isLoading, isMainMenu);
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Returns the total number of upgrades purchased
-        // Used by the route tracker to mark completed upgrades
-        // ==========MY NOTES==============
-        // Exposes how many total upgrades have been purchased
-        // UI uses this to check off items in the route
-        public int GetUpgradeCount()
-        {
-            return totalUpgrades;
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Returns details about which specific upgrades have been purchased
-        // Provides upgrade-by-upgrade tracking for the route
-        // ==========MY NOTES==============
-        // More detailed than just a counter, shows exactly which upgrades are done
-        // Helps track progress through the specific upgrade path
-        public bool[] GetPurchasedUpgrades()
-        {
-            return upgradePurchased;
-        }
-
         #endregion
 
-        #region Private Helper Methods
-
+        #region State Detection Methods
         // ==========FORMAL COMMENT=========
-        // Helper method to read resource expenditure values
-        // Follows pointer paths to track spent resources
+        // Methods that analyze game memory to detect specific events or states
+        // Includes activity detection, upgrade tracking, and game status monitoring
         // ==========MY NOTES==============
-        // Similar to ReadCollectible but for resources spent
-        // Combines the shared first offset with resource-specific offsets
-        private int ReadResourceSpent(int[] uniqueOffsets)
-        {
-            // Combine the shared first offset with resource-specific offsets
-            int[] fullOffsets = new int[uniqueOffsets.Length + 1];
-            fullOffsets[0] = RESOURCES_FIRST_OFFSET;
-            Array.Copy(uniqueOffsets, 0, fullOffsets, 1, uniqueOffsets.Length);
-
-            try
-            {
-                return Read<int>(resourcesBaseAddress, fullOffsets);
-            }
-            catch (Exception)
-            {
-                return 0; // Return 0 if reading fails
-            }
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Helper method to read collectibles using shared memory pattern
-        // Uses common base address and offset structure with specific third offset
-        // ==========MY NOTES==============
-        // Simplifies reading collectibles that follow the standard pattern
-        // Makes the code cleaner by removing duplicated memory reading logic
-        private int ReadCollectible(int thirdOffset)
-        {
-            return Read<int>(collectiblesBaseAddress, [FirstOffset, SecondOffset, thirdOffset, LastOffset]);
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Helper method to count collectibles that are stored as individual flags
-        // Iterates through a range of third offsets and sums their values
-        // ==========MY NOTES==============
-        // Used for things like chests and taverns that have many individual locations
-        // Each location has its own memory address with a predictable pattern
-        private int CountCollectibles(int startOffset, int endOffset)
-        {
-            int count = 0;
-            for (int thirdOffset = startOffset; thirdOffset <= endOffset; thirdOffset += OffsetStep)
-            {
-                count += ReadCollectible(thirdOffset);
-            }
-            return count;
-        }
-
+        // These methods figure out what the player is doing or has done
+        // They watch for changes in memory values that indicate game activities
+        // Used to track progress through the route
         private void DetectModernDayMissions(int character)
         {
             if (character == 1 && character != oldcharacter)
@@ -743,6 +732,49 @@ namespace Route_Tracker
             {
                 isMainMenu = false;
             }
+        }
+        #endregion
+
+        #region Public Stats Interface
+        // ==========FORMAL COMMENT=========
+        // Returns the current counters for special activities detected through percentage changes
+        // Provides access to story mission, templar hunt, and legendary ship completion counts
+        // Used by route tracking system to mark these activities as completed
+        // ==========MY NOTES==============
+        // Tells the route tracker how many special activities we've completed
+        // This is how the UI knows when to check off story missions and legendary ships
+        // Returns a tuple with all three counter values at once
+        public (int StoryMissions, int TemplarHunts, int LegendaryShips) GetSpecialActivityCounts()
+        {
+            return (completedStoryMissions, completedTemplarHunts, defeatedLegendaryShips);
+        }
+
+        public (bool IsLoading, bool IsMainMenu) GetGameStatus()
+        {
+            return (isLoading, isMainMenu);
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Returns the total number of upgrades purchased
+        // Used by the route tracker to mark completed upgrades
+        // ==========MY NOTES==============
+        // Exposes how many total upgrades have been purchased
+        // UI uses this to check off items in the route
+        public int GetUpgradeCount()
+        {
+            Debug.WriteLine("Total Upgrades: " + totalUpgrades);
+            return totalUpgrades;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Returns details about which specific upgrades have been purchased
+        // Provides upgrade-by-upgrade tracking for the route
+        // ==========MY NOTES==============
+        // More detailed than just a counter, shows exactly which upgrades are done
+        // Helps track progress through the specific upgrade path
+        public bool[] GetPurchasedUpgrades()
+        {
+            return upgradePurchased;
         }
         #endregion
     }

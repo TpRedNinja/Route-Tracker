@@ -29,6 +29,11 @@ namespace Route_Tracker
         public string LocationCondition { get; set; } = string.Empty;
         public string? ConditionType { get; set; } // e.g., "Viewpoints", "Myan", etc.
         public int? ConditionValue { get; set; } // The value needed for completion
+        // add unique ID for stable identification
+        public int Id { get; set; }
+
+        // add skipped flag
+        public bool IsSkipped { get; set; }
 
         // Runtime state
         public bool IsCompleted { get; set; } = false;
@@ -37,12 +42,14 @@ namespace Route_Tracker
         Justification = "it breaks everything")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
         Justification = "it breaks everything")]
-        public RouteEntry(string name, string type = "", int condition = 0)
+        public RouteEntry(string name, string type = "", int condition = 0, int id = 0)
         {
             Name = name;
             Type = type;
             Condition = condition;
+            Id = id;
             IsCompleted = false;
+            IsSkipped = false;
         }
 
         // ==========FORMAL COMMENT=========
@@ -57,8 +64,9 @@ namespace Route_Tracker
         {
             get
             {
-                if (!string.IsNullOrEmpty(Coordinates))
-                    return $"{Name} [{Coordinates}]";
+                // If coordinates exist and are not "None", append them to the name in brackets
+                if (!string.IsNullOrEmpty(Coordinates) && !Coordinates.Equals("None", StringComparison.OrdinalIgnoreCase))
+                    return $"{Name}, {Coordinates}";
                 else
                     return Name;
             }

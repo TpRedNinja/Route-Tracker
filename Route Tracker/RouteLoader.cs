@@ -36,24 +36,30 @@ namespace Route_Tracker
                 foreach (string line in File.ReadAllLines(routePath))
                 {
                     string[] parts = line.Split('\t');
-                    if (parts.Length >= 3) // Assuming at least display text, type, condition value
+                    if (parts.Length >= 4) // Now checking for at least 4 columns (including coordinates)
                     {
                         string displayText = parts[0].Trim();
-                        string collectibleType = parts[1].Trim().ToLowerInvariant(); // Convert to lowercase for consistency
+                        string collectibleType = parts[1].Trim().ToLowerInvariant();
 
                         if (int.TryParse(parts[2].Trim(), out int conditionValue))
                         {
                             // Create RouteEntry with proper type and condition
                             RouteEntry entry = new(displayText, collectibleType, conditionValue);
+
+                            // Add coordinates from the fourth column if available
+                            if (parts.Length > 3 && !string.IsNullOrWhiteSpace(parts[3]))
+                            {
+                                entry.Coordinates = parts[3].Trim();
+                            }
+
                             entries.Add(entry);
 
-                            // Debug output to help diagnose issues
-                            Console.WriteLine($"Loaded: {displayText}, Type: {collectibleType}, Condition: {conditionValue}");
+                            // Debug output
+                            Console.WriteLine($"Loaded: {displayText}, Type: {collectibleType}, Condition: {conditionValue}, Coordinates: {entry.Coordinates}");
                         }
                     }
                 }
             }
-
             return entries;
         }
         // ==========FORMAL COMMENT=========
