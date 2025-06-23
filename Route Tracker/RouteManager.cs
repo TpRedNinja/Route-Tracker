@@ -935,6 +935,39 @@ namespace Route_Tracker
                 return false;
             }
         }
+
+        public string GetRouteFilePath()
+        {
+            return routeFilePath;
+        }
+
+        // And add this method to show and open the save location
+        public void ShowSaveLocation(Form parentForm)
+        {
+            string saveDir = Path.Combine(
+                Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                "SavedProgress");
+
+            MessageBox.Show(parentForm,
+                $"Autosave files are stored in:\n{saveDir}",
+                "Autosave Location",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+
+            // Try to open the folder
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = saveDir,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to open save directory: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

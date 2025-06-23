@@ -209,6 +209,41 @@ namespace Route_Tracker
 
             // Initialize hotkey state
             isHotkeysEnabled = settingsManager.GetHotkeysEnabled();
+
+            ToolStripMenuItem showSaveLocationMenuItem = new("Show Save Location");
+            showSaveLocationMenuItem.Click += ShowSaveLocationMenuItem_Click;
+            settingsMenuItem.DropDownItems.Add(showSaveLocationMenuItem);
+        }
+
+        private void ShowSaveLocationMenuItem_Click(object? sender, EventArgs e)
+        {
+            // Get the route file path from the RouteManager if available
+            string routeFilePath = routeManager?.GetRouteFilePath() ??
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Routes", "AC4 100 % Route - Main Route.tsv");
+
+            // Calculate the save directory path
+            string saveDir = Path.Combine(
+                Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                "SavedProgress");
+
+            // Show the path in a message box
+            MessageBox.Show($"Autosave location: {saveDir}",
+                "Save File Location",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+
+            // Try to open the folder for the user
+            try
+            {
+                Process.Start("explorer.exe", saveDir);
+            }
+            catch
+            {
+                // If opening the folder fails, show additional instructions
+                MessageBox.Show($"Could not open the folder automatically.\n\n" +
+                    $"Please navigate to this location manually:\n{saveDir}",
+                    "Open Folder Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void HotkeysMenuItem_Click(object? sender, EventArgs e)
