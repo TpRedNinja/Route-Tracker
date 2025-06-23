@@ -59,6 +59,10 @@ namespace Route_Tracker
     {
 
         // Update constructor to accept architecture info
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290: Use primary constructure",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "because i said so")]
         public GameStatsBase(IntPtr processHandle, IntPtr baseAddress)
         {
             this.processHandle = processHandle;
@@ -72,7 +76,7 @@ namespace Route_Tracker
         // Timer-related fields for automatic stat updates
         private System.Threading.CancellationTokenSource? _updateCancellationTokenSource;
         private bool _isUpdating = false;
-        private readonly int _updateIntervalMs = 1000; // Default update interval of 1 second
+        private readonly int _updateIntervalMs = 2500; // Default update interval of 1 second
         private System.Threading.Timer? _updateTimer; // Timer that controls the periodic stat updates
 
         // Event that fires whenever game statistics change
@@ -96,7 +100,7 @@ namespace Route_Tracker
                 if (!ReadProcessMemory(processHandle, address, &address, pointer_size, out nint bytesReads) ||
                     bytesReads != pointer_size || address == IntPtr.Zero)
                 {
-                    Debug.WriteLine($"Failed to read memory address at offset {offset:X}");
+                    //Debug.WriteLine($"Failed to read memory address at offset {offset:X}");
                     return default;
                 }
                 address += offset;
@@ -107,7 +111,7 @@ namespace Route_Tracker
             if (!ReadProcessMemory(processHandle, address, &value, size, out nint bytesRead) ||
                 bytesRead != size)
             {
-                Debug.WriteLine($"Failed to read value from memory at address {address:X}");
+                //Debug.WriteLine($"Failed to read value from memory at address {address:X}");
                 return default;
             }
             return value;
@@ -122,24 +126,24 @@ namespace Route_Tracker
         // Add the new interface method
         public virtual Dictionary<string, object> GetStatsAsDictionary()
         {
-            var stats = GetStats();
+            (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure, int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music, int Forts, int Taverns, int TotalChests) = GetStats();
 
             return new Dictionary<string, object>
             {
-                ["Completion Percentage"] = stats.Percent,
-                ["Exact Percentage"] = Math.Round(stats.PercentFloat, 2),
-                ["Viewpoints Completed"] = stats.Viewpoints,
-                ["Myan Stones Collected"] = stats.Myan,
-                ["Buried Treasure Collected"] = stats.Treasure,
-                ["AnimusFragments Collected"] = stats.Fragments,
-                ["AssassinContracts Completed"] = stats.Assassin,
-                ["NavalContracts Completed"] = stats.Naval,
-                ["LetterBottles Collected"] = stats.Letters,
-                ["Manuscripts Collected"] = stats.Manuscripts,
-                ["Music Sheets Collected"] = stats.Music,
-                ["Forts Captured"] = stats.Forts,
-                ["Taverns unlocked"] = stats.Taverns,
-                ["Total Chests Collected"] = stats.TotalChests
+                ["Completion Percentage"] = Percent,
+                ["Exact Percentage"] = Math.Round(PercentFloat, 2),
+                ["Viewpoints Completed"] = Viewpoints,
+                ["Myan Stones Collected"] = Myan,
+                ["Buried Treasure Collected"] = Treasure,
+                ["AnimusFragments Collected"] = Fragments,
+                ["AssassinContracts Completed"] = Assassin,
+                ["NavalContracts Completed"] = Naval,
+                ["LetterBottles Collected"] = Letters,
+                ["Manuscripts Collected"] = Manuscripts,
+                ["Music Sheets Collected"] = Music,
+                ["Forts Captured"] = Forts,
+                ["Taverns unlocked"] = Taverns,
+                ["Total Chests Collected"] = TotalChests
             };
         }
         #endregion
@@ -183,13 +187,13 @@ namespace Route_Tracker
                 if (!_isUpdating || _updateTimer == null)
                     return;
 
-                var stats = GetStats(); // This now calls the derived class implementation
+                (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure, int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music, int Forts, int Taverns, int TotalChests) = GetStats(); // This now calls the derived class implementation
 
                 StatsUpdated?.Invoke(this, new StatsUpdatedEventArgs(
-                    stats.Percent, stats.PercentFloat, stats.Viewpoints, stats.Myan,
-                    stats.Treasure, stats.Fragments, stats.Assassin, stats.Naval,
-                    stats.Letters, stats.Manuscripts, stats.Music, stats.Forts,
-                    stats.Taverns, stats.TotalChests));
+                    Percent, PercentFloat, Viewpoints, Myan,
+                    Treasure, Fragments, Assassin, Naval,
+                    Letters, Manuscripts, Music, Forts,
+                    Taverns, TotalChests));
             }
             catch (Exception ex)
             {
@@ -226,7 +230,10 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // This is the Windows function that lets us peek into the game's memory
         // Without this, we couldn't read any stats
-#pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "SYSLIB1054:Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time",
+        Justification = "Using ReadProcessMemory for direct memory reading in unsafe context")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression", 
+        Justification = "Required for unsafe memory operations")]
         [DllImport("kernel32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool ReadProcessMemory(
@@ -237,6 +244,6 @@ namespace Route_Tracker
             out nint lpNumberOfBytesRead);
     }
 
-   
+
 }
 

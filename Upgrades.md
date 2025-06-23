@@ -19,7 +19,7 @@ This document catalogs all upgrades in the speedrun route and their detection pa
 10. **Mortar Storage 2** - 2000 reales
 
 ## Mission Upgrade
-11. **Cannons 1** - 70 metal
+11. **Broadside Cannons 1** - 70 metal
 
 ## World Exploration Upgrades (Second Set)
 12. **Round Shot Strength 3** - 12000 reales
@@ -62,5 +62,10 @@ This document catalogs all upgrades in the speedrun route and their detection pa
 37. **Ram Strength 1** - 500 reales + 25 wood
 38. **Ram Strength 2** - 5000 reales + 150 metal + 250 wood
 
+## Post "Realities of War" Upgrades
+39. **Mortar 3** - 8000 reales + 300 metal
+40. **Broadside Cannons 2** - 2000 reales + 100 metal
 
-**Note:** This list may be updated as the route file is completed. Approximately 5 hours of additional gameplay footage still needs to be analyzed for potential upgrades.
+## Kingston Buried Treasure Upgrades
+41. **Round Shot Strength 4** - 35000 reales
+42. **Heavy Shot 3** - 25000 reales

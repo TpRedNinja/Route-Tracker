@@ -1,8 +1,8 @@
 upgrades
 
 --in a mission in one go--
-1. Pistol Holster 2/Health 1(sense these are both available at the same time its up to user to get either one) heroupgrade = 1
-2. Pistol Holster 2/Health 1(sense these are both available at the same time its up to user to get either one) heroupgrade = 2
+1. Pistol Holster 2/Health 1(sense these are both available at the same time its up to user to get either one) hero upgrade = 1
+2. Pistol Holster 2/Health 1(sense these are both available at the same time its up to user to get either one) hero upgrade = 2
 --in a mission--
 3. Hull 1 costs 1000 money
 --in world in one go--
@@ -14,7 +14,7 @@ upgrades
 9. Mortar storage 1 costs 800 money
 10. Mortar storage 2 costs 2000 money
 --in a mission--
-11.Cannons 1 costs 70 metal
+11. Broadside Cannons 1 costs 70 metal
 --in world in one go--
 12. Round Shot Strength 3 costs 12000 money
 13. Chain Shot strength 1 costs 2500 money
@@ -34,12 +34,12 @@ upgrades
 25. crocodile leather costs 2000 need 2
 26. killer whale skin costs 3150 need 2
 27. humpback whale skin costs 3500 need 2
-28. Pistol Holster 3 heroupgrade = 3
-29. Pistol Holster 4 heroupgrade = 4
-30. Smoke Bomb Pouch 1 heroupgrade = 5
-31. Smoke Bomb Pouch 2 heroupgrade = 6
-32. Dart Pouch 1 heroupgrade = 7
-33. Dart Pouch 2 heroupgrade = 8
+28. Pistol Holster 3 hero upgrade = 3
+29. Pistol Holster 4 hero upgrade = 4
+30. Smoke Bomb Pouch 1 hero upgrade = 5
+31. Smoke Bomb Pouch 2 hero upgrade = 6
+32. Dart Pouch 1 hero upgrade = 7
+33. Dart Pouch 2 hero upgrade = 8
 --in a mission in one go--
 34. Hull armor 2 costs 4000 money 100 metal 200 wood
 35. Diving bell costs 5000
@@ -47,6 +47,12 @@ upgrades
 --in world in one go--
 37. Ram Strength 1 costs 500 money 25 wood
 38. Ram Strength 2 costs 5000 money 150 metal 250 wood
+--after the realities of war--
+39. Mortar 3 costs 8000 money 300 metal
+40. Broadside Canons 2 costs 2000 money 100 metal
+--Kingston for buried treasure--
+41. Round Shot Strength 4 costs 35000 money
+42. Heavy Shot 3 costs 25000 money
 
 
 

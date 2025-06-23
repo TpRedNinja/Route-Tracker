@@ -39,6 +39,10 @@ namespace Route_Tracker
         // Saves settings from UI controls to configuration
         // ==========MY NOTES==============
         // Stores current settings so they're remembered next time
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
         [SupportedOSPlatform("windows6.1")]
         public void SaveSettings(string gameDirectory, bool autoStart)
         {
@@ -54,6 +58,10 @@ namespace Route_Tracker
         // Selects the appropriate setting based on game name
         // ==========MY NOTES==============
         // Stores the game executable location for a specific game
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
         [SupportedOSPlatform("windows6.1")]
         public void SaveDirectory(string selectedGame, string directory)
         {
@@ -72,6 +80,10 @@ namespace Route_Tracker
         // Retrieves the directory for the specified game
         // ==========MY NOTES==============
         // Gets the saved path for a specific game
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
         [SupportedOSPlatform("windows6.1")]
         public string GetGameDirectory(string game)
         {

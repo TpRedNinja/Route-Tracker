@@ -1,1013 +1,875 @@
-Name	Type	Condition	Coordinates	Conition for locations
-Viewpoint 1 Cape Bonavista	Viewpoint	1		1
-Chest 1 Cape Bonavista	Chest	1		1
-Chest 2 Cape Bonavista	Chest	2		2
-Fragment 1 Cape Bonavista	Animus Fragment	1		1
-Chest 3 Cape Bonavista	Chest	3		3
-Chest 4 Cape Bonavista	Chest	4		4
-Viewpoint 2 Cape Bonavista	Viewpoint	2		2
-Viewpoint 3 Cape Bonavista	Viewpoint	3		3
-Fragment 2 Cape Bonavista	Animus Fragment	2		2
-Chest 5 Cape Bonavista	Chest	5		5
-Treasure Map Cape Bonavista -> Edward Kennway	Story	1		1
-Welcome to Abstergo Entertainment	Story	2		2
-Fragment 1 Havana	Animus Fragment	3		1
-Manuscript 1 Havana	Manuscripts	1		1
-Viewpoint 1 Havana	Viewpoint	4		1
-Chest 1 Havana	Chest	1		1
-Shanty 1 Havana	Shanty	1		1
-Lively Havana	Story	3		3
-Chest 2 Havana	Chest	2		2
-Fragment 2 Havana	Animus Fragment	4		2
-Chest 3 Havana	Chest	3		3
-Shanty 2 Havana	Shanty	2		2
-Fragment 3 Havana	Animus Fragment	5		3
-Chest 4 Havana	Chest	4		4
-Fragment 4 Havana	Animus Fragment	6		4
-Chest 5 Havana	Chest	5		5
-Manuscript 2 Havana	Manuscripts	2		2
-Chest 6 Havana	Chest	6		6
-Fragment 5 Havana	Animus Fragment	7		5
-And my Sugar	Story	4		4
-(On way to next Mission) Chest 7 Havana	Chest	7		7
-Chest 8 Havana	Chest	8		8
-Fragment 6 Havana	Animus Fragment	8		6
-Fragement 7 Havana	Animus Fragment	9		7
-Viewpoint 2 Havana	Viewpoint	5		2
-Mister Walpole I presume	Story	5		5
-get beach bandit -> Viewpoint 3 Havana	Viewpoint	6		3
-Start A Man They Call A Sage -> Fragment 8	Animus Fragment	10		1
-A Man They Call A Sage	Story	6		6
-Get Spanish Captain -> Quit warp -> Chest 9 Havana	Chest	9		9
-Fragment 9 Havana	Animus Fragment	11		8
-Fragment 10 Havana	Animus Fragment	12		9
-Chest 10 Havana	Chest	10		10
-Fragment 11 Havana	Animus Fragment	13		10
-Treasure Map -> Shanty 3 Havana	Shanty	3		3
-Fragment 12 Havana	Animus Fragment	14		11
-Viewpoint 4 Havana	Viewpoint	7		4
-No More Taxes	Assassin Contracts	1		1
-Get Botched Escape -> Chest 11 Havana	Chest	11		11
-Quit warp -> Manuscript 3 Havana	Manuscripts	3		3
-Buried Chest Havana	Burired Treasure	1		1
-Beach Bandit -> Quit warp	Assassin Contracts	2		2
-Chest 12 Havana	Chest	12		12
-Viewpoint 5 Havana	Viewpoint	8		5
-Start Claiming Whats Due -> Chest 13 Havana	Chest	13		13
-Claiming Whats Due	Story	7		7
-Treasure Fleet	Story	8		8
+Name	Type	Condition	Coordinates	Condition for locations
+Viewpoint 1 Cape Bonavista	Viewpoint	1	None	1
+Chest 1 Cape Bonavista	Chest	1	None	1
+Chest 2 Cape Bonavista	Chest	2	None	2
+Fragment 1 Cape Bonavista	Animus Fragment	1	None	1
+Chest 3 Cape Bonavista	Chest	3	None	3
+Chest 4 Cape Bonavista	Chest	4	None	4
+Viewpoint 2 Cape Bonavista	Viewpoint	2	None	2
+Viewpoint 3 Cape Bonavista	Viewpoint	3	None	3
+Fragment 2 Cape Bonavista	Animus Fragment	2	None	2
+Chest 5 Cape Bonavista	Chest	5	None	5
+Treasure Map Cape Bonavista -> Edward Kennway	Story	1	None	1
+Welcome to Abstergo Entertainment	Story	2	None	2
+Fragment 1 Havana	Animus Fragment	3	None	1
+Manuscript 1 Havana	Manuscripts	1	None	1
+Viewpoint 1 Havana	Viewpoint	4	None	1
+Chest 1 Havana	Chest	6	None	1
+Shanty 1 Havana	Shanty	1	None	1
+Lively Havana	Story	3	None	3
+Start ...And My Sugar? -> Chest 2 Havana	Chest	7	None	2
+Fragment 2 Havana	Animus Fragment	4	None	2
+Chest 3 Havana	Chest	8	None	3
+Shanty 2 Havana	Shanty	2	None	2
+Fragment 3 Havana	Animus Fragment	5	None	3
+Fragment 4 Havana	Animus Fragment	6	None	4
+Chest 4 Havana	Chest	9	None	4
+Chest 5 Havana	Chest	10	None	5
+Reload Checkpoint -> Manuscript 2 Havana	Manuscripts	2	None	2
+Chest 6 Havana	Chest	11	None	6
+(Fort)Fragment 5 Havana	Animus Fragment	7	None	5
+And my Sugar	Story	4	None	4
+(On way to next Mission) Chest 7 Havana	Chest	12	None	7
+Chest 8 Havana	Chest	13	None	8
+Fragment 6 Havana	Animus Fragment	8	None	6
+Fragement 7 Havana	Animus Fragment	9	None	7
+Viewpoint 2 Havana	Viewpoint	5	None	2
+Mister Walpole I presume	Story	5	None	5
+get beach bandit -> Viewpoint 3 Havana	Viewpoint	6	None	3
+Start A Man They Call A Sage -> Fragment 8 Havana	Animus Fragment	10	None	8
+A Man They Call A Sage	Story	6	None	6
+Get Spanish Commander -> Quit warp -> Chest 9 Havana	Chest	14	None	9
+Fragment 9 Havana	Animus Fragment	11	None	9
+Fragment 10 Havana	Animus Fragment	12	None	10
+Chest 10 Havana	Chest	15	None	10
+Fragment 11 Havana	Animus Fragment	13	None	11
+Treasure Map Havana -> Shanty 3 Havana	Shanty	3	None	3
+Manuscript 3 Havana	Manuscripts	3	None	3
+Fragment 12 Havana	Animus Fragment	14	None	12
+Viewpoint 4 Havana	Viewpoint	7	None	4
+No More Taxes	Assassin Contracts	1	None	1
+Get Botched Escape -> Chest 11 Havana	Chest	16	None	11
+Botched Escape	Assassin Contracts	2	None	2
+Quit warp -> Fast travel to South Viewpoint -> Buried Treasure Havana	Burired Treasure	1	None	1
+Beach Bandit -> Quit warp	Assassin Contracts	3	None	3
+Chest 12 Havana	Chest	17	None	12
+Viewpoint 5 Havana	Viewpoint	8	None	5
+Start Claiming Whats Due -> Chest 13 Havana	Chest	18	None	13
+Claiming Whats Due	Story	7	None	7
+Treasure Fleet	Story	8	None	8
 Fragment 1 Uncharted	Animus Fragment	15	(566,864)	1
 Fragment 2 Uncharted	Animus Fragment	16	(589,906)	2
-Reload -> Chest 1 Uncharted	Chest	1	(501,846)	1
-Chest 2 Uncharted	Chest	2	(457,904)	2
+Reload -> Chest 1 Uncharted	Chest	19	(501,846)	1
+Chest 2 Uncharted	Chest	20	(457,904)	2
 Fragment 3 Uncharted	Animus Fragment	17	(458,903)	3
- Reload -> Chest 3 Uncharted	Chest	3	(550,816)	3
-Letter Abaco Island	Letters	1		1
-Shoot Ocolot (skin) -> Treasure Map -> Air assassinate Ocolot if near (skin) -> Pistol/Health Upgrade 1	Upgrades	1		1
-Fragment 1 Abaco Island	Animus Fragment	18		1
-Viewpoint Abaco Island	Viewpoint	9		1
-Chest 1 Abaco Island	Chest	1		1
-Fragment 2 Abaco Island	Animus Fragment	19		2
-Fragment 3 Abaco Island 	Animus Fragment	20		20
-boat return to ship -> This Tyro Captain	Story	9		9
-Start Now Hiring -> free crew at church -> Viewpoint 1 Nassua	Viewpoint	10		1
-Fragment 1 Nassua -> reload	Animus Fragment	21		1
-Now Hiring	Story	10		10
-Prizes and Plunder (Start Prizes and plunder -> Destroy scooner -> Discover AndIs -> reload -> Complete Prizes and Plunder)	Story	11		11
-Exit Mission -> Buy Roundshot 2x, Mortor, HeavyShot 2x, Mortor storage 2x,	Upgrades	2		2
+ Reload -> Chest 3 Uncharted	Chest	21	(550,816)	3
+Letter 1 Abaco Island	Letters	1	None	1
+Shoot Ocolot (skin) -> Treasure Map -> Air assassinate Ocolot if near (skin) ->Health Upgrade 1	Upgrades	1	None	1
+ Pistol Holster 1	Upgrades	2	None	2
+Fragment 1 Abaco Island	Animus Fragment	18	None	1
+Viewpoint Abaco Island	Viewpoint	9	None	1
+Chest 1 Abaco Island	Chest	22	None	1
+Fragment 2 Abaco Island	Animus Fragment	19	None	2
+Fragment 3 Abaco Island 	Animus Fragment	20	None	20
+boat return to ship -> This Tyro Captain	Story	9	None	9
+Start Now Hiring -> free crew at church -> Viewpoint 1 Nassua	Viewpoint	10	None	1
+Fragment 1 Nassua	Animus Fragment	21	None	1
+reload -> Now Hiring	Story	10	None	10
+Start Prizes and plunder -> Destroy scooner -> Discover AndIs -> reload -> Hull Armor 1	Upgrades	3	None	3
+Complete Prizes and Plunder	Story	11	None	11
+Exit Mission -> Buy Roundshot Strength 1	Upgrades	4	None	4
+Buy Roundshot Strength 2	Upgrades	5	None	5
+Buy Mortar 1	Upgrades	6	None	6
+Buy HeavyShot 1	Upgrades	7	None	7
+Buy HeavyShot 2	Upgrades	8	None	8
+Buy Mortar storage 1	Upgrades	9	None	9
+Buy Mortar storage 2	Upgrades	10	None	10
 Start Raise the BlackFlag -> Fragment 4 Uncharted	Animus Fragment	22	(495,675)	4
-Chest 4 Uncharted	Chest	4	(442,669)	4
-Reload -> Do first ship boarding -> Reload 2nd ship boarding, Get Canon upgrade on jackdaw in captain corders	Upgrades	3		3
-Raise the BlackFlag (Wait for Hunter ship then destroy it but reduce wanted level after boarding is done)	Story	12		12
-Chest 5 Uncharted	Chest	5	(488,591)	5
-Quit Warp -> Salt Key Banter	Taverns	1		1
-Get Shady Buisness -> Chest 1 SaltKey	Chest	1		1
-Chest 2 SaltKey	Chest	2		2
-Viewpoint SaltKey	Viewpoint	11		1
-Chest 3 SaltKey	Chest	3		3
-Shady Buisness	Assassin Contracts	3		3
-Chest 6 Uncharted	Chest	6		6
-Reload -> Fragment 1 Matanzas	Animus Fragment	23		1
-Chest 1 Matanzas	Chest	1		1
-Fragment 2 Matanzas	Animus Fragment	24		2
-Fast travel SaltKey -> Letter SaltKey	Letters	2		2
-Chest 4 SaltKey	Chest	4		4
-Fragment 1 SaltKey	Animus Fragment	25		1
-Fragment 2 Salt Key	Animus Fragment	26		2
-Shanty SaltKey	Shanty	4		1
-Get The Informant -> Fragment 3 SaltKey	Animus Fragment	27		2
-Chest 5 SaltKey	Chest	5		5
-Chest 6 SaltKey	Chest	6		6
-Fast travel AndIs -> get The Treasure Hunter -> The Andreas Inn	Taverns	2		2
-Letter Andreas Island	Letters	3		3
-Manuscript Andreas Island	Manuscripts	4		4
-Chest 1 AndreasIsland	Chest	1		1
-Chest 2 AndreasIsland	Chest	2		2
-Fragment 1 AndreasIsland	Animus Fragment	28		1
-Start The Plantation and its yeilds -> Fragment 2 AndreasIsland	Animus Fragment	29		2
-Viewpoint AndreasIsland	Viewpoint	12		1
-Chest 3 AndreasIsland	Chest	3		3
-Chest 4 AndreasIsland	Chest	4		4
-Chest 5 AndreasIsland	Chest	5		5
-TreasureMap Andreas Island -> Return to Boat when timer starts near red zone -> Chest 7 Uncharted	Chest	7	(651,723)	7
-When it says reduce distance to target and new objective appears reload -> Chest 1 CatIsland	Chest	1		1
-Fragment 1 CatIsland	Animus Fragment	30		1
-Chest 2 CatIsland	Chest	2		2
-Fragment 2 Cat Island -> Reload	Animus Fragment	31		2
-Chest 3 CatIsland	Chest	3		3
-Chest 4 CatIsland	Chest	4		4
-Shanty CatIsland	Shanty	5		1
-Viewpoint CatIsland	Viewpoint	13		1
-Sugarcan and its Yeilds	Story	13		13
-Chest 5 CatIsland	Chest	5		5
-MyanStone Cat Island	Myan Stones	1		1
+Chest 4 Uncharted	Chest	23	(442,669)	4
+Reload -> Do first ship boarding -> Reload 2nd ship boarding,  Get Broadside Canon upgrade 1 on jackdaw in captain corders	Upgrades	11	None	11
+Raise the BlackFlag  (Wait for Hunter ship then destroy it but reduce wanted level after boarding is done)	Story	12	None	12
+Chest 5 Uncharted	Chest	24	(488,591)	5
+Quit Warp -> Salt Key Banter	Taverns	1	None	1
+Get Shady Buisness -> Chest 1 SaltKey	Chest	25	None	1
+Chest 2 SaltKey	Chest	26	None	2
+Viewpoint SaltKey	Viewpoint	11	None	1
+Chest 3 SaltKey	Chest	27	None	3
+Shady Buisness	Assassin Contracts	4	None	4
+Chest 6 Uncharted	Chest	28	(400,646)	6
+Reload -> Fragment 1 Matanzas	Animus Fragment	23	None	1
+Chest 1 Matanzas	Chest	29	None	1
+Fragment 2 Matanzas	Animus Fragment	24	None	2
+Fast travel SaltKey -> Letter 2 SaltKey	Letters	2	None	2
+Chest 4 SaltKey	Chest	30	None	4
+Fragment 1 SaltKey	Animus Fragment	25	None	1
+Fragment 2 Salt Key	Animus Fragment	26	None	2
+Shanty SaltKey	Shanty	4	None	1
+Get The Informant -> Fragment 3 SaltKey	Animus Fragment	27	None	2
+Chest 5 SaltKey	Chest	31	None	5
+Chest 6 SaltKey	Chest	32	None	6
+Fast travel AndIs -> get The Treasure Hunter -> The Andreas Inn	Taverns	2	None	2
+Letter 3 Andreas Island	Letters	3	None	3
+Manuscript Andreas Island	Manuscripts	4	None	4
+Chest 1 AndreasIsland	Chest	33	None	1
+Chest 2 AndreasIsland	Chest	34	None	2
+Fragment 1 AndreasIsland	Animus Fragment	28	None	1
+Start The Plantation and its yeilds -> Fragment 2 AndreasIsland	Animus Fragment	29	None	2
+Viewpoint AndreasIsland	Viewpoint	12	None	1
+Chest 3 AndreasIsland	Chest	35	None	3
+Chest 4 AndreasIsland	Chest	36	None	4
+Chest 5 AndreasIsland	Chest	37	None	5
+TreasureMap Andreas Island -> Return to Boat when timer starts near red zone -> Chest 7 Uncharted	Chest	38	(651,723)	7
+When it says reduce distance to target and new objective appears reload -> Chest 1 CatIsland	Chest	39	None	1
+Fragment 1 CatIsland	Animus Fragment	30	None	1
+Chest 2 CatIsland	Chest	40	None	2
+Fragment 2 Cat Island -> Reload	Animus Fragment	31	None	1
+Chest 3 CatIsland	Chest	41	None	3
+Chest 4 CatIsland	Chest	42	None	4
+Shanty CatIsland	Shanty	5	None	1
+Viewpoint CatIsland	Viewpoint	13	None	1
+Sugarcan and its Yeilds	Story	13	None	13
+Chest 5 CatIsland	Chest	43	None	5
+MyanStone Cat Island	Myan Stones	1	None	1
 Fragment 5 Uncharted	Animus Fragment	32	(819,644)	5
-Quit warp -> Treasure Map Salt Lagoon -> Start Proper Defenses -> Chest 1 Salt Lagoon	Chest	1		1
-Viewpoint Salt Lagoon	Viewpoint	14		1
-Fragment 1 Salt Lagoon	Animus Fragment	33		1
-Proper Defenses	Story	14		14
-Chest 8 Uncharted	Chest	8	(901,487)	8
-Fragment 1 Great Inagua	Animus Fragment	34		1
-Chest 1 Great Inagua	Chest	1		1
-Shanty 1 Great Inagua	Shanty	6		1
-Chest 2 Great Inagua	Chest	2		2
-Fragment 2 Great Inagua	Animus Fragment	35		2
-Chest 3 Great Inagua	Chest	3		3
-Fragment 3 Great Inagua	Animus Fragment	36		3
-Chest 4 Great Inagua	Chest	4		4
-TreasureMap Great Inagua -> A Single Madman	Story	15		15
-A Small Favour	Story	16		16
-Fragment 4 Great Inagua	Animus Fragment	37		4
-Chest 5 Great Inagua	Chest	5		5
-Reload -> Shanty 2	Shanty	7		1
-Letter Great Inagua	Letters	4		4
-Chest 6 Great Inagua	Chest	6		6
-Chest 7 Great Inagua	Chest	7		7
-Reload -> Myan Stone Great Inagua	Myan Stones	2		2
-Chest 8 Great Inagua	Chest	8		8
-Chest 9 Great Inagua	Chest	9		9
-Chest 10 Great Inagua	Chest	10		10
-Fragment 5 Great Inagua	Animus Fragment	38		5
-Viewpoint Great Inagua	Viewpoint	15		1
-Return to boat -> This Old Cove	Story	17		17
-Fast travel just outside Nassua -> Chest 9 Uncharted	Chest	9	(674,771)	9
-Swim until minimap has you in restricted area then quit warp -> Fragment 1 Eleuthera	Animus Fragment	39		1
-Chest 1 Eleuthera	Chest	1		1
-Fragment 2 Eleuthera	Animus Fragment	40		2
-Chest 2 Eleuthera	Chest	2		2
-Eleuthera Captured	Forts	1		1
-Brother In Arms -> Fast travel to Eleuthera	Legendary Ships	1		1
-Buy Roundshot, Chainshot 2x, Firebarrel, Heavyshot Storage 2x, Refull Mortor Shot	Upgrades	4		4
-Fragment 6 Uncharted	Animus Fragment	41	(723,739)	6
-Spanish Plague -> Fast Travel to Cape Bonavista	Naval Contracts	1		1
-Fast travel to Viewpoint 1 -> Chest 6 Cape Bonavista	Chest	6		6
-Letter Cape Bonavista	Letters	5		5
-Chest 7 Cape Bonavista	Chest	7		7
-Fast travel to viewpoint 2 -> Chest 8 Cape Bonavista	Chest	8		8
-Fast travel back to viewpoint 2 -> Chest 9 Cape Bonavista	Chest	9		9
-Fragment 3 Cape Bonavista	Animus Fragment	42		3
-Chest 10 Cape Bonavista	Chest	10		10
-Chest 11 Cape Bonavista	Chest	11		11
-Chest 12 Cape Bonavista	Chest	12		12
-MyanStone Cape Bonavista	Myan Stones	3		3
-Chest 13 Cape Bonavista	Chest	13		13
-Shanty Cape Bonavista	Shanty	8		1
-Fragment 4 Cape Bonavista	Animus Fragment	43		4
-Fast travel back to viewpoint 2 -> Chest 14 Cape Bonavista	Chest	14		14
-Chest 15 Cape Bonavista	Chest	15		15
-Fast travel to viewpoint 3 -> Chest 16 Cape Bonavista	Chest	16		16
-Buried Chest Cape Bonavista	Burired Treasure	2		2
-Chest 10 Uncharted	Chest	10	(121,628)	10
-Cheat reload -> Disable fort then infiltrate -> Fragment 1 Conttoyor	Animus Fragment	44		1
-Chest 1 Conttoyor	Chest	1		1
-Fragment 2 Conttoyor	Animus Fragment	45		2
-Chest 2 Conttoyor	Chest	2		2
-Capture Conttoyor	Forts	2		2
-Refil ammo if needed -> Law of the Ocean	Naval Contracts	2		2
-Start Nothing is True -> Chest 1 Tulum	Chest	1		1
-Viewpoint 1 Tulum	Viewpoint	16		1
-Fragment 1 Tulum	Animus Fragment	46		1
-Chest 2 Tulum	Chest	2		2
-Fragment 2 Tulum	Animus Fragment	47		2
-Chest 3 Tulum	Chest	3		3
-Chest 4 Tulum	Chest	4		4
-MyanStone Tulum	Myan Stones	4		4
-Nothing is True	Story	18		18
-The Sage's Buired Secret	Story	19		19
-Chest 5 Tulum	Chest	5		5
-Chest 6 Tulum	Chest	6		6
-Viewpoint 2 Tulum	Viewpoint	17		2
-Fragment 3 Tulum	Animus Fragment	48		3
-Overrun and Outnumbered	Story	20		20
-Start The Forts -> Defeat fort defenses then reload & infiltrate -> Fragment 1 Punta Guarico	Animus Fragment	49		1
-Chest 1 Punta Guarico	Chest	1		1
-Chest 2 Punta Guarico	Chest	2		2
-Fragment 2 Punta Guarico	Animus Fragment	50		2
-Capture Punta Guarico	Story	21		21
-Chest 11 Uncharted	Chest	11		11
-Quit Warp -> MyanStone do not pick up -> Chest 1 Tortuga	Chest	1		1
-Chest 2 Tortuga	Chest	2		2
-Chest 3 Tortuga	Chest	3		3
-Viewpoint Tortuga	Viewpoint	18		1
-Fragment 1 Tortuga	Animus Fragment	51		1
-Treasure Map Tortuga -> Chest 4 Tortuga	Chest	4		4
-Warehouse -> Chest 5 Tortuga	Chest	5		5
-Chest 6 Tortuga	Chest	6		6
-Fragment 2 Tortuga 	Animus Fragment	52		52
-Cheat warp -> MyanStone Tortuga 	Myan Stones	5		5
-Fast travel to Matanzas -> Letter Matanzas	Letters	6		6
-Chest 2 Matanzas	Chest	2		2
-Chest 3 Matanzas	Chest	3		3
-Chest 4 Matanzas	Chest	4		4
-Viewpoint Matanzas	Viewpoint	19		1
-Fragment 3 Matanzas	Animus Fragment	53		3
-Warehouse -> Buried Chest Matanzas	Burired Treasure	3		3
-MyanStone Matanzas	Myan Stones	6		6
-Fast Travel to Punta Guarico -> Buy Mortor, Swivel, Refill ammo if needed-> Cheat reload after leaving habormaster	Upgrades	5		5
+Quit warp -> Treasure Map Salt Lagoon -> Start Proper Defenses -> Chest 1 Salt Lagoon	Chest	44	None	1
+Viewpoint Salt Lagoon	Viewpoint	14	None	1
+Fragment 1 Salt Lagoon	Animus Fragment	33	None	1
+Proper Defenses	Story	14	None	14
+Chest 8 Uncharted	Chest	45	(901,487)	8
+Fragment 1 Great Inagua	Animus Fragment	34	None	1
+Chest 1 Great Inagua	Chest	46	None	1
+Shanty 1 Great Inagua	Shanty	6	None	1
+Chest 2 Great Inagua	Chest	47	None	2
+Fragment 2 Great Inagua	Animus Fragment	35	None	2
+Chest 3 Great Inagua	Chest	48	None	3
+Fragment 3 Great Inagua	Animus Fragment	36	None	3
+Chest 4 Great Inagua	Chest	49	None	4
+TreasureMap Great Inagua -> A Single Madman	Story	15	None	15
+A Small Favour	Story	16	None	16
+Fragment 4 Great Inagua	Animus Fragment	37	None	4
+Chest 5 Great Inagua	Chest	50	None	5
+Reload -> Shanty 2	Shanty	7	None	1
+Letter 4 Great Inagua	Letters	4	None	4
+Chest 6 Great Inagua	Chest	51	None	6
+Chest 7 Great Inagua	Chest	52	None	7
+Reload -> Myan Stone Great Inagua	Myan Stones	2	None	2
+Chest 8 Great Inagua	Chest	53	None	8
+Chest 9 Great Inagua	Chest	54	None	9
+Chest 10 Great Inagua	Chest	55	None	10
+Fragment 5 Great Inagua	Animus Fragment	38	None	5
+Viewpoint Great Inagua	Viewpoint	15	None	1
+Return to boat -> This Old Cove	Story	17	None	17
+Fast travel just outside Nassua -> Chest 9 Uncharted	Chest	56	(674,771)	9
+Swim until minimap has you in restricted area then quit warp -> Fragment 1 Eleuthera	Animus Fragment	39	None	1
+Chest 1 Eleuthera	Chest	57	None	1
+Fragment 2 Eleuthera	Animus Fragment	40	None	2
+Chest 2 Eleuthera	Chest	58	None	2
+Capture Eleuthera	Forts	1	None	1
+Brother In Arms -> Fast travel to Eleuthera	Legendary Ships	1	None	1
+Buy Roundshot  Strength 3	Upgrades	12	None	12
+Buy Chainshot Strength 1	Upgrades	13	None	13
+Buy Chainshot Strength 2	Upgrades	14	None	14
+Fire barrel strength 1	Upgrades	15	None	15
+Buy Heavy shot Storage 1	Upgrades	16	None	16
+Buy Heavy shot Storage 2, Refill Mortar Shot if needed	Upgrades	17	None	17
+Accept Spanish Plague-> Fragment 6 Uncharted	Animus Fragment	41	(723,739)	6
+Spanish Plague -> Fast Travel to Cape Bonavista	Naval Contracts	1	None	1
+Fast travel to Viewpoint 1 -> Chest 6 Cape Bonavista	Chest	59	None	6
+Letter 5 Cape Bonavista	Letters	5	None	5
+Chest 7 Cape Bonavista	Chest	60	None	7
+Fast travel to viewpoint 2 -> Chest 8 Cape Bonavista	Chest	61	None	8
+Fast travel back to viewpoint 2 -> Chest 9 Cape Bonavista	Chest	62	None	9
+Fragment 3 Cape Bonavista	Animus Fragment	42	None	3
+Chest 10 Cape Bonavista	Chest	63	None	10
+Chest 11 Cape Bonavista	Chest	64	None	11
+Chest 12 Cape Bonavista	Chest	65	None	12
+MyanStone Cape Bonavista	Myan Stones	3	None	3
+Chest 13 Cape Bonavista	Chest	66	None	13
+Shanty Cape Bonavista	Shanty	8	None	1
+Fragment 4 Cape Bonavista	Animus Fragment	43	None	4
+Fast travel back to viewpoint 2 -> Chest 14 Cape Bonavista	Chest	67	None	14
+Chest 15 Cape Bonavista	Chest	68	None	15
+Fast travel to viewpoint 3 -> Chest 16 Cape Bonavista	Chest	69	None	16
+Buried Treasure Cape Bonavista	Burired Treasure	2	None	2
+Chest 10 Uncharted	Chest	70	(121,628)	10
+Cheat reload -> Disable fort then infiltrate -> Fragment 1 Conttoyor	Animus Fragment	44	None	1
+Chest 1 Conttoyor	Chest	71	None	1
+Fragment 2 Conttoyor	Animus Fragment	45	None	2
+Chest 2 Conttoyor	Chest	72	None	2
+Capture Conttoyor	Forts	2	None	2
+Refil ammo if needed -> Law of the Ocean	Naval Contracts	2	None	2
+Start Nothing is True -> Chest 1 Tulum	Chest	73	None	1
+Viewpoint 1 Tulum	Viewpoint	16	None	1
+Fragment 1 Tulum	Animus Fragment	46	None	1
+Chest 2 Tulum	Chest	74	None	2
+Fragment 2 Tulum	Animus Fragment	47	None	2
+Chest 3 Tulum	Chest	75	None	3
+Chest 4 Tulum	Chest	76	None	4
+MyanStone Tulum	Myan Stones	4	None	4
+Nothing is True	Story	18	None	18
+The Sage's Buired Secret	Story	19	None	19
+Chest 5 Tulum	Chest	77	None	5
+Chest 6 Tulum	Chest	78	None	6
+Viewpoint 2 Tulum	Viewpoint	17	None	2
+Fragment 3 Tulum	Animus Fragment	48	None	3
+Overrun and Outnumbered	Story	20	None	20
+Start The Forts -> Defeat fort defenses then reload & infiltrate -> Fragment 1 Punta Guarico	Animus Fragment	49	None	1
+Chest 1 Punta Guarico	Chest	79	None	1
+Chest 2 Punta Guarico	Chest	80	None	2
+Fragment 2 Punta Guarico	Animus Fragment	50	None	2
+Capture Punta Guarico	Story	21	None	21
+Chest 11 Uncharted	Chest	81	(832,387)	11
+Quit Warp -> MyanStone do not pick up -> Chest 1 Tortuga	Chest	82	None	1
+Chest 2 Tortuga	Chest	83	None	2
+Chest 3 Tortuga	Chest	84	None	3
+Viewpoint Tortuga	Viewpoint	18	None	1
+Fragment 1 Tortuga	Animus Fragment	51	None	1
+Treasure Map Tortuga -> Chest 4 Tortuga	Chest	85	None	4
+Warehouse -> Chest 5 Tortuga	Chest	86	None	5
+Chest 6 Tortuga	Chest	87	None	6
+Fragment 2 Tortuga 	Animus Fragment	52	None	52
+Cheat warp -> MyanStone Tortuga 	Myan Stones	5	None	5
+Fast travel to Matanzas -> Letter 6 Matanzas	Letters	6	None	6
+Chest 2 Matanzas	Chest	88	None	2
+Chest 3 Matanzas	Chest	89	None	3
+Chest 4 Matanzas	Chest	90	None	4
+Viewpoint Matanzas	Viewpoint	19	None	1
+Fragment 3 Matanzas	Animus Fragment	53	None	3
+Warehouse -> Buried Treasure Matanzas	Burired Treasure	3	None	3
+MyanStone Matanzas	Myan Stones	6	None	6
+Fast Travel to Punta Guarico -> Buy Mortar 2	Upgrades	18	None	18
+Buy Swivel Strength 1, Refill ammo if needed-> Cheat reload after leaving habormaster	Upgrades	19	None	19
 Fragment 7 Uncharted	Animus Fragment	54	(738,310)	7
-swim to ship a little quit warp  Destroy Defenses & Infiltrate fort -> Chest 1 Navassa	Chest	1		1
-Chest 2 Navassa	Chest	2		2
-Fragment 1 Navassa	Animus Fragment	55		1
-Fragment 2 Navassa	Animus Fragment	56		2
-Capture Navassa	Forts	3		3
-Refill ammo if needed -> Start Blind Justice -> Letter 1 Uncharted	Letters	7	(798,191)	7
-Chest 12 Uncharted	Chest	12	(800,192)	12
-Blind Justice	Naval Contracts	3		3
-TreasureMap -> Chest 1 Ille A Vache	Chest	1		1
-Fragment 1 Ille A Vache	Animus Fragment	57		1
-Viewpoint Ille A Vache	Viewpoint	20		1
-Chest 2 Ille A Vache	Chest	2		2
-VinoAVache	Taverns	3		3
-Get The Expedition -> Manuscript Ille A Vache	Manuscripts	5		5
-HMS Prince	Legendary Ships	2		2
-Fast Travel to Punta Guarico -> sail to red area unboard quit warp -> Buried Chest Cumberland Bay	Burired Treasure	4		4
-The Expedition	Assassin Contracts	4		4
-Viewpoint Cumberland Bay	Viewpoint	21		1
-Fragment 1 Cumberland Bay	Animus Fragment	58		1
-Fast travel back to Viewpoint -> Chest 1 Cumberland Bay	Chest	1		1
-Chest 2 Cumberland Bay	Chest	2		2
-Chest 3 Cumberland Bay	Chest	3		3
-TreasureMap -> Fragment 2 Cumberland Bay	Animus Fragment	59		2
-Letter Cumberland Bay	Letters	8		8
-Fast travel Ille A Vache viewpoint -> Fragment 2 Ille A Vache	Animus Fragment	60		2
-Get The Slave Master -> Chest 3 Ille A Vache	Chest	3		3
-Chest 4 Ille A Vache	Chest	4		4
-Chest 13 Uncharted	Chest	13	(893,174)	13
+swim to ship a little quit warp  Destroy Defenses & Infiltrate fort -> Chest 1 Navassa	Chest	91	None	1
+Chest 2 Navassa	Chest	92	None	2
+Fragment 1 Navassa	Animus Fragment	55	None	1
+Fragment 2 Navassa	Animus Fragment	56	None	2
+Capture Navassa	Forts	3	None	3
+Refill ammo if needed -> Start Blind Justice -> Letter 7 Uncharted 1	Letters	7	(798,191)	7
+Chest 12 Uncharted	Chest	93	(800,192)	12
+Blind Justice	Naval Contracts	3	None	3
+TreasureMap -> Chest 1 Ille A Vache	Chest	94	None	1
+Fragment 1 Ille A Vache	Animus Fragment	57	None	1
+Viewpoint Ille A Vache	Viewpoint	20	None	1
+Chest 2 Ille A Vache	Chest	95	None	2
+Vino A Vache	Taverns	3	None	3
+Get The Expedition -> Manuscript Ille A Vache	Manuscripts	5	None	5
+HMS Prince	Legendary Ships	2	None	2
+Fast Travel to Punta Guarico -> sail to red area unboard quit warp ->  Buried Treasure Cumberland Bay	Burired Treasure	4	None	4
+The Expedition	Assassin Contracts	5	None	5
+Viewpoint Cumberland Bay	Viewpoint	21	None	1
+Fragment 1 Cumberland Bay	Animus Fragment	58	None	1
+Fast travel back to Viewpoint -> Chest 1 Cumberland Bay	Chest	96	None	1
+Chest 2 Cumberland Bay	Chest	97	None	2
+Chest 3 Cumberland Bay	Chest	98	None	3
+TreasureMap -> Fragment 2 Cumberland Bay	Animus Fragment	59	None	2
+Letter 8 Cumberland Bay	Letters	8	None	8
+Fast travel Ille A Vache viewpoint -> Fragment 2 Ille A Vache	Animus Fragment	60	None	2
+Get The Slave Master -> Chest 3 Ille A Vache	Chest	99	None	3
+Chest 4 Ille A Vache	Chest	100	None	4
+Chest 13 Uncharted	Chest	101	(893,174)	13
 Fragment 8 Uncharted	Animus Fragment	61	(965,144)	8
-Fast Travel to Tortuga -> Chest 7 Tortuga	Chest	7		7
-The Slave Master	Assassin Contracts	5		5
-Letter Tortuga -> Fast travel to Navassa	Letters	9		9
-Chest 14 Uncharted	Chest	14	(699,155)	14
-Start Traveling Salesman-> buy officer's rapiers, cannon-barrel pistols,	Upgrades	6		6
-Buy  rabbit pelt 2x, hutia pelt 2x, howler moneky skin 2x, crocodile leather 2x, killer whale skin 2x,  humbackwhale skin 2x. Then get pistol holster 3 & 4, smoke bomb puch 1 & 2, & dart puch 1 & 2. 	Upgrades	7		7
-Viewpoint 1 Kingston	Viewpoint	22		1
-Shanty 1 Kingston	Shanty	9		1
-Chest 1 Kingston	Chest	1		1
-Chest 2 Kingston	Chest	2		2
-Reload when objective turns to eavesdrop -> fragment 1 Kingston	Animus Fragment	62		1
-Shanty 2 Kingston	Shanty	10		2
-Complete Travelling Salesman	Story	22		22
-Viewpoint 2 Kingston	Viewpoint	23		2
-The Weapons Expert	Assassin Contracts	6		6
-Fast travel to Viewpoint 2 Kingston -> Fragment 2 Kingston	Animus Fragment	63		2
-Get The British Captain -> Start Alleged Drunkenness -> Shanty 3 Kingston	Shanty	11		3
-The British Captain	Assassin Contracts	7		7
-Fragment 3 Kingston	Animus Fragment	64		3
-Do first Eavesdrop on guards -> Viewpoint 3 Kingston(near warehouse)	Viewpoint	24		1
-Get warehouse -> Chest 3 Kingston	Chest	3		3
-Kingston Crown	Taverns	4		4
-Fragment 4 Kingston	Animus Fragment	65		4
-Chest 4 Kingston	Chest	4		4
-Complete Alleged Drunkenness	Templar Hunts	1		1
-Shanty 4 Kingston	Shanty	12		4
-Start Recruiting Maroons -> Chest 5 Kingston	Chest	5		5
-Manuscript 1 Kingston -> Reload	Manuscripts	6		6
-Shanty 5 Kingston	Shanty	13		5
-get The Plantation Master -> Fragment 5 Kingston	Animus Fragment	66		5
-Viewpoint 4 Kingston	Viewpoint	25		3
-Free final slave -> Fragment 6 Kingston	Animus Fragment	67		6
-Recruiting Maroons	Templar Hunts	2		2
-Start Unmanned -> Viewpoint 5 Kingston	Viewpoint	26		4
-After disabling all bells -> Chest 6 Kingston	Chest	6		6
-(far left outside the walls)Chest 7 Kingston	Chest	7		7
-Reload-> Viewpoint 6 Kingston	Viewpoint	27		5
-Chest 8 Kingston	Chest	8		8
-Chest 9 Kingston	Chest	9		9
-Fragment 7 Kingston(before killing prines or after)	Animus Fragment	68		1
-Get The Slave Traders -> Complete Unmanned	Story	23		23
-Fast travel to Kingston viewpoint 2 -> The Slave Traders	Assassin Contracts	8		8
-Fast travel to Viewpoint 5->get The Judge->Fast travel to Viewpoint near warehouse south->Chest 10 Kingston	Chest	10		10
-Fast travel to North east Viewpoint -> The Slave Master	Assassin Contracts	9		9
-Chest 11 Kingston	Chest	11		11
-Viewpoint 7 Kingston	Viewpoint	28		6
-Fragment 7 Kingston	Animus Fragment	69		7
-Fragment 8 Kingston	Animus Fragment	70		8
-Get the Guard Post -> fast travel to viewpoint 7 -> Chest 12 Kingston	Chest	12		12
-Chest 13 Kingston	Chest	13		13
-Quit warp -> The Guard Post	Assassin Contracts	10		10
-Chest 14 Kingston	Chest	14		14
-Chest 15 Kingston	Chest	15		15
-Fast travel to viewpoint 2 -> Under Attack	Templar Hunts	3		3
-Fast travel to viewpoint 2 -> Start The Commanders Ruse -> Fragment 9 Kingston 	Animus Fragment	71		71
-Shanty 6 Kingston	Shanty	14		6
-The Commanders Ruse	Templar Hunts	4		4
-Chest 16 Kingston	Chest	16		16
-Fast travel to Kingston -> (during following sequence) Shanty 1 Nassua	Shanty	15		1
-buy hull armor, Diving bell, mortor storage, Refill ammo, Cheat reload	Upgrades	8		8
-Chest 1 Nassua	Chest	1		1
-Chest 2 Nassua	Chest	2		2
-Cheat warp -> Chest 3 Nassua	Chest	3		3
+Fast Travel to Tortuga -> Chest 7 Tortuga	Chest	102	None	7
+The Slave Master	Assassin Contracts	6	None	6
+Letter 9 Tortuga	Letters	9	None	9
+Fast travel to Navassa -> Chest 14 Uncharted	Chest	103	(699,155)	14
+go to kingston -> Start Traveling Salesman-> Buy officer's rapiers	Upgrades	20	None	20
+Buy Cannon-Barrel Pistols	Upgrades	21	None	21
+Buy  rabbit pelt 2x 	Upgrades	22	None	22
+Buy hutia pelt 2x	Upgrades	23	None	23
+Buy howler moneky skin 2x	Upgrades	24	None	24
+Buy crocodile leather 2x	Upgrades	25	None	25
+Buy killer whale skin 2x	Upgrades	26	None	26
+Buy humpback whale skin 2x	Upgrades	27	None	27
+Buy  Pistol Holster 3	Upgrades	28	None	28
+Buy Pistol Holster 4	Upgrades	29	None	29
+Buy smoke bomb pouch 1	Upgrades	30	None	30
+Buy smoke bomb pouch 2	Upgrades	31	None	31
+Buy dart pouch 1	Upgrades	32	None	32
+Buy dart pouch 2	Upgrades	33	None	33
+Viewpoint 1 Kingston	Viewpoint	22	None	1
+Shanty 1 Kingston	Shanty	9	None	1
+Chest 1 Kingston	Chest	104	None	1
+Chest 2 Kingston	Chest	105	None	2
+Reload when objective turns to eavesdrop -> fragment 1 Kingston	Animus Fragment	62	None	1
+Shanty 2 Kingston	Shanty	10	None	2
+Complete Travelling Salesman	Story	22	None	22
+Viewpoint 2 Kingston	Viewpoint	23	None	2
+The Weapons Expert	Assassin Contracts	7	None	7
+Fast travel to Viewpoint 2 Kingston -> Fragment 2 Kingston	Animus Fragment	63	None	2
+Get The British Captain -> Start The Maroon Assassins -> Shanty 3 Kingston	Shanty	11	None	3
+The British Captain	Assassin Contracts	8	None	8
+Fragment 3 Kingston	Animus Fragment	64	None	3
+Do first Eavesdrop on guards -> (near warehouse) Viewpoint 3 Kingston	Viewpoint	24	None	3
+Get warehouse -> Chest 3 Kingston	Chest	106	None	3
+Kingston Crown	Taverns	4	None	4
+Fragment 4 Kingston	Animus Fragment	65	None	4
+Chest 4 Kingston	Chest	107	None	4
+Complete The Maroon Assassins	Templar Hunts	1	None	1
+Shanty 4 Kingston	Shanty	12	None	4
+Start Recruiting Maroons -> Chest 5 Kingston	Chest	108	None	5
+Manuscript 1 Kingston	Manuscripts	6	None	6
+Reload -> Shanty 5 Kingston	Shanty	13	None	5
+get The Plantation Master -> Fragment 5 Kingston	Animus Fragment	66	None	5
+Viewpoint 4 Kingston	Viewpoint	25	None	4
+Free final slave -> Fragment 6 Kingston	Animus Fragment	67	None	6
+Recruiting Maroons	Templar Hunts	2	None	2
+Start Unmanned -> Viewpoint 5 Kingston	Viewpoint	26	None	5
+After disabling all bells -> Chest 6 Kingston	Chest	109	None	6
+(far left outside the walls)Chest 7 Kingston	Chest	110	None	7
+Reload-> Viewpoint 6 Kingston	Viewpoint	27	None	6
+Chest 8 Kingston	Chest	111	None	8
+Chest 9 Kingston	Chest	112	None	9
+(before killing prines or after) Fragment 7 Kingston	Animus Fragment	68	None	7
+Get The Slave Traders -> Complete Unmanned	Story	23	None	23
+Fast travel to Kingston viewpoint 2 -> The Slave Traders	Assassin Contracts	9	None	9
+Fast travel to Viewpoint 5 -> get The Judge ->  Fast travel to Viewpoint near warehouse south -> Chest 10 Kingston	Chest	113	None	10
+Fast travel to North east Viewpoint -> The Slave Master	Assassin Contracts	10	None	10
+Chest 11 Kingston	Chest	114	None	11
+Viewpoint 7 Kingston	Viewpoint	28	None	7
+Fragment 8 Kingston	Animus Fragment	69	None	8
+Fragment 9 Kingston	Animus Fragment	70	None	9
+Get the Guard Post -> fast travel to viewpoint 7 -> Chest 12 Kingston	Chest	115	None	12
+Chest 13 Kingston	Chest	116	None	13
+Quit warp -> The Guard Post	Assassin Contracts	11	None	11
+Chest 14 Kingston	Chest	117	None	14
+Chest 15 Kingston	Chest	118	None	15
+Fast travel to viewpoint 2 -> Under Attack	Templar Hunts	3	None	3
+Fast travel to viewpoint 2 -> Start The Commanders Ruse -> Fragment 10 Kingston	Animus Fragment	71	None	10
+Shanty 6 Kingston	Shanty	14	None	6
+The Commanders Ruse	Templar Hunts	4	None	4
+Chest 16 Kingston	Chest	119	None	16
+Fast travel to Nassua -> (during following sequence) Shanty 1 Nassua	Shanty	15	None	1
+Buy Hull Armor 2	Upgrades	34	None	34
+Buy Diving Bell	Upgrades	35	None	35
+Buy Mortar storage 3, Refill ammo, Cheat reload	Upgrades	36	None	36
+Chest 1 Nassua	Chest	120	None	1
+Chest 2 Nassua	Chest	121	None	2
+Cheat warp -> Chest 3 Nassua	Chest	122	None	3
 Fast travel to just outsude Havana -> Fragment 9 Uncharted	Animus Fragment	72	(268,699)	9
-Destroy Defenses & Infiltrate fort -> The Informant	Assassin Contracts	11		11
-Chest 1 DryTortuga	Chest	1		1
-Fragment 1 DryTortuga	Animus Fragment	73		1
-Fragment 2 DryTortuga	Animus Fragment	74		2
-Chest 2 DryTortuga	Chest	2		2
-Capture Dry Tortuga	Forts	4		4
-Private Escort	Naval Contracts	4		4
-El Impoluto	Legendary Ships	3		3
-Fast travel to dry tortuga -> Chest 15 Uncharted	Chest	15	(316,759)	15
-Swim in water Quit warp -> Start Diving for Medicines -> Chest 1 Underwater	Chest	1		1
-Chest 2 Underwater	Chest	2		2
-Fragment 1 Underwater	Animus Fragment	75		1
-Chest 3 Underwater	Chest	3		3
-get medicine chest then Go through water tunnel reload -> Fragment 2 Underwater	Animus Fragment	76		2
-Chest 4 Underwater	Chest	4		4
-Fragment 3 Underwater	Animus Fragment	77		3
-Chest 5 Underwater	Chest	5		5
-Chest 6 Underwater	Chest	6		6
-Complete Diving for Medicines	Story	24		24
+Destroy Defenses & Infiltrate fort -> The Informant	Assassin Contracts	12	None	12
+Chest 1 DryTortuga	Chest	123	None	1
+Fragment 1 DryTortuga	Animus Fragment	73	None	1
+Fragment 2 DryTortuga	Animus Fragment	74	None	2
+Chest 2 DryTortuga	Chest	124	None	2
+Capture Dry Tortuga	Forts	4	None	4
+Private Escort	Naval Contracts	4	None	4
+El Impoluto	Legendary Ships	3	None	3
+Fast travel to dry tortuga -> Chest 15 Uncharted	Chest	125	(316,759)	15
+Swim in water Quit warp -> Start Diving for Medicines -> Chest 1 Underwater	Chest	126	None	1
+Chest 2 Underwater	Chest	127	None	2
+Fragment 1 Underwater	Animus Fragment	75	None	1
+Chest 3 Underwater	Chest	128	None	3
+get medicine thing then Go through water tunnel reload -> Fragment 2 Underwater	Animus Fragment	76	None	2
+Chest 4 Underwater	Chest	129	None	4
+Fragment 3 Underwater	Animus Fragment	77	None	3
+Chest 5 Underwater	Chest	130	None	5
+Chest 6 Underwater	Chest	131	None	6
+Complete Diving for Medicines	Story	24	None	24
 Fragment 10 Uncharted	Animus Fragment	78	(362,815)	10
 Fragment 11 Uncharted	Animus Fragment	79	(369,862)	11
-Quit warp -> Letter Florida	Letters	10		10
-Fragment 1 Florida	Animus Fragment	80		1
-Viewpoint Florida	Viewpoint	29		1
-Cheat reload -> Fragment 2 Florida	Animus Fragment	81		2
-Chest Florida	Chest	1		1
+Quit warp -> Letter 10 Florida	Letters	10	None	10
+Fragment 1 Florida	Animus Fragment	80	None	1
+Viewpoint Florida	Viewpoint	29	None	1
+Cheat reload -> Fragment 2 Florida	Animus Fragment	81	None	2
+Chest Florida	Chest	132	None	1
 Fast Travel to San Ignacio Wreck -> Fragment 12 Uncharted	Animus Fragment	82	(388,722)	12
-Fast Travel to Florida -> Chest 16 Uncharted	Chest	16	(455,784)	16
+Fast Travel to Florida -> Chest 16 Uncharted	Chest	133	(455,784)	16
 Fragment 13 Uncharted	Animus Fragment	83	(513,770)	13
-Chest 17 Uncharted	Chest	17	(497,730)	17
-Fast Travel just outside Kingston -> Chest 18 Uncharted	Chest	18	(655,73)	18
-Cheat reload -> Chest 19 Uncharted	Chest	19	(527,113)	19
-Swim then quit warp -> Chest 7 Underwater	Chest	7		7
-Chest 8 Underwater	Chest	8		8
-Chest 9 Underwater	Chest	9		9
-Fragment 4 Underwater	Animus Fragment	84		4
-Chest 10 Underwater	Chest	10		10
-Chest 11 Underwater	Chest	11		11
-Chest 12 Underwater	Chest	12		12
-Fragment 5 Underwater	Animus Fragment	85		5
-Chest 13 Underwater	Chest	13		13
-Fragment 6 Underwater	Animus Fragment	86		6
-Cheat reload -> Chest 20 Uncharted	Chest	20	(471,217)	20
-quit warp -> Buried Chest New Bone	Burired Treasure	5		5
-Viewpoint New Bone	Viewpoint	30		1
-Skip fragment on windmill Get Castaway -> Fragment 1 New Bone	Animus Fragment	87		1
-Chest 1 New Bone	Chest	1		1
-Myan Stone New Bone	Myan Stones	7		7
-warehouse -> Chest 2 New Bone	Chest	2		2
-Chest 3 New Bone	Chest	3		3
-Chest 4 New Bone	Chest	4		4
-Fragment 2 New Bone	Animus Fragment	88		2
-Chest 5 New Bone	Chest	5		5
+Chest 17 Uncharted	Chest	134	(497,730)	17
+Fast Travel just outside Kingston -> Chest 18 Uncharted	Chest	135	(655,73)	18
+Cheat reload -> Chest 19 Uncharted	Chest	136	(527,113)	19
+Swim then quit warp -> Chest 7 Underwater	Chest	137	None	7
+Chest 8 Underwater	Chest	138	None	8
+Chest 9 Underwater	Chest	139	None	9
+Fragment 4 Underwater	Animus Fragment	84	None	4
+Chest 10 Underwater	Chest	140	None	10
+Chest 11 Underwater	Chest	141	None	11
+Chest 12 Underwater	Chest	142	None	12
+Fragment 5 Underwater	Animus Fragment	85	None	5
+Chest 13 Underwater	Chest	143	None	13
+Fragment 6 Underwater	Animus Fragment	86	None	6
+Cheat reload -> Chest 20 Uncharted	Chest	144	(471,217)	20
+quit warp -> Buried Treasure New Bone	Burired Treasure	5	None	5
+Viewpoint New Bone	Viewpoint	30	None	1
+Skip fragment on windmill Get Castaway -> Fragment 1 New Bone	Animus Fragment	87	None	1
+Chest 1 New Bone	Chest	145	None	1
+Myan Stone New Bone	Myan Stones	7	None	7
+warehouse -> Chest 2 New Bone	Chest	146	None	2
+Chest 3 New Bone	Chest	147	None	3
+Chest 4 New Bone	Chest	148	None	4
+Fragment 2 New Bone	Animus Fragment	88	None	2
+Chest 5 New Bone	Chest	149	None	5
 Fast travel to The Blue Hole -> Fragment 14 Uncharted	Animus Fragment	89	(549,167)	14
 Fast travel to NewBone -> Fragment 15 Uncharted	Animus Fragment	90	(468,44)	15
-La Dama Negra	Legendary Ships	4		4
+La Dama Negra	Legendary Ships	4	None	4
 Fast travel to SaltLagoon -> Fragment 16 Uncharted	Animus Fragment	91	(707,629)	16
-Cheat reload start Devil's Advocate -> Chest 21 Uncharted	Chest	21	(809,597)	21
+Cheat reload start Devil's Advocate -> Chest 21 Uncharted	Chest	150	(809,597)	21
 Fragment 17 Uncharted	Animus Fragment	92	(854,598)	17
-Complete Devils Advocate	Story	25		25
-Fast Travel Salt Lagoon -> Chest 22 Uncharted	Chest	22	(760,560)	22
-quit warp -> Crooked Island Canter	Taverns	5		5
-Refill ammo -> Viewpoint CrookedIsland	Viewpoint	31		1
-Chest 1 CrookedIsland	Chest	1		1
-Chest 2 CrookedIsland	Chest	2		2
-Cheat reload -> Fragment 1 CrookedIsland	Animus Fragment	93		1
-Chest 3 CrookedIsland	Chest	3		3
-The Poachers	Assassin Contracts	12		12
-Viewpoint Mariguana	Viewpoint	32		1
-Fast travel to Viewpoint Mariguana -> Fragment 1 Mariguana	Animus Fragment	94		1
-Chest 1 Mariguana	Chest	1		1
-Chest 2 Mariguana	Chest	2		2
-Chest 3 Mariguana	Chest	3		3
-Treasure Map Mariguana -> Chest 4 Mariguana	Chest	4		4
-Fragment 2 Mariguana	Animus Fragment	95		2
-The Treasure Hunter	Assassin Contracts	13		13
-Cheat reload -> Abaco Island Chest 	Burired Treasure	6		6
-Get Slavers Intution -> Andreas Island Chest	Burired Treasure	7		7
-A Slavers Intution	Assassin Contracts	14		14
+Complete Devils Advocate	Story	25	None	25
+Fast Travel Salt Lagoon -> Chest 22 Uncharted	Chest	151	(760,560)	22
+quit warp -> Crooked Island Canter	Taverns	5	None	5
+Refill ammo -> Viewpoint CrookedIsland	Viewpoint	31	None	1
+Chest 1 CrookedIsland	Chest	152	None	1
+Chest 2 CrookedIsland	Chest	153	None	2
+Cheat reload -> Fragment 1 CrookedIsland	Animus Fragment	93	None	1
+Chest 3 CrookedIsland	Chest	154	None	3
+The Poachers	Assassin Contracts	13	None	13
+Viewpoint Mariguana	Viewpoint	32	None	1
+Fast travel to Viewpoint Mariguana -> Fragment 1 Mariguana	Animus Fragment	94	None	1
+Chest 1 Mariguana	Chest	155	None	1
+Chest 2 Mariguana	Chest	156	None	2
+Chest 3 Mariguana	Chest	157	None	3
+Treasure Map Mariguana -> Chest 4 Mariguana	Chest	158	None	4
+Fragment 2 Mariguana	Animus Fragment	95	None	2
+The Treasure Hunter	Assassin Contracts	14	None	14
+Cheat reload -> Buried Treasure Abaco Island	Burired Treasure	6	None	6
+Get Slavers Intution -> Buried Treasure Andreas Island	Burired Treasure	7	None	7
+A Slavers Intution	Assassin Contracts	15	None	15
 quit warp -> Fragment 18 Uncharted	Animus Fragment	96	(581,659)	18
-cheat reload -> Chest 14 Underwater	Chest	14		14
-Chest 15 Underwater	Chest	15		15
-Fragment 7 Underwater	Animus Fragment	97		7
-Chest 16 Underwater	Chest	16		16
-Chest 17 Underwater	Chest	17		17
-Chest 18 Underwater	Chest	18		18
-Chest 19 Underwater	Chest	19		19
-Chest 20 Underwater	Chest	20		20
-Fragment 8 Underwater	Animus Fragment	98		8
-cheat warp -> Chest 23 Uncharted	Chest	23	(677,674)	23
-Letter Crooked Island	Letters	11		11
-Fragment 2 CrookedIsland	Animus Fragment	99		2
-Fragment 3 CrookedIsland	Animus Fragment	100		3
-Chest 4 CrookedIsland	Chest	4		4
-Chest 5 CrookedIsland	Chest	5		5
-Chest 6 CrookedIsland	Chest	6		6
-The Deserter	Assassin Contracts	15		15
-Chest 2 Salt Lagoon	Chest	2		2
-Fragment 2 Salt Lagoon	Animus Fragment	101		2
-Salt Lagoon Chest	Burired Treasure	8		8
-Chest 3 Salt Lagoon	Chest	3		3
-Chest 24 Uncharted	Chest	24	(707,558)	24
-Swim to red quit warp -> Destroy Defenses & Infiltrate fort -> Chest 1 Gibra	Chest	1		1
-Fragment 1 Gibra	Animus Fragment	102		1
-Fragment 2 Gibra	Animus Fragment	103		2
-Chest 2 Gibra	Chest	2		2
-Capture Gibra	Forts	5		5
-Silk on the Waves	Naval Contracts	5		5
-buy ram strength 2x, cheat reload	Upgrades	9		9
-Chest 25 Uncharted	Chest	25	(653,590)	25
-Fast travel to gibra -> Fragment 19 Uncharted	Animus Fragment	104		19
-Swim quit warp -> Chest 1 Jiguey	Chest	1		1
-Chest 2 Jiguey	Chest	2		2
-Fragment 1 Jiguey	Animus Fragment	105		1
-Chest 3 Jiguey	Chest	3		3
-Jiguey Chest	Burired Treasure	9		9
-Chest 4 Jiguey	Chest	4		4
-Fragment 2 Jiguey	Animus Fragment	106		2
-quit warp -> Letter Jiguey	Letters	12		12
-Fragment 20 Uncharted	Animus Fragment	107		20
-Complete The Sige of Charles Town	Story	26		26
-Complete Corporate Pressure	Story	27		27
-Start We Demand A Parlay -> Fragment 2 Nassua	Animus Fragment	108		1
-Shanty 2 Nassua	Shanty	16		2
-Chest 4 Nassua	Chest	4		4
-Fragment 2 Nassua	Animus Fragment	109		2
-get The Pirate Captain -> Fragment 3 Nassua	Animus Fragment	110		3
-Fragment 3(fort) Nassua	Animus Fragment	111		4
-Reload -> Fragment 4 Nassua	Animus Fragment	112		5
-Viewpoint 2 Nassua	Viewpoint	33		2
-Chest 5 Nassua	Chest	5		5
-Complete We Demand A Parlay	Story	28		28
-Fragment 6 Nassua	Animus Fragment	113		6
-Manuscript 1 Nassua	Manuscripts	7		7
-Cheat Reload -> Start Gunpowder Plot -> Chest 6 Nassua	Chest	6		6
-Chest 7 Nassua	Chest	7		7
-Fragment 7 Nassua	Animus Fragment	114		7
-Viewpoint 3 Nassua	Viewpoint	34		3
-Shanty 3 Nassua	Shanty	17		3
-Chest 8 Nassua	Chest	8		8
-Manuscript 2 Nassua	Manuscripts	8		8
-Viewpoint 4 Nassua	Viewpoint	35		4
-Fragment 8 Nassua	Animus Fragment	115		8
-Fragment 9 Nassua	Animus Fragment	116		9
-Chest 9 Nassua	Chest	9		9
-Viewpoint 5 Nassua	Viewpoint	36		5
-Complete The Gunpowder Plot	Assassin Contracts	16		16
-Chest 10 Nassua	Chest	10		10
-Manuscript 3 Nassua	Manuscripts	9		9
-Cheat reload -> Chest 11 Nassua	Chest	11		11
-Viewpoint 6 Nassua	Viewpoint	37		6
-Manuscript 4 Nassua	Manuscripts	10		10
-Start Commodore Eighty-Sixed -> Chest 12 Nassua	Chest	12		12
-Chest 13 Nassua	Chest	13		13
-Manuscript 5 Nassua	Manuscripts	11		11
-Chest 14 Nassua	Chest	14		14
-Reload -> Complete Commodore Eighty-Sixed	Story	29		29
-Cheat Reload -> start Oh Brother... -> Shanty 4 Nassua	Shanty	18		4
-Complete Oh Brother...	Templar Hunts	5		5
-Chest 15 Nassua	Chest	15		15
-Shanty 5 Nassua	Shanty	19		5
-The Pirate Captain	Assassin Contracts	17		17
-Fragment 10 Nassua	Animus Fragment	117		10
-Chest 16 Nassua	Chest	16		16
-Chest 17 Nassua	Chest	17		17
-Chest 18 Nassua	Chest	18		18
-Fragment 11 Nassua	Animus Fragment	118		11
-quit warp -> Chest 19 Nassua	Chest	19		19
-Viewpoint 7 Nassua	Viewpoint	38		7
-Complete The Fire Ship	Story	30		30
-Start The Other Brother -> get The Outlaws -> Complete The Other Brother	Templar Hunts	6		6
-Chest 20 Nassua	Chest	20		20
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
-		0		
+cheat reload -> Chest 14 Underwater	Chest	159	None	14
+Chest 15 Underwater	Chest	160	None	15
+Fragment 7 Underwater	Animus Fragment	97	None	7
+Chest 16 Underwater	Chest	161	None	16
+Chest 17 Underwater	Chest	162	None	17
+Chest 18 Underwater	Chest	163	None	18
+Chest 19 Underwater	Chest	164	None	19
+Chest 20 Underwater	Chest	165	None	20
+Fragment 8 Underwater	Animus Fragment	98	None	8
+cheat warp -> Chest 23 Uncharted	Chest	166	(677,674)	23
+Letter 11 Crooked Island	Letters	11	None	11
+Fragment 2 CrookedIsland	Animus Fragment	99	None	2
+Fragment 3 CrookedIsland	Animus Fragment	100	None	3
+Chest 4 CrookedIsland	Chest	167	None	4
+Chest 5 CrookedIsland	Chest	168	None	5
+Chest 6 CrookedIsland	Chest	169	None	6
+The Deserter	Assassin Contracts	16	None	16
+Chest 2 Salt Lagoon	Chest	170	None	2
+Fragment 2 Salt Lagoon	Animus Fragment	101	None	2
+Buried Treasure Salt Lagoon	Burired Treasure	8	None	8
+Chest 3 Salt Lagoon	Chest	171	None	3
+Chest 24 Uncharted	Chest	172	(707,558)	24
+Swim to red quit warp -> Destroy Defenses & Infiltrate fort -> Chest 1 Gibra	Chest	173	None	1
+Fragment 1 Gibra	Animus Fragment	102	None	1
+Fragment 2 Gibra	Animus Fragment	103	None	2
+Chest 2 Gibra	Chest	174	None	2
+Capture Gibra	Forts	5	None	5
+Silk on the Waves	Naval Contracts	5	None	5
+Buy Ram Strength 1	Upgrades	37	None	37
+Buy Ram Strength 2, cheat reload	Upgrades	38	None	38
+Chest 25 Uncharted	Chest	175	(653,590)	25
+Fast travel to gibra -> Fragment 19 Uncharted	Animus Fragment	104	(613,534)	19
+Swim quit warp -> Chest 1 Jiguey	Chest	176	None	1
+Chest 2 Jiguey	Chest	177	None	2
+Fragment 1 Jiguey	Animus Fragment	105	None	1
+Chest 3 Jiguey	Chest	178	None	3
+Buried Treasure Jiguey	Burired Treasure	9	None	9
+Chest 4 Jiguey	Chest	179	None	4
+Fragment 2 Jiguey	Animus Fragment	106	None	2
+quit warp -> Letter 12 Jiguey	Letters	12	None	12
+Fragment 20 Uncharted	Animus Fragment	107	(585,592)	20
+The Sige of Charles Town	Story	26	None	26
+Corporate Pressure	Story	27	None	27
+Start We Demand A Parlay -> Fragment 2 Nassua	Animus Fragment	108	None	2
+Shanty 2 Nassua	Shanty	16	None	2
+Chest 4 Nassua	Chest	180	None	4
+Fragment 3 Nassua	Animus Fragment	109	None	3
+get The Pirate Captain -> Fragment 4 Nassua	Animus Fragment	110	None	4
+Fragment 5 (fort) Nassua	Animus Fragment	111	None	5
+Reload -> Fragment 6 Nassua	Animus Fragment	112	None	6
+Viewpoint 2 Nassua	Viewpoint	33	None	2
+Chest 5 Nassua	Chest	181	None	5
+Complete We Demand A Parlay	Story	28	None	28
+Fragment 7 Nassua	Animus Fragment	113	None	7
+Manuscript 1 Nassua	Manuscripts	7	None	7
+Cheat Reload -> Start Gunpowder Plot -> Chest 6 Nassua	Chest	182	None	6
+Chest 7 Nassua	Chest	183	None	7
+Fragment 8 Nassua	Animus Fragment	114	None	8
+Viewpoint 3 Nassua	Viewpoint	34	None	3
+Shanty 3 Nassua	Shanty	17	None	3
+Chest 8 Nassua	Chest	184	None	8
+Refill on ammo if needed -> Manuscript 2 Nassua	Manuscripts	8	None	8
+Viewpoint 4 Nassua	Viewpoint	35	None	4
+Fragment 9 Nassua	Animus Fragment	115	None	9
+Fragment 10 Nassua	Animus Fragment	116	None	10
+Chest 9 Nassua	Chest	185	None	9
+Viewpoint 5 Nassua	Viewpoint	36	None	5
+Complete The Gunpowder Plot	Story	29	None	29
+Chest 10 Nassua	Chest	186	None	10
+Manuscript 3 Nassua	Manuscripts	9	None	9
+Cheat reload -> Chest 11 Nassua	Chest	187	None	11
+Viewpoint 6 Nassua	Viewpoint	37	None	6
+Manuscript 4 Nassua	Manuscripts	10	None	10
+Start Commodore Eighty-Sixed -> Chest 12 Nassua	Chest	188	None	12
+Chest 13 Nassua	Chest	189	None	13
+Manuscript 5 Nassua	Manuscripts	11	None	11
+Chest 14 Nassua	Chest	190	None	14
+Chest 15 Nassua	Chest	191	None	15
+Reload -> Complete Commodore Eighty-Sixed	Story	30	None	30
+Cheat Reload -> start Oh Brother... -> Shanty 4 Nassua	Shanty	18	None	4
+Complete Oh Brother...	Templar Hunts	5	None	5
+Chest 16 Nassua	Chest	192	None	16
+Shanty 5 Nassua	Shanty	19	None	5
+Fragment 11 Nassua	Animus Fragment	117	None	11
+Chest 17 Nassua	Chest	193	None	17
+The Pirate Captain	Assassin Contracts	17	None	17
+Chest 18 Nassua	Chest	194	None	18
+Chest 19 Nassua	Chest	195	None	19
+Fragment 12 Nassua	Animus Fragment	118	None	12
+quit warp -> Chest 20 Nassua	Chest	196	None	20
+Viewpoint 7 Nassua	Viewpoint	38	None	7
+Complete The Fire Ship	Story	31	None	31
+Start The Other Brother -> get The Outlaws -> Complete The Other Brother	Templar Hunts	6	None	6
+Chest 21 Nassua	Chest	197	None	21
+Do Upton's Sorrow	Templar Hunts	7	None	7
+Start Queen of Pirates, King of Fools -> Buried Treasure Nassua	Burired Treasure	10	None	10
+Complete The Outlaws	Assassin Contracts	18	None	18
+Fragment 13 Nassua	Animus Fragment	119	None	13
+Kill the targets -> Chest 22 Nassua	Chest	198	None	22
+Complete Queen of Pirates, King of Fools	Templar Hunts	8	None	8
+Fast Travel to Abaco Island -> Chest 26 Uncharted	Chest	199	(669,830)	26
+Letter 13 Uncharted 2	Letters	13	(669,830)	13
+Chest 27 Uncharted	Chest	200	(688,904)	27
+Chest 28 Uncharted	Chest	201	(637,947)	28
+Do Not Go Gently...	Story	32	None	32
+Fast travel to Cumberland Bay -> Chest 1 Cruz	Chest	202	None	1
+Fragment 1 Cruz	Animus Fragment	120	None	1
+Chest 2 Cruz	Chest	203	None	2
+Fragment 2 Cruz	Animus Fragment	121	None	2
+Capture Cruz	Forts	6	None	6
+Drift Wood	Naval Contracts	6	None	6
+Chest 21 Underwater	Chest	204	None	21
+Chest 22 Underwater	Chest	205	None	22
+Fragment 9 Underwater	Animus Fragment	122	None	9
+Chest 23 Underwater	Chest	206	None	23
+Chest 24 Underwater	Chest	207	None	24
+Chest 25 Underwater	Chest	208	None	25
+Fragment 10 Underwater	Animus Fragment	123	None	10
+Chest 26 Underwater	Chest	209	None	26
+Chest 27 Underwater	Chest	210	None	27
+Chest 28 Underwater	Chest	211	None	28
+Cheat reload -> exit ship wreck -> Chest 29 Uncharted	Chest	212	(441,385)	29
+Chest 30 Uncharted	Chest	213	(379,400)	30
+Vainglorious Bastards(try and get frigate to spawn with metal)	Story	33	None	33
+Buried Treasure Isla Providencia	Burired Treasure	11	None	11
+Chest 1 Isla Providencia	Chest	214	None	1
+Viewpoint 1 Isla Providencia	Viewpoint	39	None	1
+Chest 2 Isla Providencia	Chest	215	None	2
+Letter 14 Isla Providencia	Letters	14	None	14
+Chest 3 Isla Providencia	Chest	216	None	3
+Chest 4 Isla Providencia	Chest	217	None	4
+Fragment 1 Isla Providencia	Animus Fragment	124	None	1
+Fragment 2 Isla Providencia	Animus Fragment	125	None	2
+Chest 5 Isla Providencia	Chest	218	None	5
+Fragment 3 Isla Providencia	Animus Fragment	126	None	3
+Myan Stone 1 Isla Providencia	Myan Stones	8	None	8
+Chest 6 Isla Providencia	Chest	219	None	6
+Viewpoint 2 Isla Providencia	Viewpoint	40	None	2
+Fragment 4 Isla Providencia	Animus Fragment	127	None	4
+Chest 7 Isla Providencia	Chest	220	None	7
+Treasure Map Isla Providencia -> Chest 8 Isla Providencia	Chest	221	None	8
+Chest 9 Isla Providencia	Chest	222	None	9
+Myan Stone 2 Isla Providencia	Myan Stones	9	None	9
+Fragment 5 Isla Providencia	Animus Fragment	128	None	5
+Viewpoint 3 Isla Providencia	Viewpoint	41	None	3
+Complete Marooned	Story	34	None	34
+Fast travel to Conttoyor -> Start The Realities of War ->  Refill on ammo if needed -> Chest 31 Uncharted	Chest	223	(58,535)	31
+The Realities of War	Naval Contracts	7	None	7
+Fast travel to Conttoyor -> refill on ammo/repair ship if needed -> Mortar 3	Upgrades	39	None	39
+BroadSide Cannon 2	Upgrades	40	None	40
+Cheat reload to skip upgrade of jackdaw cutscene -> fast travel to tulum ->  return to ship -> Cheat reload -> Fragment 1 Chinchorro	Animus Fragment	129	None	1
+Fragment 2 Chinchorro	Animus Fragment	130	None	2
+Chest 1 Chinchorro	Chest	224	None	1
+Chest 2 Chinchorro	Chest	225	None	2
+Capture Chinchorro	Forts	7	None	7
+Return to ship -> when 410 away from shipwreck quit warp ->  Chest 29 Underwater	Chest	226	None	29
+Chest 30 Underwater	Chest	227	None	30
+Cheat reload -> Fragment 11 Underwater	Animus Fragment	131	None	11
+Chest 31 Underwater	Chest	228	None	31
+Chest 32 Underwater	Chest	229	None	32
+Chest 33 Underwater	Chest	230	None	33
+Fragment 12 Underwater	Animus Fragment	132	None	12
+Chest 34 Underwater	Chest	231	None	34
+Chest 35 Underwater	Chest	232	None	35
+Fragment 13 Underwater	Animus Fragment	133	None	13
+Cheat Reload -> leave shipwreck -> Chest 32 Uncharted	Chest	233	(246,347)	32
+Quit warp -> Fragment 1 Cayman Sound	Animus Fragment	134	None	1
+The Castaway	Assassin Contracts	19	None	19
+Letter 15 Cayman Sound	Letters	15	None	15
+Chest 1 Cayman Sound	Chest	234	None	1
+Fragment 2 Cayman Sound	Animus Fragment	135	None	2
+Chest 2 Cayman Sound	Chest	235	None	2
+Fragment 3 Cayman Sound	Animus Fragment	136	None	3
+Viewpoint Cayman Sound	Viewpoint	42	None	1
+The Taino Assassin	Templar Hunts	9	None	9
+Fast Travel to Devil Eye's Cavern -> Chest 33 Uncharted	Chest	236	(442,333)	33
+Quit warp -> Start Templar Ships -> Fragment 1 Grand Cayman	Animus Fragment	137	None	1
+Shanty Grand Cayman	Shanty	20	None	1
+Chest 1 Grand Cayman	Chest	237	None	1
+Start Eavesdrop -> Chest 2 Grand Cayman	Chest	238	None	2
+Chest 3 Grand Cayman	Chest	239	None	3
+Templar Ships	Templar Hunts	10	None	10
+The Randy Cayman	Taverns	6	None	6
+Fragment 2 Grand Cayman	Animus Fragment	138	None	2
+Chest 4 Grand Cayman	Chest	240	None	4
+Chest reload -> The Twin Dilemma	Assassin Contracts	20	None	20
+Cheat reload -> Start Right Hand Man -> Get The Smugglers Squat -> Viewpoint Grand Cayman	Viewpoint	43	None	1
+Fragment 3 Grand Cayman	Animus Fragment	139	None	3
+Chest 5 Grand Cayman	Chest	241	None	5
+Reload checkpoint -> Activate chase sequence -> Chest 6 Grand Cayman	Chest	242	None	6
+Right Hand Man	Templar Hunts	11	None	11
+Fast Travel to Cayman Sound -> Chest 34 Uncharted	Chest	243	(294,408)	34
+Quit warp -> Start The trail of Lucia Márquez -> Chest 1 Pinos Isle	Chest	244	None	1
+Fragment 1 Pinos Isle	Animus Fragment	140	None	1
+Chest 2 Pinos Isle	Chest	245	None	2
+The trail of Lucia Márquez	Templar Hunts	12	None	12
+Viewpoint Pinos Isle	Viewpoint	44	None	1
+Chest 3 Pinos Isle	Chest	246	None	3
+Buried Treasure Pinos Isle	Burired Treasure	12	None	12
+Fragment 2 Pinos Isle	Animus Fragment	141	None	2
+Chest 4 Pinos Isle	Chest	247	None	4
+Chest 5 Pinos Isle	Chest	248	None	5
+Treasure Map Pinos Isle -> Do Myan stone puzzle -> Fragment 3 Pinos Isle	Animus Fragment	142	None	3
+Myan Stone 1 Pinos Isle	Myan Stones	10	None	10
+Chest 6 Pinos Isle	Chest	249	None	6
+Fast travel to Cayman Sound Viewpoint ->  Treasure Map Cayman Sound -> Chest 3 Cayman Sound	Chest	250	None	3
+Buried Treasure Cayman Sound	Burired Treasure	13	None	13
+Fast Travel to Chinchorro -> Contraband	Naval Contracts	8	None	8
+Quit warp -> Fragment 21 Uncharted	Animus Fragment	143	(144,402)	21
+Chest 35 Uncharted	Chest	251	(121,450)	35
+Fragment 22 Uncharted	Animus Fragment	144	(167,504)	22
+Quit warp -> Fragment 1 Arroyos	Animus Fragment	145	None	1
+Chest 1 Arroyos	Chest	252	None	1
+Chest 2 Arroyos	Chest	253	None	2
+Fragment 2 Arroyos	Animus Fragment	146	None	2
+Get Tomb Raiders -> Fragment 3 Arroyos	Animus Fragment	147	None	3
+Chest 3 Arroyos	Chest	254	None	3
+Viewpoint Arroyos	Viewpoint	45	None	1
+Chest 4 Arroyos	Chest	255	None	4
+Fast travel to Pinos Isle Viewpoint -> Tomb Raiders	Assassin Contracts	21	None	21
+Cheat reload -> Myan stone 2 Pinos Isle	Myan Stones	11	None	11
+Fast travel to Arroyos -> Chest 36 Uncharted	Chest	256	(302,572)	36
+Swim until u enter restricted zone -> Quit warp -> Fort defenses -> Fragment 1 Castilo de Jagua	Animus Fragment	148	None	1
+Chest 1 Castilo de Jagua	Chest	257	None	1
+Chest 2 Castilo de Jagua	Chest	258	None	2
+Fragment 2 Castilo de Jagua	Animus Fragment	149	None	2
+Capture Castilo de Jagua	Forts	8	None	8
+Start Eye For An Eye -> Fragment 23 Uncharted	Animus Fragment	150	(269,481)	23
+ Eye For An Eye	Naval Contracts	9	None	9
+Cheat reload -> Chest 36 Underwater	Chest	259	None	36
+Chest 37 Underwater	Chest	260	None	37
+Cheat reload -> Chest 38 Underwater	Chest	261	None	38
+Chest 39 Underwater	Chest	262	None	39
+Chest 40 Underwater	Chest	263	None	40
+Fragment 14 Underwater	Animus Fragment	151	None	14
+Chest 41 Underwater	Chest	264	None	41
+Chest 42 Underwater	Chest	265	None	42
+Fragment 15 Underwater	Animus Fragment	152	None	15
+Cheat reload -> Fast travel to Arroyos Viewpoint -> A Last Drink For The Road	Assassin Contracts	22	None	22
+Cheat reload -> Arroyos Arms	Taverns	7	None	7
+Chest 5 Arroyos	Chest	266	None	5
+Fast travel to Chinchorro -> Start Smugglers Den -> Chest 37 Uncharted	Chest	267	(93,292)	37
+Smugglers Den	Naval Contracts	10	None	10
+Fragment 24 Uncharted	Animus Fragment	153	(51,321)	24
+Quit warp -> Treasure Map Corozal -> Chest 1 Corozal	Chest	268	None	1
+Cheat reload -> Manuscript Corozal	Manuscripts	12	None	12
+Chest 2 Corozal	Chest	269	None	2
+Viewpoint Corozal	Viewpoint	46	None	1
+Fragment 1 Corozal	Animus Fragment	154	None	1
+Letter 16 Corozal	Letters	16	None	16
+Corozal Tavern	Taverns	8	None	8
+Fragment 2 Corozal	Animus Fragment	155	None	2
+Chest 3 Corozal	Chest	270	None	3
+Chest 4 Corozal	Chest	271	None	4
+The Unworthy Brother	Assassin Contracts	23	None	23
+Fast travel to Corozal Viewpoint -> Get The Outlaws Cave ->  Fragment 25 Uncharted	Animus Fragment	156	(105,207)	25
+When 630m away quit warp -> Chest 1 Ambergris Key	Chest	272	None	7
+Buried Treasure Ambergris Key	Burired Treasure	14	None	14
+Fragment 1 Ambergris Key	Animus Fragment	157	None	4
+The Outlaws Cave	Assassin Contracts	24	None	24
+Chest 2 Ambergris Key	Chest	273	None	8
+Chest 3 Ambergris Key	Chest	274	None	9
+Fragment 2 Ambergris Key	Animus Fragment	158	None	5
+Treasure Map Ambergris Key -> Fast Travel to New Bone -> Fragment 3 New Bone	Animus Fragment	159	None	3
+Get The Dreaded Pirate -> Fast travel to Kingston viewpoint near Mission -> Start Imagine My Surprise -> Chest 17 Kingston	Chest	275	None	17
+Manuscript 2 Kingston	Manuscripts	13	None	13
+Fragment 11 Kingston	Animus Fragment	160	None	11
+Imagine My Surprise	Story	35	None	35
+Manuscript 3 Kingston	Manuscripts	14	None	14
+Cheat reload -> Travel across pond -> Cheat relaod ->  Manuscript 4 Kingston	Manuscripts	15	None	15
+Cheat reload -> Viewpoint 7 Kingston	Viewpoint	47	None	8
+The Judge	Assassin Contracts	25	None	25
+Fragment 12 Kingston	Animus Fragment	161	None	12
+Chest 18 Kingston	Chest	276	None	18
+Fast Travel to Navassa -> Chest 38 Uncharted	Chest	277	(792,240)	38
+Cheat Reload -> Fragment 26 Uncharted	Animus Fragment	162	(669,269)	26
+Swim in water for 5 seconds quit warp -> Chest 1 AnottoBay	Chest	278	None	1
+Fragment 1 AnottoBay	Animus Fragment	163	None	1
+Smugglers Squat	Assassin Contracts	26	None	26
+Chest 2 AnottoBay	Chest	279	None	2
+Treasure Map AnottoBay -> Chest 3 AnottoBay	Chest	280	None	3
+Buried Treasure AnottoBay	Burired Treasure	15	None	15
+Fragment 2 AnottoBay	Animus Fragment	164	None	2
+Fast travel to Navassa -> A personal Matter	Naval Contracts	11	None	11
+When 760m away quit warp -> Fragment 16 Underwater	Animus Fragment	165	None	16
+Chest 43 Underwater	Chest	281	None	43
+Cheat reload -> Chest 44 Underwater	Chest	282	None	44
+Chest 45 Underwater	Chest	283	None	45
+Chest 46 Underwater	Chest	284	None	46
+Fragment 17 Underwater	Animus Fragment	166	None	17
+Chest 47 Underwater	Chest	285	None	47
+Chest 48 Underwater	Chest	286	None	48
+Chest 49 Underwater	Chest	287	None	49
+Chest 50 Underwater	Chest	288	None	50
+Fragment 18 Underwater	Animus Fragment	167	None	18
+Cheat reload -> Chest 39 Uncharted	Chest	289	(711,98)	39
+Cheat reload after ship fight -> Viewpoint 1 Principe	Viewpoint	48	None	1
+Fragment 1 Principe	Animus Fragment	168	None	1
+Chest 1 Principe	Chest	290	None	1
+Chest 2 Principe	Chest	291	None	2
+Reload Checkpoint -> Chest 3 Principe	Chest	292	None	3
+Buried Treasure Principe	Burired Treasure	16	None	16
+Viewpoint 2 Principe	Viewpoint	49	None	2
+Chest 4 Principe	Chest	293	None	4
+Reload Checkpointe -> Chest 5 Principe	Chest	294	None	5
+Burgess and Cockrham -> Chest 6 Principe	Chest	295	None	6
+Trust is Earned	Story	36	None	36
+Chest 1 Misteriosa	Chest	296	None	1
+Chest 2 Misteriosa	Chest	297	None	2
+Cheat reload -> Myan Stone Puzzle -> Fragment 1 Misteriosa	Animus Fragment	169	None	1
+Treasure Map Misteriosa -> Viewpoint Misteriosa	Viewpoint	50	None	1
+Buried Treasure Misteriosa	Burired Treasure	17	None	17
+Chest 3 Misteriosa	Chest	298	None	3
+Chest 4 Misteriosa	Chest	299	None	4
+Fragment 2 Misteriosa	Animus Fragment	170	None	2
+Letter 17 Misteriosa	Letters	17	None	17
+Myan Stone 1 Misteriosa	Myan Stones	12	None	12
+Fast travel Viewpoint Misteriosa -> The Dreaded Pirate	Assassin Contracts	27	None	27
+Fast travel Viewpoint Misteriosa -> Chest 5 Misteriosa	Chest	300	None	5
+Chest 6 Misteriosa	Chest	301	None	6
+Myan Stone 2 Misteriosa	Myan Stones	13	None	13
+Fast travel to Kingston Viewpoint 1 -> Round Shot Strength 4	Upgrades	41	None	41
+Heavy Shot 3	Upgrades	42	None	42
+Buried Treasure Kingston	Burired Treasure	18	None	18
+Fast travel to Punta Guarico -> Fragment 27 Uncharted	Animus Fragment	171	(816,307)	27
+Weathering The Storm	Naval Contracts	12	None	12
+Cheat reload -> Fragment 1 Petite Caverne	Animus Fragment	172	None	1
+Chest 1 Petite Caverne	Chest	302	None	1
+Chest 2 Petite Caverne	Chest	303	None	2
+Buried Treasure Petite Caverne	Burired Treasure	19	None	19
+Treasure Map Petite Caverne -> Chest 3 Petite Caverne	Chest	304	None	3
+Fragment 2 Petite Caverne	Animus Fragment	173	None	2
+Chest 4 Petite Caverne	Chest	305	None	4
+Fast travel to La Concepcion Wreck -> Fragment 28 Uncharted	Animus Fragment	174	(153,248)	28
+Quit warp -> Letter 18 Santanillas	Letters	18	None	18
+Myan Stone 1 Santanillas	Myan Stones	14	None	14
+Fragment 1 Santanillas	Animus Fragment	175	None	1
+Treasure Map Santanillas -> Chest 1 Santanillas	Chest	306	None	1
+Fragment 2 Santanillas	Animus Fragment	176	None	2
+Myan Stone 2 Santanillas	Myan Stones	15	None	15
+Fast travel Ambergris Key -> Black Barts Gambit	Story	37	None	37
+Letter 19 Uncharted 3	Letters	19	(144,98)	19
+Chest 40 Uncharted	Chest	307	(144,97)	40
+Fast travel to Santanillas -> Chest 41 Uncharted	Chest	308	(238,169)	41
+Chest 42 Uncharted	Chest	309	(176,191)	42
+Start Murder and Mayhem -> Fragment 3 Santanillas	Animus Fragment	177	None	3
+Chest 2 Santanillas	Chest	310	None	2
+Chest 3 Santanillas	Chest	311	None	3
+Chest 4 Santanillas	Chest	312	None	4
+Chest 5 Santanillas	Chest	313	None	5
+Viewpoint Santanillas	Viewpoint	51	None	1
+Fast travel to Castillo de Jagua -> Chest 43 Uncharted	Chest	314	(410,503)	43
+Swim 5 seconds quit warp -> Fragment 1 San Juan	Animus Fragment	178	None	1
+Chest 1 San Juan	Chest	315	None	1
+Buried Treasure San Juan	Burired Treasure	20	None	20
+Chest 2 San Juan	Chest	316	None	2
+Chest 3 San Juan	Chest	317	None	3
+Fragment 2 San Juan	Animus Fragment	179	None	2
+Fast travel Devil's Eye Cavern -> Charlotte Defenses -> Chest 1 Charlotte	Chest	318	None	1
+Fragment 1 Charlotte	Animus Fragment	180	None	1
+Fragment 2 Charlotte	Animus Fragment	181	None	2
+Chest 2 Charlotte	Chest	319	None	2
+Capture Charlotte	Forts	9	None	9
+Fast travel to abaco island build up wanted level to 2 -> Hunter Gather	Naval Contracts	13	None	13
+Fragment 29 Uncharted	Animus Fragment	182	(371,267)	29
+Papers, Please	Naval Contracts	14	None	14
+Fast travel to Havana -> Get A Shipment of Powder -> Fragment 13 Havana	Animus Fragment	183	None	13
+Bureau Under Attack	Templar Hunts	13	None	13
+Start A Thief in the Market -> Shanty 4 Havana	Shanty	21	None	4
+Chest 14 Havana	Chest	320	None	14
+Manuscript 4 Havana	Manuscripts	16	None	16
+Chest 15 Havana	Chest	321	None	15
+Spanish Commander	Assassin Contracts	28	None	28
+Get Unliscensed Dealer -> A Thief in the Market	Templar Hunts	14	None	14
+Viewpoint 6 Havana	Viewpoint	52	None	6
+Unliscensed Dealer	Assassin Contracts	29	None	29
+Fast travel south viewpoint -> Start Arm's Race -> Manuscript 5 Havana	Manuscripts	17	None	17
+Viewpoint 7 Havana	Viewpoint	53	None	7
+Fragment 14 Havana	Animus Fragment	184	None	14
+Shanty 5 Havana	Shanty	22	None	5
+Chest 16 Havana	Chest	322	None	16
+Arm's Race	Templar Hunts	15	None	15
+Cheat reload -> fast travel south east viewpoint -> Flints End	Templar Hunts	16	None	16
+A Shipment of Powder	Assassin Contracts	30	None	30
+Shanty 6 Havana	Shanty	23	None	6
+Chest 17 Havana	Chest	323	None	17
+Fast travel to Charolotte -> Start The Observatory -> Chest 1 LongBay	Chest	324	None	1
+Fragment 1 LongBay	Animus Fragment	185	None	1
+Chest 2 LongBay	Chest	325	None	2
+Chest 3 LongBay	Chest	326	None	3
+Letter 20 LongBay	Letters	20	None	20
+Chest 4 LongBay	Chest	327	None	4
+Fragment 2 LongBay	Animus Fragment	186	None	2
+Fragment 3 LongBay	Animus Fragment	187	None	3
+Chest 5 LongBay	Chest	328	None	5
+Viewpoint 1 LongBay	Viewpoint	54	None	1
+Myan Stone LongBay	Myan Stones	16	None	16
+(On way out of Observatory) Fragment 4 LongBay	Animus Fragment	188	None	4
+The Observatory	Story	38	None	38
+The Bunker(passcode 1 3577)(passcode2 3777)	Story	39	None	39
+Fragment 13 Kingston	Animus Fragment	189	None	13
+Viewpoint 9 Kingston	Viewpoint	55	None	9
+Prison -> Manuscript 5 Kingston	Manuscripts	18	None	18
+Manuscript 6 Kingston	Manuscripts	19	None	19
+To Suffer Without Dying	Story	40	None	40
+Delirium	Story	41	None	41
+Fast travel to The Blue Hole -> Chest 44 Uncharted	Chest	329	(394,199)	44
+Swim until u enter restricted zone -> Quit warp -> Fort defenses -> Chest 1 Serranilla	Chest	330	None	1
+Fragment 1 Serranilla	Animus Fragment	190	None	1
+Chest 2 Serranilla	Chest	331	None	2
+Fragment 2 Serranilla	Animus Fragment	191	None	2
+Capture Serranilla	Forts	10	None	10
+Final Contract	Naval Contracts	15	None	15
+fast travel to Santanillas -> Fragment 30 Uncharted	Animus Fragment	192	(278,293)	30
+fast travel tulum viewpoint -> Chest 7 Tulum	Chest	332	None	7
+Fragment 4 Tulum	Animus Fragment	193	None	4
+Fragment 5 Tulum	Animus Fragment	194	None	5
+Buried Treasure Tulum	Burired Treasure	21	None	21
+Everything Is Permitted	Story	42	None	42
+A Governor No Longer	Story	43	None	43
+Fast travel to Tortuga -> Chest 45 Uncharted	Chest	333	(951,364)	45
+Start Royal Misfortune -> Fragment 2 Principe	Animus Fragment	195	None	2
+Fragment 3 Principe	Animus Fragment	196	None	3
+Start chase -> Fragment 4 Principe	Animus Fragment	197	None	4
+Reload checkpoint -> Fragment 5 Principe	Animus Fragment	198	None	5
+Royal Misfortune	Story	44	None	44
+Start Tainted Blood -> Chest 18 Havana	Chest	334	None	18
+Manuscript 6 Havana	Manuscripts	20	None	20
+Chest 19 Havana	Chest	335	None	19
+Chest 20 Havana	Chest	336	None	20
+Shanty 7 Havana	Shanty	24	None	7
+Viewpoint 8 Havana	Viewpoint	56	None	8
+Fragment 15 Havana	Animus Fragment	199	None	15
+Tainted Blood	Story	45	None	45
+Fast Travel Anotto Bay -> Chest 46 Uncharted	Chest	337	(627,331)	46
+Start Ever A Splinter -> Chest 6 LongBay	Chest	338	None	6
+Viewpoint 2 LongBay	Viewpoint	57	None	2
+Chest 7 LongBay	Chest	339	None	7
+Buried Treasure LongBay	Burired Treasure	22	None	22
+Fragment 5 LongBay	Animus Fragment	200	None	5
+Viewpoint 3 LongBay	Viewpoint	58	None	3
+Chest 8 LongBay	Chest	340	None	8
+Ever A Splinter	Story	46	None	46
+A Face From The Past	Story	47	None	47
+...The End	Story	48	None	48
+How Grand, Master Kenway 100% WOOOOOOOO!	Story	49	None	49

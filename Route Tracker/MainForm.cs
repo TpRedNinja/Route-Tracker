@@ -346,7 +346,7 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Takes all the game stats and formats them into a readable display
         // Shows percentages, collectibles, and all other tracked values
-        private void UpdateStatsDisplay(Label label, int percent, float percentFloat, int viewpoints, int myan,
+        private static void UpdateStatsDisplay(Label label, int percent, float percentFloat, int viewpoints, int myan,
             int treasure, int fragments, int assassin, int naval, int letters, int manuscripts,
             int music, int forts, int taverns, int totalChests)
         {
@@ -390,7 +390,7 @@ namespace Route_Tracker
                         }
 
                         // Get current stats
-                        var (Percent, PercentFloat, Viewpoints, Myan, Treasure, Fragments, Assassin, Naval, Letters, Manuscripts, Music, Forts, Taverns, TotalChests) = gameConnectionManager.GameStats.GetStats();
+                        (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure, int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music, int Forts, int Taverns, int TotalChests) = gameConnectionManager.GameStats.GetStats();
 
                         // Update the display
                         UpdateStatsDisplay(percentageLabel, Percent, PercentFloat, Viewpoints, Myan,
@@ -422,6 +422,61 @@ namespace Route_Tracker
         #endregion
 
         #region Route Tab
+
+        private void AddProgressButtons()
+        {
+            // Create panel for buttons
+            FlowLayoutPanel buttonPanel = new()
+            {
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                FlowDirection = FlowDirection.LeftToRight,
+                Padding = new Padding(5)
+            };
+            AppTheme.ApplyTo(buttonPanel);
+
+            // Create buttons
+            Button saveButton = new()
+            {
+                Text = "Save Progress",
+                AutoSize = true,
+                Margin = new Padding(5)
+            };
+            saveButton.Click += SaveButton_Click;
+
+            Button loadButton = new()
+            {
+                Text = "Load Progress",
+                AutoSize = true,
+                Margin = new Padding(5)
+            };
+            loadButton.Click += LoadButton_Click;
+
+            // Add buttons to panel
+            buttonPanel.Controls.Add(saveButton);
+            buttonPanel.Controls.Add(loadButton);
+
+            // Add panel to route tab
+            routeTabPage.Controls.Add(buttonPanel);
+        }
+
+        // Button event handlers
+        private void SaveButton_Click(object? sender, EventArgs e)
+        {
+            routeManager?.SaveProgress(this);
+        }
+
+        private void LoadButton_Click(object? sender, EventArgs e)
+        {
+            if (routeManager != null &&
+                routeTabPage.Controls["routeGrid"] is DataGridView routeGrid)
+            {
+                if (routeManager.LoadProgress(routeGrid, this))
+                    MessageBox.Show("Progress loaded successfully.", "Load Complete",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
         // ==========FORMAL COMMENT=========
         // Creates the Route tab with grid for displaying route entries
         // Sets up the DataGridView and loads initial route data
@@ -432,8 +487,10 @@ namespace Route_Tracker
         private void CreateRouteTab()
         {
             // Create and configure the Route TabPage
-            routeTabPage = new TabPage("Route");
-            routeTabPage.BackColor = Color.Black;
+            routeTabPage = new TabPage("Route")
+            {
+                BackColor = Color.Black
+            };
 
             // Create the DataGridView for route entries
             var routeGrid = CreateRouteGridView();
@@ -443,6 +500,9 @@ namespace Route_Tracker
 
             // Load route data - this could happen after routeManager is initialized in ConnectButton_Click
             LoadRouteData(routeGrid);
+
+            //add save and load buttons
+            AddProgressButtons();
         }
 
         // ==========FORMAL COMMENT=========
@@ -451,10 +511,10 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Sets up the grid that shows all route items and their completion status
         // Configures it with our dark theme and proper display settings
-        private DataGridView CreateRouteGridView()
+        private static DataGridView CreateRouteGridView()
         {
             // Create a DataGridView for displaying route entries
-            DataGridView routeGrid = new DataGridView
+            DataGridView routeGrid = new()
             {
                 Name = "routeGrid",
                 Dock = DockStyle.Fill,
@@ -486,10 +546,10 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Creates the two columns - one for the description and one for the checkmark
         // Styles them to match our dark theme and make them easy to read
-        private void ConfigureRouteGridColumns(DataGridView grid)
+        private static void ConfigureRouteGridColumns(DataGridView grid)
         {
             // Configure columns - with item first, completion status second
-            DataGridViewTextBoxColumn itemColumn = new DataGridViewTextBoxColumn
+            DataGridViewTextBoxColumn itemColumn = new()
             {
                 Name = "Item",
                 HeaderText = "", // No header text
@@ -504,7 +564,7 @@ namespace Route_Tracker
             };
 
             // Use text column for completion status
-            DataGridViewTextBoxColumn completedColumn = new DataGridViewTextBoxColumn
+            DataGridViewTextBoxColumn completedColumn = new()
             {
                 Name = "Completed",
                 HeaderText = "",
@@ -530,7 +590,7 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Makes the grid look good with our dark theme
         // Removes headers, sets colors, and configures the selection style
-        private void ApplyRouteGridStyling(DataGridView grid)
+        private static void ApplyRouteGridStyling(DataGridView grid)
         {
             // Apply theme colors to the grid
             grid.EnableHeadersVisualStyles = false;
@@ -593,10 +653,7 @@ namespace Route_Tracker
         private void UpdateRouteCompletionStatus(DataGridView routeGrid, StatsUpdatedEventArgs stats)
         {
             // Delegate all the route checking logic to the RouteManager
-            if (routeManager != null)
-            {
-                routeManager.UpdateCompletionStatus(routeGrid, stats);
-            }
+            routeManager?.UpdateCompletionStatus(routeGrid, stats);
         }
         #endregion
 
@@ -710,6 +767,12 @@ namespace Route_Tracker
                 if (routeTabPage.Controls["routeGrid"] is DataGridView routeGrid)
                 {
                     UpdateRouteCompletionStatus(routeGrid, e);
+                }
+
+                // Add this new line to handle game state transitions
+                if (routeManager != null && routeTabPage.Controls["routeGrid"] is DataGridView routeGrid2)
+                {
+                    routeManager.HandleGameStateTransition(routeGrid2);
                 }
             });
         }

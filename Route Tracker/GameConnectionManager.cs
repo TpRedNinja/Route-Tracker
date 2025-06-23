@@ -89,7 +89,7 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Just checks if the game is already running or not
         [SupportedOSPlatform("windows6.1")]
-        public bool IsProcessRunning(string processName)
+        public static bool IsProcessRunning(string processName)
         {
             return Process.GetProcessesByName(processName.Replace(".exe", "")).Length > 0;
         }
@@ -301,6 +301,10 @@ namespace Route_Tracker
             return false;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "SYSLIB1054:",
+        Justification = "Using ReadProcessMemory for direct memory reading in unsafe context")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "Required for unsafe memory operations")]
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
     }
