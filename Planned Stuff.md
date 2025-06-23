@@ -25,7 +25,6 @@ This document outlines planned support for additional games and features in Rout
 ## Feature Roadmap
 
 ### Short-term Goals
-- Complete AC4 Black Flag support
 - Implement improved UI with game switching
 - Add route management system for multiple speedrun categories
 
