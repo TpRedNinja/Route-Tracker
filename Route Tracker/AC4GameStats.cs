@@ -26,6 +26,12 @@ namespace Route_Tracker
         private readonly int[] percentFtPtrOffsets = [0x74];
         private readonly int[] fortsPtrOffsets = [0x7F0, 0xD68, 0xD70, 0x30];
         private readonly int[] loadingPtrOffsets = [0x7D8];
+        private readonly int[] characterPtrOffsets = [];
+        private readonly int[] mainMenuPtrOffsets = [];
+
+        //fields to keep track of loading and main menu status
+        private bool isLoading = false;
+        private bool isMainMenu = false;
 
         // Pre-calculated base address for most collectibles to avoid repeated calculations
         private readonly nint collectiblesBaseAddress;
@@ -40,6 +46,7 @@ namespace Route_Tracker
         // The UI uses these values to check off items in the route
         private float lastPercentageValue = 0f;
         private int completedStoryMissions = 0;
+        private int oldcharacter = 0; // Used to detect modern day missions
         private int completedTemplarHunts = 0;
         private int defeatedLegendaryShips = 0;
 
@@ -57,6 +64,9 @@ namespace Route_Tracker
         private const float STORY_MISSION_MIN = 0.66666f;
         private const float STORY_MISSION_MAX = 1.66668f;
         //private const float DETECTION_THRESHOLD = 0.00001f;
+
+        //for buying animal skins in upgrades function
+        private int skinPurchaseCheckpoint = 0;
 
         // ==========FORMAL COMMENT=========
         // Memory offset constants for locating collectible counters in game memory
@@ -121,7 +131,7 @@ namespace Route_Tracker
         private int totalUpgrades = 0;
 
         // Upgrade tracking - each entry corresponds to upgrades in the route
-        private readonly bool[] upgradePurchased = new bool[38]; // 38 total upgrades in the route
+        private readonly bool[] upgradePurchased = new bool[42]; // 38 total upgrades in the route
 
         // ==========FORMAL COMMENT=========
         // Initializes a new game statistics tracker for Assassin's Creed 4
@@ -129,6 +139,10 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Sets up our tracker to read AC4's memory
         // Calculates the starting point for finding all the collectibles
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290: Use primary constructure",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "because i said so")]
         public AC4GameStats(IntPtr processHandle, IntPtr baseAddress)
     : base(processHandle, baseAddress)
         {
@@ -154,7 +168,11 @@ namespace Route_Tracker
             int percent = Read<int>((nint)baseAddress + 0x49D9774, percentPtrOffsets);
             float percentFloat = Read<float>((nint)baseAddress + 0x049F1EE8, percentFtPtrOffsets);
             int forts = Read<int>((nint)baseAddress + 0x026C0A28, fortsPtrOffsets);
+
+            // for other functions
+            int mainmenu = Read<int>((nint)baseAddress + 0x49D2204, mainMenuPtrOffsets);
             bool loading = Read<bool>((nint)baseAddress + 0x04A1A6CC, loadingPtrOffsets);
+            int character = Read<int>((nint)baseAddress + 0x23485C0, characterPtrOffsets);
 
             // Read all other collectibles
             int viewpoints = ReadCollectible(ViewpointsThirdOffset);
@@ -181,6 +199,12 @@ namespace Route_Tracker
             // Detect upgrades using the resource values
             HandleUpgradeCases(heroupgrades, moneySpent, woodSpent, metalSpent);
 
+            // Detect modern day missions
+            DetectModernDayMissions(character);
+
+            // DetectStatuses
+            DetectStatuses(mainmenu, loading);
+
             // Return all the stats (including the basic ones that we got from memory)
             return (percent, percentFloat, viewpoints, myan, treasure, fragments, assassin, naval,
                 letters, manuscripts, music, forts, taverns, totalChests);
@@ -197,6 +221,11 @@ namespace Route_Tracker
         public (int StoryMissions, int TemplarHunts, int LegendaryShips) GetSpecialActivityCounts()
         {
             return (completedStoryMissions, completedTemplarHunts, defeatedLegendaryShips);
+        }
+
+        public (bool IsLoading, bool IsMainMenu) GetGameStatus()
+        {
+            return (isLoading, isMainMenu);
         }
 
         // ==========FORMAL COMMENT=========
@@ -275,6 +304,19 @@ namespace Route_Tracker
             return count;
         }
 
+        private void DetectModernDayMissions(int character)
+        {
+            if (character == 1 && character != oldcharacter)
+            {
+                oldcharacter = character;
+            }
+            else if(character == 0 && oldcharacter == 1)
+            {
+                oldcharacter = character;
+                completedStoryMissions++;
+            }
+        }
+
         // ==========FORMAL COMMENT=========
         // Detects special game activities based on percentage changes
         // Identifies legendary ships, templar hunts, story missions, and other collectibles
@@ -327,13 +369,6 @@ namespace Route_Tracker
         // Implement HandleUpgradeCases:
         private void HandleUpgradeCases(int currentHeroUpgrade, int moneySpent, int woodSpent, int metalSpent)
         {
-            // Debug info
-            if (moneySpent != lastMoneySpent || woodSpent != lastWoodSpent || metalSpent != lastMetalSpent)
-            {
-                Debug.WriteLine($"Resource changes - Money: {moneySpent - lastMoneySpent}, " +
-                                $"Wood: {woodSpent - lastWoodSpent}, Metal: {metalSpent - lastMetalSpent}");
-            }
-
             // First call - establish baseline
             if (lastMoneySpent == 0)
             {
@@ -538,54 +573,72 @@ namespace Route_Tracker
                     upgradePurchased[20] = true;
                     totalUpgrades++;
                     Debug.WriteLine("Detected Cannon-Barrel Pistols upgrade");
+
+                    // Set the checkpoint for animal skin purchases after weapons are bought
+                    skinPurchaseCheckpoint = moneySpent;
                 }
 
-                // Rabbit Pelt (upgrade #22) - 1400 money (700 × 2)
-                else if (moneyDelta >= 1400 && !upgradePurchased[21])
+                // Animal skin purchases using the checkpoint
+                // Only check these if we've already established the checkpoint
+                else if (skinPurchaseCheckpoint > 0)
                 {
-                    upgradePurchased[21] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Rabbit Pelt upgrade");
-                }
+                    // Calculate money spent since the checkpoint
+                    int skinMoneyDelta = moneySpent - skinPurchaseCheckpoint;
 
-                // Hutia Pelt (upgrade #23) - 1700 money (850 × 2)
-                else if (moneyDelta >= 1700 && !upgradePurchased[22])
-                {
-                    upgradePurchased[22] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Hutia Pelt upgrade");
-                }
+                    // Rabbit Pelt (upgrade #22) - 1400 money (700 × 2)
+                    if (skinMoneyDelta >= 1400 && !upgradePurchased[21])
+                    {
+                        upgradePurchased[21] = true;
+                        totalUpgrades++;
+                        Debug.WriteLine("Detected Rabbit Pelt upgrade");
+                        // Update the checkpoint for the next skin detection
+                        skinPurchaseCheckpoint = moneySpent;
+                    }
 
-                // Howler Monkey Skin (upgrade #24) - 2000 money (1000 × 2)
-                else if (moneyDelta >= 2000 && !upgradePurchased[23])
-                {
-                    upgradePurchased[23] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Howler Monkey Skin upgrade");
-                }
+                    // Hutia Pelt (upgrade #23) - 1700 money (850 × 2)
+                    else if (skinMoneyDelta >= 1700 && !upgradePurchased[22])
+                    {
+                        upgradePurchased[22] = true;
+                        totalUpgrades++;
+                        Debug.WriteLine("Detected Hutia Pelt upgrade");
+                        skinPurchaseCheckpoint = moneySpent;
+                    }
 
-                // Crocodile Leather (upgrade #25) - 4000 money (2000 × 2)
-                else if (moneyDelta >= 4000 && !upgradePurchased[24])
-                {
-                    upgradePurchased[24] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Crocodile Leather upgrade");
-                }
+                    // Howler Monkey Skin (upgrade #24) - 2000 money (1000 × 2)
+                    else if (skinMoneyDelta >= 2000 && !upgradePurchased[23])
+                    {
+                        upgradePurchased[23] = true;
+                        totalUpgrades++;
+                        Debug.WriteLine("Detected Howler Monkey Skin upgrade");
+                        skinPurchaseCheckpoint = moneySpent;
+                    }
 
-                // Killer Whale Skin (upgrade #26) - 6300 money (3150 × 2)
-                else if (moneyDelta >= 6300 && !upgradePurchased[25])
-                {
-                    upgradePurchased[25] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Killer Whale Skin upgrade");
-                }
+                    // Crocodile Leather (upgrade #25) - 4000 money (2000 × 2)
+                    else if (skinMoneyDelta >= 4000 && !upgradePurchased[24])
+                    {
+                        upgradePurchased[24] = true;
+                        totalUpgrades++;
+                        Debug.WriteLine("Detected Crocodile Leather upgrade");
+                        skinPurchaseCheckpoint = moneySpent;
+                    }
 
-                // Humpback Whale Skin (upgrade #27) - 7000 money (3500 × 2)
-                else if (moneyDelta >= 7000 && !upgradePurchased[26])
-                {
-                    upgradePurchased[26] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Humpback Whale Skin upgrade");
+                    // Killer Whale Skin (upgrade #26) - 6300 money (3150 × 2)
+                    else if (skinMoneyDelta >= 6300 && !upgradePurchased[25])
+                    {
+                        upgradePurchased[25] = true;
+                        totalUpgrades++;
+                        Debug.WriteLine("Detected Killer Whale Skin upgrade");
+                        skinPurchaseCheckpoint = moneySpent;
+                    }
+
+                    // Humpback Whale Skin (upgrade #27) - 7000 money (3500 × 2)
+                    else if (skinMoneyDelta >= 7000 && !upgradePurchased[26])
+                    {
+                        upgradePurchased[26] = true;
+                        totalUpgrades++;
+                        Debug.WriteLine("Detected Humpback Whale Skin upgrade");
+                        skinPurchaseCheckpoint = moneySpent;
+                    }
                 }
 
                 // Note: Hero upgrades #28-33 are handled earlier in the hero upgrade detection section
@@ -630,10 +683,65 @@ namespace Route_Tracker
                     Debug.WriteLine("Detected Ram Strength 2 upgrade");
                 }
 
+                // Mortar 3 (upgrade #39) - 8000 money, 300 metal
+                else if (moneyDelta >= 8000 && metalDelta >= 300 && !upgradePurchased[38])
+                {
+                    upgradePurchased[38] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Mortar 3 upgrade");
+                }
+
+                // Broadside Cannons 2 (upgrade #40) - 2000 money, 100 metal
+                else if (moneyDelta >= 2000 && metalDelta >= 100 && !upgradePurchased[39])
+                {
+                    upgradePurchased[39] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Broadside Cannons 2 upgrade");
+                }
+
+                // Round Shot Strength 4 (upgrade #41) - 35000 money
+                else if (moneyDelta >= 35000 && !upgradePurchased[40])
+                {
+                    upgradePurchased[40] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Round Shot Strength 4 upgrade");
+                }
+
+                // Heavy Shot 3 (upgrade #42) - 25000 money
+                else if (moneyDelta >= 25000 && !upgradePurchased[41])
+                {
+                    upgradePurchased[41] = true;
+                    totalUpgrades++;
+                    Debug.WriteLine("Detected Heavy Shot 3 upgrade");
+                }
+
                 // Update the last spent values
                 lastMoneySpent = moneySpent;
                 lastWoodSpent = woodSpent;
                 lastMetalSpent = metalSpent;
+            }
+        }
+
+        private void DetectStatuses(int mainmenu, bool loading)
+        {
+            //loading status
+            if(loading)
+            {
+                isLoading = true;
+            }
+            else
+            {
+                isLoading = false;
+            }
+
+            //main menu status
+            if(mainmenu == 65540)
+            {
+                isMainMenu = true;
+            }
+            else
+            {
+                isMainMenu = false;
             }
         }
         #endregion

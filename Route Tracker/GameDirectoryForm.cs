@@ -23,9 +23,10 @@ namespace Route_Tracker
             InitializeCustomComponents();
         }
 
-        private ComboBox gameDropdown;
-        private TextBox directoryTextBox;
-        private Button browseButton;
+        // Using null-forgiving operator
+        private ComboBox gameDropdown = null!;
+        private TextBox directoryTextBox = null!;
+        private Button browseButton = null!;
 
         // ==========FORMAL COMMENT=========
         // UI control fields for the game directory form
@@ -79,9 +80,9 @@ namespace Route_Tracker
         // Sets up labels, dropdowns, textboxes, and buttons with event handlers
         // ==========MY NOTES==============
         // Builds all the UI elements for selecting and setting game directories
-        private void GameDropdown_SelectedIndexChanged(object sender, EventArgs e)
+        private void GameDropdown_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            string selectedGame = gameDropdown.SelectedItem.ToString();
+            string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
             if (selectedGame == "Assassin's Creed 4")
             {
                 directoryTextBox.Text = Settings.Default.AC4Directory;
@@ -97,7 +98,7 @@ namespace Route_Tracker
         // Opens a folder browser dialog and saves the selected path
         // ==========MY NOTES==============
         // Lets the user choose a folder for the currently selected game
-        private void BrowseButton_Click(object sender, EventArgs e)
+        private void BrowseButton_Click(object? sender, EventArgs e)
         {
             using FolderBrowserDialog folderBrowserDialog = new();
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
@@ -114,7 +115,7 @@ namespace Route_Tracker
         // Saves the game folder location to the app settings
         private void SaveDirectory()
         {
-            string selectedGame = gameDropdown.SelectedItem.ToString();
+            string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
             if (selectedGame == "Assassin's Creed 4")
             {
                 Settings.Default.AC4Directory = directoryTextBox.Text;
