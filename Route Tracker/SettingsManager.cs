@@ -35,6 +35,29 @@ namespace Route_Tracker
             isLoadingSettings = false;
         }
 
+        // Add this method to save the Always On Top setting
+        [SupportedOSPlatform("windows6.1")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
+        public void SaveAlwaysOnTop(bool alwaysOnTop)
+        {
+            Settings.Default.AlwaysOnTop = alwaysOnTop;
+            Settings.Default.Save();
+        }
+
+        // Add this method to get the Always On Top setting
+        [SupportedOSPlatform("windows6.1")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
+        public bool GetAlwaysOnTop()
+        {
+            return Settings.Default.AlwaysOnTop;
+        }
+
         // ==========FORMAL COMMENT=========
         // Saves settings from UI controls to configuration
         // ==========MY NOTES==============
@@ -46,8 +69,10 @@ namespace Route_Tracker
         [SupportedOSPlatform("windows6.1")]
         public void SaveSettings(string gameDirectory, bool autoStart)
         {
+            // Keep existing code
             Settings.Default.GameDirectory = gameDirectory;
             Settings.Default.AutoStart = autoStart;
+            // Don't modify AlwaysOnTop here as it's handled separately
             Settings.Default.Save();
         }
         #endregion
@@ -71,7 +96,7 @@ namespace Route_Tracker
             }
             else if (selectedGame == "God of War 2018")
             {
-                Settings.Default.GoW2018Directory = directory;
+                Settings.Default.Gow2018Directory = directory;
             }
             Settings.Default.Save();
         }
@@ -90,11 +115,71 @@ namespace Route_Tracker
             if (game == "Assassin's Creed 4")
                 return Settings.Default.AC4Directory;
             else if (game == "God of War 2018")
-                return Settings.Default.GoW2018Directory;
+                return Settings.Default.Gow2018Directory;
             return string.Empty;
         }
         #endregion
 
-        
+        #region Hotkey Settings
+        // ==========FORMAL COMMENT=========
+        // Saves hotkey configuration to application settings
+        // Stores both complete and skip hotkey values
+        // ==========MY NOTES==============
+        // Remembers which keys to use for completing and skipping entries
+        [SupportedOSPlatform("windows6.1")]
+        public static void SaveHotkeys(Keys completeHotkey, Keys skipHotkey)
+        {
+            Settings.Default.CompleteHotkey = (int)completeHotkey;
+            Settings.Default.SkipHotkey = (int)skipHotkey;
+            Settings.Default.Save();
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Retrieves currently configured hotkeys from settings
+        // Returns a tuple containing both hotkey values
+        // ==========MY NOTES==============
+        // Gets the saved hotkey settings as a pair of values
+        [SupportedOSPlatform("windows6.1")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
+        public (Keys CompleteHotkey, Keys SkipHotkey) GetHotkeys()
+        {
+            return ((Keys)Settings.Default.CompleteHotkey, (Keys)Settings.Default.SkipHotkey);
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Saves the enabled state of hotkeys
+        // Controls whether hotkeys are active in the application
+        // ==========MY NOTES==============
+        // Remembers whether hotkeys should work or be ignored
+        [SupportedOSPlatform("windows6.1")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
+        public void SaveHotkeysEnabled(bool enabled)
+        {
+            Settings.Default.HotkeysEnabled = enabled;
+            Settings.Default.Save();
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Retrieves whether hotkeys are currently enabled
+        // Determines if hotkey presses should be processed
+        // ==========MY NOTES==============
+        // Checks if hotkeys should be active or ignored
+        [SupportedOSPlatform("windows6.1")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
+        public bool GetHotkeysEnabled()
+        {
+            return Settings.Default.HotkeysEnabled;
+        }
+        #endregion
+
     }
 }

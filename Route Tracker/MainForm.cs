@@ -64,6 +64,8 @@ namespace Route_Tracker
         private TextBox gameDirectoryTextBox = null!; // Same approach
         private CheckBox autoStartCheckBox = null!; // Same approach
 
+        private bool isHotkeysEnabled = false;
+
         // ==========FORMAL COMMENT=========
         // Constructor - initializes the form and loads user settings
         // ==========MY NOTES==============
@@ -72,19 +74,37 @@ namespace Route_Tracker
         public MainForm()
         {
             InitializeComponent();
-            InitializeCustomComponents();
 
-            // Initialize managers
+            // Initialize managers FIRST
             gameConnectionManager = new GameConnectionManager();
             gameConnectionManager.StatsUpdated += GameStats_StatsUpdated;
 
-            settingsManager = new SettingsManager();  // Add this line
+            settingsManager = new SettingsManager(); // Move this up before UI initialization
+
+            // Now initialize UI components that need settingsManager
+            InitializeCustomComponents();
+
+            // Auto-detect on startup
+            AutoDetectGameOnStartup();
 
             LoadSettings();
             this.FormClosing += MainForm_FormClosing;
         }
 
         #region UI Initialization
+        private void AutoDetectGameOnStartup()
+        {
+            ToolStripComboBox? gameDropdown = this.MainMenuStrip?.Items.OfType<ToolStripComboBox>().FirstOrDefault();
+            if (gameDropdown != null)
+            {
+                string detectedGame = gameConnectionManager.DetectRunningGame();
+                if (!string.IsNullOrEmpty(detectedGame))
+                {
+                    gameDropdown.SelectedItem = detectedGame;
+                }
+            }
+        }
+
         // ==========FORMAL COMMENT=========
         // Initializes all custom UI components and sets up the form appearance
         // Configures the menu, tabs, and controls with proper theming
@@ -155,12 +175,130 @@ namespace Route_Tracker
             ToolStripMenuItem gameDirectoryMenuItem = new("Game Directory");
             gameDirectoryMenuItem.Click += GameDirectoryMenuItem_Click;
 
-            // Add the Auto-Start Game and Game Directory menu items to the Settings menu item
+            // Create and configure the Always On Top menu item
+            ToolStripMenuItem alwaysOnTopMenuItem = new("Always On Top")
+            {
+                CheckOnClick = true,
+                Checked = this.TopMost // Initialize with current state
+            };
+            alwaysOnTopMenuItem.CheckedChanged += AlwaysOnTopMenuItem_CheckedChanged;
+
+            // Add the menu items to the Settings menu item
             settingsMenuItem.DropDownItems.Add(autoStartMenuItem);
             settingsMenuItem.DropDownItems.Add(gameDirectoryMenuItem);
+            settingsMenuItem.DropDownItems.Add(alwaysOnTopMenuItem);
 
             // Add the Settings menu item to the MenuStrip
             menuStrip.Items.Add(settingsMenuItem);
+
+            // Add separator
+            settingsMenuItem.DropDownItems.Add(new ToolStripSeparator());
+
+            // Add hotkeys menu items
+            ToolStripMenuItem hotkeysMenuItem = new("Configure Hotkeys");
+            hotkeysMenuItem.Click += HotkeysMenuItem_Click;
+            settingsMenuItem.DropDownItems.Add(hotkeysMenuItem);
+
+            ToolStripMenuItem enableHotkeysMenuItem = new("Enable Hotkeys")
+            {
+                CheckOnClick = true,
+                Checked = settingsManager.GetHotkeysEnabled()
+            };
+            enableHotkeysMenuItem.CheckedChanged += EnableHotkeysMenuItem_CheckedChanged;
+            settingsMenuItem.DropDownItems.Add(enableHotkeysMenuItem);
+
+            // Initialize hotkey state
+            isHotkeysEnabled = settingsManager.GetHotkeysEnabled();
+        }
+
+        private void HotkeysMenuItem_Click(object? sender, EventArgs e)
+        {
+            // Create the form
+            HotkeysSettingsForm hotkeysForm = new()
+            {
+                // Ensure form appears in front of main window
+                StartPosition = FormStartPosition.CenterParent
+            };
+
+            // If TopMost is set on main form, we need to temporarily adjust
+            bool wasTopMost = this.TopMost;
+            if (wasTopMost)
+                this.TopMost = false;
+
+            // Show dialog as modal with this form as owner
+            hotkeysForm.ShowDialog(this);
+
+            // Restore TopMost setting if needed
+            if (wasTopMost)
+                this.TopMost = true;
+        }
+
+        private void EnableHotkeysMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem menuItem)
+            {
+                isHotkeysEnabled = menuItem.Checked;
+                settingsManager.SaveHotkeysEnabled(isHotkeysEnabled);
+            }
+        }
+
+        // Override ProcessCmdKey to handle hotkeys
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // Only process hotkeys if enabled and on route tab
+            if (isHotkeysEnabled && tabControl.SelectedTab == routeTabPage)
+            {
+                (Keys CompleteHotkey, Keys SkipHotkey) = settingsManager.GetHotkeys();
+
+                if (keyData == CompleteHotkey)
+                {
+                    CompleteSelectedEntry();
+                    return true;
+                }
+                else if (keyData == SkipHotkey)
+                {
+                    SkipSelectedEntry();
+                    return true;
+                }
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        // Methods to handle entry actions
+        private void CompleteSelectedEntry()
+        {
+            if (routeTabPage.Controls["routeGrid"] is DataGridView routeGrid &&
+                routeGrid.CurrentRow != null &&
+                routeGrid.CurrentRow.Tag is RouteEntry selectedEntry)
+            {
+                // Mark as complete
+                selectedEntry.IsCompleted = true;
+                routeGrid.CurrentRow.Cells[1].Value = "X";
+
+                // Update grid
+                RouteManager.SortAndScrollToFirstIncomplete(routeGrid);
+
+                // Auto-save progress
+                routeManager?.AutoSaveProgress();
+            }
+        }
+
+        private void SkipSelectedEntry()
+        {
+            if (routeTabPage.Controls["routeGrid"] is DataGridView routeGrid &&
+                routeGrid.CurrentRow != null &&
+                routeGrid.CurrentRow.Tag is RouteEntry selectedEntry)
+            {
+                // Mark as skipped
+                selectedEntry.IsSkipped = true;
+
+                // Remove from display
+                routeGrid.Rows.Remove(routeGrid.CurrentRow);
+
+                // Auto-save progress
+                routeManager?.AutoSaveProgress();
+            }
         }
 
         // ==========FORMAL COMMENT=========
@@ -204,6 +342,11 @@ namespace Route_Tracker
             gameDropdown.Items.AddRange(["", "Assassin's Creed 4", "God of War 2018"]);
             gameDropdown.SelectedIndex = 0;
             menuStrip.Items.Add(gameDropdown);
+
+            // Add auto-detect button
+            ToolStripButton autoDetectButton = new("Auto-Detect");
+            autoDetectButton.Click += AutoDetectButton_Click;
+            menuStrip.Items.Add(autoDetectButton);
 
             // Create and configure the connect button
             ToolStripButton connectButton = new("Connect to Game");
@@ -266,6 +409,32 @@ namespace Route_Tracker
             };
             autoStartCheckBox.CheckedChanged += AutoStartCheckBox_CheckedChanged;
             statsTabPage.Controls.Add(autoStartCheckBox);
+        }
+
+        private void AutoDetectButton_Click(object? sender, EventArgs e)
+        {
+            ToolStripComboBox? gameDropdown = this.MainMenuStrip?.Items.OfType<ToolStripComboBox>().FirstOrDefault();
+            ToolStripLabel? connectionLabel = this.MainMenuStrip?.Items.OfType<ToolStripLabel>().FirstOrDefault();
+
+            if (gameDropdown == null || connectionLabel == null)
+            {
+                MessageBox.Show("Required controls are missing.");
+                return;
+            }
+
+            // Try to detect running game
+            string detectedGame = gameConnectionManager.DetectRunningGame();
+
+            if (!string.IsNullOrEmpty(detectedGame))
+            {
+                // Found a game - select it in the dropdown
+                gameDropdown.SelectedItem = detectedGame;
+                connectionLabel.Text = $"Detected: {detectedGame}";
+            }
+            else
+            {
+                connectionLabel.Text = "No supported games detected";
+            }
         }
         #endregion
 
@@ -422,7 +591,12 @@ namespace Route_Tracker
         #endregion
 
         #region Route Tab
-
+        // ==========FORMAL COMMENT=========
+        // Adds save and load buttons to the route tab for progress persistence
+        // Creates and configures a button panel with appropriate styling and event handlers
+        // ==========MY NOTES==============
+        // Adds buttons that let the user manually save and load their progress
+        // Places them at the top of the route tab in a horizontal panel
         private void AddProgressButtons()
         {
             // Create panel for buttons
@@ -460,12 +634,24 @@ namespace Route_Tracker
             routeTabPage.Controls.Add(buttonPanel);
         }
 
-        // Button event handlers
+        // ==========FORMAL COMMENT=========
+        // Event handler for Save Progress button clicks
+        // Delegates to the RouteManager to handle the file dialog and saving process
+        // ==========MY NOTES==============
+        // Runs when the user clicks Save Progress
+        // Lets routeManager handle all the details of saving the data
         private void SaveButton_Click(object? sender, EventArgs e)
         {
             routeManager?.SaveProgress(this);
         }
 
+        // ==========FORMAL COMMENT=========
+        // Event handler for Load Progress button clicks
+        // Delegates to the RouteManager to handle file selection and loading process
+        // Provides user feedback when loading completes successfully
+        // ==========MY NOTES==============
+        // Runs when the user clicks Load Progress
+        // Has RouteManager do the actual loading and shows a message if it worked
         private void LoadButton_Click(object? sender, EventArgs e)
         {
             if (routeManager != null &&
@@ -529,9 +715,10 @@ namespace Route_Tracker
                 MultiSelect = false,
                 Font = new Font("Segoe UI", 11f),
                 RowTemplate = { Height = 30 },
-                AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None,
                 BorderStyle = BorderStyle.None,
-                CellBorderStyle = DataGridViewCellBorderStyle.Single
+                CellBorderStyle = DataGridViewCellBorderStyle.Single,
+                AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells,
+                DefaultCellStyle = { WrapMode = DataGridViewTriState.True }
             };
 
             ConfigureRouteGridColumns(routeGrid);
@@ -559,7 +746,8 @@ namespace Route_Tracker
                 {
                     Padding = new Padding(10, 5, 5, 5),
                     BackColor = Color.Black,
-                    ForeColor = Color.White
+                    ForeColor = Color.White,
+                    WrapMode = DataGridViewTriState.True // Enable text wrapping
                 }
             };
 
@@ -675,11 +863,21 @@ namespace Route_Tracker
                 return;
             }
 
+            // Get selected game, or try auto-detect if nothing selected
             string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
             if (string.IsNullOrEmpty(selectedGame))
             {
-                connectionLabel.Text = "Please select a game.";
-                return;
+                selectedGame = gameConnectionManager.DetectRunningGame();
+                if (!string.IsNullOrEmpty(selectedGame))
+                {
+                    gameDropdown.SelectedItem = selectedGame;
+                    connectionLabel.Text = $"Auto-detected: {selectedGame}";
+                }
+                else
+                {
+                    connectionLabel.Text = "Please select a game.";
+                    return;
+                }
             }
 
             string gameDirectory = settingsManager.GetGameDirectory(selectedGame);
@@ -742,6 +940,10 @@ namespace Route_Tracker
             return string.Empty;
         }
 
+        //for method below
+        private DateTime _lastUIUpdateTime = DateTime.MinValue;
+        private readonly TimeSpan _minimumUIUpdateInterval = TimeSpan.FromMilliseconds(100);
+
         // ==========FORMAL COMMENT=========
         // Event handler for GameStats statistics update events
         // Receives updated game metrics and refreshes the UI with the latest values
@@ -752,8 +954,17 @@ namespace Route_Tracker
         // The real workhorse that keeps the display current without clicking buttons
         private void GameStats_StatsUpdated(object? sender, StatsUpdatedEventArgs e)
         {
+            // Throttle UI updates to prevent excessive redraws
+            if (DateTime.Now - _lastUIUpdateTime < _minimumUIUpdateInterval)
+                return;
+
+            _lastUIUpdateTime = DateTime.Now;
+
             this.Invoke(() => {
-                // Update stats display if in updating mode
+                // Use SuspendLayout to batch UI updates
+                tabControl.SuspendLayout();
+
+                // Update stats display if we're in updating mode
                 if (statsTabPage.Controls[0] is TableLayoutPanel statsLayout &&
                     statsLayout.Controls["percentageLabel"] is Label percentageLabel &&
                     percentageLabel.Tag?.ToString() == "updating")
@@ -763,17 +974,13 @@ namespace Route_Tracker
                         e.Music, e.Forts, e.Taverns, e.TotalChests);
                 }
 
-                // Update route completion status
+                // Update route completion status if we're connected
                 if (routeTabPage.Controls["routeGrid"] is DataGridView routeGrid)
                 {
                     UpdateRouteCompletionStatus(routeGrid, e);
                 }
 
-                // Add this new line to handle game state transitions
-                if (routeManager != null && routeTabPage.Controls["routeGrid"] is DataGridView routeGrid2)
-                {
-                    routeManager.HandleGameStateTransition(routeGrid2);
-                }
+                tabControl.ResumeLayout();
             });
         }
 
@@ -801,6 +1008,18 @@ namespace Route_Tracker
         private void LoadSettings()
         {
             settingsManager.LoadSettings(gameDirectoryTextBox, autoStartCheckBox);
+
+            // Apply the Always On Top setting
+            this.TopMost = settingsManager.GetAlwaysOnTop();
+
+            // Update menu item if it exists
+            if (MainMenuStrip?.Items.OfType<ToolStripMenuItem>().FirstOrDefault(i => i.Text == "Settings") is ToolStripMenuItem settingsMenuItem)
+            {
+                if (settingsMenuItem.DropDownItems.OfType<ToolStripMenuItem>().FirstOrDefault(i => i.Text == "Always On Top") is ToolStripMenuItem alwaysOnTopMenuItem)
+                {
+                    alwaysOnTopMenuItem.Checked = this.TopMost;
+                }
+            }
         }
 
         // ==========FORMAL COMMENT=========
@@ -931,6 +1150,26 @@ namespace Route_Tracker
             string selectedGame = settingsGameDropdown.SelectedItem?.ToString() ?? string.Empty;
             settingsDirectoryTextBox.Text = settingsManager.GetGameDirectory(selectedGame);
         }
+
+        // ==========FORMAL COMMENT=========
+        // Event handler for Always On Top menu item state changes
+        // Applies the setting immediately and persists it to application settings
+        // Maintains UI consistency with application behavior
+        // ==========MY NOTES==============
+        // Makes the window stay on top of other windows when checked
+        // Updates both the visual display and saves the setting for next time
+        private void AlwaysOnTopMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem alwaysOnTopMenuItem)
+            {
+                // Apply the setting immediately
+                this.TopMost = alwaysOnTopMenuItem.Checked;
+
+                // Save the setting
+                settingsManager.SaveAlwaysOnTop(alwaysOnTopMenuItem.Checked);
+            }
+        }
+
         #endregion
 
         #region Form Events

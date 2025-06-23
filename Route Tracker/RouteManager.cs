@@ -63,6 +63,12 @@ namespace Route_Tracker
             {
                 string filename = Path.GetFileName(routeFilePath);
                 routeEntries = routeLoader.LoadRoute(filename);
+
+                // Assign sequential IDs to entries
+                for (int i = 0; i < routeEntries.Count; i++)
+                {
+                    routeEntries[i].Id = i + 1;
+                }
             }
             return routeEntries;
         }
@@ -184,6 +190,13 @@ namespace Route_Tracker
                     if (int.TryParse(parts[2].Trim(), out int conditionValue))
                     {
                         RouteEntry entry = new(displayText, conditionType, conditionValue);
+
+                        // Add coordinates from the fourth column if available
+                        if (parts.Length > 3 && !string.IsNullOrWhiteSpace(parts[3]))
+                        {
+                            entry.Coordinates = parts[3].Trim();
+                        }
+
                         entries.Add(entry);
                     }
                 }
@@ -622,19 +635,19 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Silently saves progress whenever route entries change
         // Used for preserving progress between game sessions and crashes
-        private void AutoSaveProgress()
+        public void AutoSaveProgress()
         {
             if (routeEntries == null || routeEntries.Count == 0)
                 return;
 
             try
             {
-                // Create save data
-                Dictionary<string, bool> completionStatus = [];
+                // Create save data with completion and skip status
+                Dictionary<string, (bool IsCompleted, bool IsSkipped)> entryStatus = [];
                 foreach (var entry in routeEntries)
                 {
-                    string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
-                    completionStatus[key] = entry.IsCompleted;
+                    string key = $"{entry.Id}_{entry.Name}_{entry.Type}_{entry.Condition}";
+                    entryStatus[key] = (entry.IsCompleted, entry.IsSkipped);
                 }
 
                 // Create directory for saves if it doesn't exist
@@ -650,7 +663,7 @@ namespace Route_Tracker
                 string autosaveFile = Path.Combine(saveDir, $"{routeName}_AutoSave.json");
 
                 // Save the data - completely overwrite the file
-                string json = System.Text.Json.JsonSerializer.Serialize(completionStatus);
+                string json = System.Text.Json.JsonSerializer.Serialize(entryStatus);
                 File.WriteAllText(autosaveFile, json);
 
                 Debug.WriteLine($"Auto-saved progress to {autosaveFile}");
@@ -688,37 +701,57 @@ namespace Route_Tracker
 
                 // Load and apply saved data
                 string json = File.ReadAllText(autosaveFile);
-                var completionStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, bool>>(json);
 
-                if (completionStatus == null || completionStatus.Count == 0)
-                    return false;
-
-                // Apply saved completion status
-                bool anyChanges = false;
-                foreach (var entry in routeEntries)
+                try
                 {
-                    string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
-                    if (completionStatus.TryGetValue(key, out bool isCompleted))
+                    // First, try to deserialize as the new tuple format
+                    var entryStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, (bool IsCompleted, bool IsSkipped)>>(json);
+
+                    // Apply status to entries
+                    foreach (var entry in routeEntries)
                     {
-                        if (entry.IsCompleted != isCompleted)
+                        string key = $"{entry.Id}_{entry.Name}_{entry.Type}_{entry.Condition}";
+                        if (entryStatus != null && entryStatus.TryGetValue(key, out var status))
+                        {
+                            entry.IsCompleted = status.IsCompleted;
+                            entry.IsSkipped = status.IsSkipped;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Fallback: try the old format (for backwards compatibility)
+                    var completionStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, bool>>(json);
+
+                    // Apply completion status only
+                    foreach (var entry in routeEntries)
+                    {
+                        string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
+                        if (completionStatus != null && completionStatus.TryGetValue(key, out bool isCompleted))
                         {
                             entry.IsCompleted = isCompleted;
-                            anyChanges = true;
                         }
                     }
                 }
 
-                // Update UI if needed
+                // Update UI
+                routeGrid.Rows.Clear();
+                bool anyChanges = false;
+
+                foreach (var entry in routeEntries)
+                {
+                    // Skip entries marked as skipped
+                    if (entry.IsSkipped)
+                        continue;
+
+                    string completionMark = entry.IsCompleted ? "X" : "";
+                    int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                    routeGrid.Rows[rowIndex].Tag = entry;
+                    anyChanges = true;
+                }
+
                 if (anyChanges)
                 {
-                    routeGrid.Rows.Clear();
-                    foreach (var entry in routeEntries)
-                    {
-                        string completionMark = entry.IsCompleted ? "X" : "";
-                        int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
-                        routeGrid.Rows[rowIndex].Tag = entry;
-                    }
-
                     SortAndScrollToFirstIncomplete(routeGrid);
                     Debug.WriteLine($"Loaded autosave from {autosaveFile}");
                     return true;

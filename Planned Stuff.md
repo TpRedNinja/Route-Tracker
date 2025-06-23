@@ -5,13 +5,11 @@ This document outlines planned support for additional games and features in Rout
 ## Games for Future Updates (After Version 1.0)
 
 ### Immediate Plans
-- **God of War (2018)**
-  - Combat encounter tracking
+- **God of War (2018) & Ragnarök**
   - Collectible and chest tracking
   - Upgrade material tracking
   - Realm tear detection
-
-- **God of War Ragnarök**
+  - Story progression tracking
   - Favor completion tracking
   - Collectible detection across all realms
   - Equipment upgrade tracking
@@ -20,9 +18,9 @@ This document outlines planned support for additional games and features in Rout
 ### Future Considerations
 - **Tomb Raider Reboot Trilogy**
   - Tomb completion tracking
-  - Document and relic collection
+  - Documents and relics collection
   - Challenge progress
-  - XP and skill acquisition
+  - skill acquisition
 
 ## Feature Roadmap
 
@@ -30,7 +28,6 @@ This document outlines planned support for additional games and features in Rout
 - Complete AC4 Black Flag support
 - Implement improved UI with game switching
 - Add route management system for multiple speedrun categories
-- Add manual completion feature (button to mark items as complete)
 
 ### Long-term Vision
 - Multi-language support
@@ -39,7 +36,11 @@ This document outlines planned support for additional games and features in Rout
 - User-friendly system for adding custom games, routes and pointers
 - Image support to show collectible locations in-game
 
-## Technical Improvements
+## Recently Implemented Features
 - Save/load functionality for route progress
+- "Always On Top" window mode
+- Text wrapping for better readability in route descriptions
+- Game state detection (loading screens and main menu transitions)
 - Automatic game detection
 - Performance optimizations for minimal resource usage
+-  Customizable hotkeys for marking route entries

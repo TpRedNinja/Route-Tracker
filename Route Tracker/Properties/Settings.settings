@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿<?xml version='1.0' encoding='utf-8'?>
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Route_Tracker.Properties" GeneratedClassName="Settings">
   <Profiles />
@@ -12,27 +11,20 @@
     <Setting Name="AC4Directory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ACSDirectory" Type="System.String" Scope="User">
+    <Setting Name="Gow2018Directory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-  </Settings>
-=======
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Route_Tracker.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="GameDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="AutoStart" Type="System.Boolean" Scope="User">
+    <Setting Name="AlwaysOnTop" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="AC4Directory" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="CompleteHotkey" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="ACSDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="SkipHotkey" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="HotkeysEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
->>>>>>> MainForm.cs
 </SettingsFile>

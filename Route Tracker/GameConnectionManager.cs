@@ -118,7 +118,7 @@ namespace Route_Tracker
                 }
                 else if (currentProcess == "GoW.exe")
                 {
-                    gameDirectory = Settings.Default?.GoW2018Directory ?? string.Empty;
+                    gameDirectory = Settings.Default?.Gow2018Directory ?? string.Empty;
                 }
 
                 if (string.IsNullOrEmpty(gameDirectory))
@@ -199,6 +199,45 @@ namespace Route_Tracker
                 }
             }
         }
+
+        [SupportedOSPlatform("windows6.1")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "it breaks shit")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "it breaks shit")]
+        public string DetectRunningGame()
+        {
+            // Define known game processes and their friendly names
+            Dictionary<string, string> gameProcessMap = new()
+            {
+                { "AC4BFSP", "Assassin's Creed 4" },
+                { "GoW", "God of War 2018" }
+                // Add more games here as needed
+            };
+
+            // Check for running processes that match our supported games
+            foreach (var process in Process.GetProcesses())
+            {
+                try
+                {
+                    // Check if this process name matches any of our supported games
+                    foreach (var game in gameProcessMap)
+                    {
+                        if (process.ProcessName.Contains(game.Key, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return game.Value; // Return the friendly game name
+                        }
+                    }
+                }
+                catch
+                {
+                    // Skip any processes we can't access
+                    continue;
+                }
+            }
+
+            return string.Empty; // No matching game found
+        }
         #endregion
 
         #region Game Statistics
@@ -258,6 +297,7 @@ namespace Route_Tracker
         }
         #endregion
 
+        #region Connection Orchestration
         // ==========FORMAL COMMENT=========
         // High-level method that orchestrates the game connection process
         // Handles game selection, auto-starting if needed, and statistics initialization
@@ -300,12 +340,15 @@ namespace Route_Tracker
 
             return false;
         }
+        #endregion
 
+        #region external API Imports
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "SYSLIB1054:",
         Justification = "Using ReadProcessMemory for direct memory reading in unsafe context")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
         Justification = "Required for unsafe memory operations")]
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+        #endregion
     }
 }

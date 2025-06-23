@@ -89,7 +89,7 @@ namespace Route_Tracker
             }
             else if (selectedGame == "God of War 2018")
             {
-                directoryTextBox.Text = Settings.Default.GoW2018Directory;
+                directoryTextBox.Text = Settings.Default.Gow2018Directory;
             }
         }
 
@@ -122,7 +122,7 @@ namespace Route_Tracker
             }
             else if (selectedGame == "God of War 2018")
             {
-                Settings.Default.GoW2018Directory = directoryTextBox.Text;
+                Settings.Default.Gow2018Directory = directoryTextBox.Text;
             }
             Settings.Default.Save();
         }
