@@ -118,5 +118,29 @@ namespace Route_Tracker.Properties {
                 this["HotkeysEnabled"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CheckForUpdateOnStartup {
+            get {
+                return ((bool)(this["CheckForUpdateOnStartup"]));
+            }
+            set {
+                this["CheckForUpdateOnStartup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DevMode {
+            get {
+                return ((bool)(this["DevMode"]));
+            }
+            set {
+                this["DevMode"] = value;
+            }
+        }
     }
 }

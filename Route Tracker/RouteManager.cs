@@ -541,21 +541,18 @@ namespace Route_Tracker
 
             // Get all entries from the grid
             List<RouteEntry> entries = [];
-            Dictionary<RouteEntry, int> originalIndices = [];
-
             for (int i = 0; i < routeGrid.Rows.Count; i++)
             {
                 if (routeGrid.Rows[i].Tag is RouteEntry entry)
                 {
                     entries.Add(entry);
-                    originalIndices[entry] = i; // Track original position
                 }
             }
 
-            // Sort entries: completed first, then original order within groups
+            // Sort: completed first (by Id), then incomplete (by Id)
             var sortedEntries = entries
                 .OrderByDescending(e => e.IsCompleted)
-                .ThenBy(e => originalIndices[e])
+                .ThenBy(e => e.Id)
                 .ToList();
 
             // Clear and re-add rows in sorted order
@@ -595,6 +592,10 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Silently saves progress whenever route entries change
         // Used for preserving progress between game sessions and crashes
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1869:",
+        Justification = "Performance optimizations are minimal")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:",
+        Justification = "because i said so")]
         public void AutoSaveProgress()
         {
             if (routeEntries == null || routeEntries.Count == 0)
@@ -623,7 +624,8 @@ namespace Route_Tracker
                 string autosaveFile = Path.Combine(saveDir, $"{routeName}_AutoSave.json");
 
                 // Save the data - completely overwrite the file
-                string json = System.Text.Json.JsonSerializer.Serialize(entryStatus);
+                System.Text.Json.JsonSerializerOptions options = new() { WriteIndented = true };
+                string json = System.Text.Json.JsonSerializer.Serialize(entryStatus, options);
                 File.WriteAllText(autosaveFile, json);
 
                 Debug.WriteLine($"Auto-saved progress to {autosaveFile}");

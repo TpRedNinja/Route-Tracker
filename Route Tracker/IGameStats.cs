@@ -18,7 +18,9 @@ namespace Route_Tracker
         Dictionary<string, object> GetStatsAsDictionary();
 
         (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,
-        int Fragments, int Assassin, int Naval, int Letters, int Manuscripts,
-        int Music, int Forts, int Taverns, int TotalChests) GetStats();
+         int Fragments, int Assassin, int Naval, int Letters, int Manuscripts,
+         int Music, int Forts, int Taverns, int TotalChests) GetStats();
+
+        (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts();
     }
 }

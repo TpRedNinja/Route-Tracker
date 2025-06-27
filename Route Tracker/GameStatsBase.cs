@@ -57,6 +57,7 @@ namespace Route_Tracker
     // The core class that powers the entire tracking functionality
     public abstract unsafe class GameStatsBase : IGameStats
     {
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290: Use primary constructure",
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
@@ -135,6 +136,13 @@ namespace Route_Tracker
         public abstract (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,
             int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music,
             int Forts, int Taverns, int TotalChests) GetStats();
+
+        // make GetSpecialActivityCounts() virtual so it can be overridden if needed
+        public virtual (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
+        {
+            // Default implementation for games that don't support these stats
+            return (0, 0, 0, 0);
+        }
 
         // Add the new interface method
         public virtual Dictionary<string, object> GetStatsAsDictionary()

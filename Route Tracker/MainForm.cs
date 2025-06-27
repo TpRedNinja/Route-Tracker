@@ -6,9 +6,19 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Route_Tracker.Properties;
+using System.Net.Http;
+using System.Text.Json;
+using System.IO.Compression;
 
 namespace Route_Tracker
 {
+    // static class so version number can be displayed and so we can get updates
+    public static class AppInfo
+    {
+        public const string Version = "v0.2-Beta";
+        public const string GitHubRepo = "TpRedNinja/Route-Tracker"; // e.g. "myuser/RouteTracker"
+    }
+
     // ==========FORMAL COMMENT=========
     // Main form class that provides the user interface for the Assassin's Creed Route Tracker
     // Handles connections to game processes, memory reading, and displaying game statistics
@@ -56,10 +66,14 @@ namespace Route_Tracker
         private RouteManager? routeManager; // Mark as nullable since it's set after connection
         private readonly GameConnectionManager gameConnectionManager;
         private readonly SettingsManager settingsManager;
+        private StatsWindow? statsWindow;
+        private Button showStatsButton = null!;
+        private Button saveButton = null!;
+        private Button loadButton = null!;
+        private Button resetButton = null!;
+        
 
-        private TabControl tabControl = null!; // Use null-forgiving operator since initialized in InitializeCustomComponents
-        private TabPage statsTabPage = null!; // Same approach
-        private TabPage routeTabPage = null!; // Same approach
+        private DataGridView routeGrid = null!;
 
         private TextBox gameDirectoryTextBox = null!; // Same approach
         private CheckBox autoStartCheckBox = null!; // Same approach
@@ -89,6 +103,8 @@ namespace Route_Tracker
 
             LoadSettings();
             this.FormClosing += MainForm_FormClosing;
+            // In MainForm.cs constructor or Load event
+            this.Text = $"Route Tracker {AppInfo.Version}";
         }
 
         #region UI Initialization
@@ -118,8 +134,85 @@ namespace Route_Tracker
             AppTheme.ApplyTo(this);
 
             CreateMainMenu();
-            SetupTabs();
             InitializeHiddenControls();
+
+            // Progress buttons (manual position)
+            int buttonWidth = 100;
+            int buttonHeight = 25;
+            int spacing = 10;
+            int menuHeight = this.MainMenuStrip?.Height ?? 24;
+
+            saveButton = new Button
+            {
+                Text = "Save Progress",
+                Width = buttonWidth,
+                Height = buttonHeight,
+                Left = spacing,
+                Top = menuHeight + spacing,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont
+            };
+            saveButton.Click += SaveButton_Click;
+            this.Controls.Add(saveButton);
+
+            loadButton = new Button
+            {
+                Text = "Load Progress",
+                Width = buttonWidth,
+                Height = buttonHeight,
+                Left = saveButton.Right + spacing,
+                Top = menuHeight + spacing,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont
+            };
+            loadButton.Click += LoadButton_Click;
+            this.Controls.Add(loadButton);
+
+            resetButton = new Button
+            {
+                Text = "Reset Progress",
+                Width = buttonWidth,
+                Height = buttonHeight,
+                Left = loadButton.Right + spacing,
+                Top = menuHeight + spacing,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont
+            };
+            resetButton.Click += ResetProgressButton_Click;
+            this.Controls.Add(resetButton);
+
+            // Keep buttons in place on resize (optional, if you want them to stay at the top left)
+            this.Resize += (s, e) =>
+            {
+                int y = (this.MainMenuStrip?.Height ?? 24) + spacing;
+                saveButton.Top = y;
+                loadButton.Top = y;
+                resetButton.Top = y;
+                loadButton.Left = saveButton.Right + spacing;
+                resetButton.Left = loadButton.Right + spacing;
+            };
+
+            // Add the Show Stats button at the bottom-right (as before)
+            showStatsButton = new Button
+            {
+                Text = "Show Stats",
+                Width = 90,
+                Height = 25,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont
+            };
+            showStatsButton.Click += ShowStatsMenuItem_Click;
+            this.Controls.Add(showStatsButton);
+            showStatsButton.Left = this.ClientSize.Width - showStatsButton.Width - 20;
+            showStatsButton.Top = this.ClientSize.Height - showStatsButton.Height - 20;
+            this.Resize += (s, e) =>
+            {
+                showStatsButton.Left = this.ClientSize.Width - showStatsButton.Width - 20;
+                showStatsButton.Top = this.ClientSize.Height - showStatsButton.Height - 20;
+            };
+
+            routeGrid = CreateRouteGridView();
+            this.Controls.Add(routeGrid);
         }
 
         // ==========FORMAL COMMENT=========
@@ -142,14 +235,53 @@ namespace Route_Tracker
             // Create settings menu with sub-items
             CreateSettingsMenu(menuStrip);
 
-            // Create tab navigation buttons
-            CreateTabButtons(menuStrip);
-
             // Create connection controls
             CreateConnectionControls(menuStrip);
 
             this.MainMenuStrip = menuStrip;
             this.Controls.Add(menuStrip);
+        }
+
+        private void ShowStatsMenuItem_Click(object? sender, EventArgs e)
+        {
+            if (statsWindow == null || statsWindow.IsDisposed)
+                statsWindow = new StatsWindow();
+
+            // Try to get stats from the current game connection
+            if (gameConnectionManager.GameStats is IGameStats stats)
+            {
+                var (Percent, PercentFloat, Viewpoints, Myan, Treasure, Fragments, Assassin, Naval, Letters, Manuscripts, Music, Forts, Taverns, TotalChests) = stats.GetStats();
+                var (StoryMissions, TemplarHunts, LegendaryShips, TreasureMaps) = stats.GetSpecialActivityCounts();
+
+                string statsText =
+                    $"Completion Percentage: {Percent}%\n" +
+                    $"Completion Percentage Exact: {Math.Round(PercentFloat, 2)}%\n" +
+                    $"Viewpoints Completed: {Viewpoints}\n" +
+                    $"Myan Stones Collected: {Myan}\n" +
+                    $"Buried Treasure Collected: {Treasure}\n" +
+                    $"AnimusFragments Collected: {Fragments}\n" +
+                    $"AssassinContracts Completed: {Assassin}\n" +
+                    $"NavalContracts Completed: {Naval}\n" +
+                    $"LetterBottles Collected: {Letters}\n" +
+                    $"Manuscripts Collected: {Manuscripts}\n" +
+                    $"Music Sheets Collected: {Music}\n" +
+                    $"Forts Captured: {Forts}\n" +
+                    $"Taverns unlocked: {Taverns}\n" +
+                    $"Total Chests Collected: {TotalChests}\n" +
+                    $"Story Missions Completed: {StoryMissions}\n" +
+                    $"Templar Hunts Completed: {TemplarHunts}\n" +
+                    $"Legendary Ships Defeated: {LegendaryShips}\n" +
+                    $"Treasure Maps Collected: {TreasureMaps}";
+
+                statsWindow.UpdateStats(statsText);
+            }
+            else
+            {
+                statsWindow.UpdateStats("No stats available. Connect to a game first.");
+            }
+
+            statsWindow.Show();
+            statsWindow.BringToFront();
         }
 
         // ==========FORMAL COMMENT=========
@@ -163,6 +295,10 @@ namespace Route_Tracker
         {
             // Create and configure the Settings menu item
             ToolStripMenuItem settingsMenuItem = new("Settings");
+
+            AddUpdateCheckMenuItem(settingsMenuItem);
+
+            AddDevModeMenuItem(settingsMenuItem);
 
             // Create and configure the Auto-Start Game menu item
             ToolStripMenuItem autoStartMenuItem = new("Auto-Start Game")
@@ -281,7 +417,7 @@ namespace Route_Tracker
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             // Only process hotkeys if enabled and on route tab
-            if (isHotkeysEnabled && tabControl.SelectedTab == routeTabPage)
+            if (isHotkeysEnabled)
             {
                 (Keys CompleteHotkey, Keys SkipHotkey) = settingsManager.GetHotkeys();
 
@@ -303,9 +439,8 @@ namespace Route_Tracker
         // Methods to handle entry actions
         private void CompleteSelectedEntry()
         {
-            if (routeTabPage.Controls["routeGrid"] is DataGridView routeGrid &&
-                routeGrid.CurrentRow != null &&
-                routeGrid.CurrentRow.Tag is RouteEntry selectedEntry)
+            if (routeGrid.CurrentRow != null && routeGrid.CurrentRow.Tag is RouteEntry 
+                selectedEntry)
             {
                 // Mark as complete
                 selectedEntry.IsCompleted = true;
@@ -321,9 +456,7 @@ namespace Route_Tracker
 
         private void SkipSelectedEntry()
         {
-            if (routeTabPage.Controls["routeGrid"] is DataGridView routeGrid &&
-                routeGrid.CurrentRow != null &&
-                routeGrid.CurrentRow.Tag is RouteEntry selectedEntry)
+            if (routeGrid.CurrentRow != null && routeGrid.CurrentRow.Tag is RouteEntry selectedEntry)
             {
                 // Mark as skipped
                 selectedEntry.IsSkipped = true;
@@ -334,26 +467,6 @@ namespace Route_Tracker
                 // Auto-save progress
                 routeManager?.AutoSaveProgress();
             }
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Creates tab navigation buttons in the main menu for switching between views
-        // Adds event handlers to change the selected tab when clicked
-        // ==========MY NOTES==============
-        // Adds buttons to switch between Stats and Route views
-        // Simpler than using regular tabs and looks better with our theme
-        [SupportedOSPlatform("windows6.1")]
-        private void CreateTabButtons(MenuStrip menuStrip)
-        {
-            // Create and configure the Stats tab button
-            ToolStripButton statsTabButton = new("Stats");
-            statsTabButton.Click += (sender, e) => tabControl.SelectedTab = statsTabPage;
-            menuStrip.Items.Add(statsTabButton);
-
-            // Create and configure the Route tab button
-            ToolStripButton routeTabButton = new("Route");
-            routeTabButton.Click += (sender, e) => tabControl.SelectedTab = routeTabPage;
-            menuStrip.Items.Add(routeTabButton);
         }
 
         // ==========FORMAL COMMENT=========
@@ -390,34 +503,6 @@ namespace Route_Tracker
         }
 
         // ==========FORMAL COMMENT=========
-        // Sets up the tab control system for organizing content into views
-        // Creates stats and route tabs and adds them to the form
-        // ==========MY NOTES==============
-        // Creates the main layout with tabs for different sections
-        // Each tab has its own content that's built separately
-        [SupportedOSPlatform("windows6.1")]
-        private void SetupTabs()
-        {
-            // Create and configure the TabControl
-            tabControl = new TabControl
-            {
-                Dock = DockStyle.Fill
-            };
-            AppTheme.ApplyTo(tabControl);
-
-            // Create the tabs
-            CreateStatsTab();
-            CreateRouteTab();
-
-            // Add the TabPages to the TabControl
-            tabControl.TabPages.Add(statsTabPage);
-            tabControl.TabPages.Add(routeTabPage);
-
-            // Add the TabControl to the form's controls
-            this.Controls.Add(tabControl);
-        }
-
-        // ==========FORMAL COMMENT=========
         // Initializes hidden controls used for settings that aren't directly visible
         // Sets up event handlers and default values for these controls
         // ==========MY NOTES==============
@@ -434,7 +519,7 @@ namespace Route_Tracker
                 Width = 600,
                 Dock = DockStyle.Top
             };
-            statsTabPage.Controls.Add(gameDirectoryTextBox);
+            this.Controls.Add(gameDirectoryTextBox);
 
             autoStartCheckBox = new CheckBox
             {
@@ -443,9 +528,8 @@ namespace Route_Tracker
                 Dock = DockStyle.Top
             };
             autoStartCheckBox.CheckedChanged += AutoStartCheckBox_CheckedChanged;
-            statsTabPage.Controls.Add(autoStartCheckBox);
+            this.Controls.Add(autoStartCheckBox);
         }
-
         private void AutoDetectButton_Click(object? sender, EventArgs e)
         {
             ToolStripComboBox? gameDropdown = this.MainMenuStrip?.Items.OfType<ToolStripComboBox>().FirstOrDefault();
@@ -473,210 +557,7 @@ namespace Route_Tracker
         }
         #endregion
 
-        #region Stats Tab
-        // ==========FORMAL COMMENT=========
-        // Creates the Stats tab with layout and controls for displaying game statistics
-        // Uses nested layout panels for proper alignment and spacing
-        // ==========MY NOTES==============
-        // Builds the stats display page with a button and results area
-        // Uses layout panels to make everything line up properly
-        [SupportedOSPlatform("windows6.1")]
-        private void CreateStatsTab()
-        {
-            // Create and configure the Stats TabPage
-            statsTabPage = new TabPage("Stats");
-            AppTheme.ApplyTo(statsTabPage);
-
-            // Use TableLayoutPanel for better layout management
-            TableLayoutPanel statsLayout = new()
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,  // Left margin, content, right margin
-                RowCount = 2,     // Button row, stats display row
-                Padding = new Padding(AppTheme.StandardPadding)
-            };
-            AppTheme.ApplyTo(statsLayout);
-
-            // Configure column styles - center content with margins on sides
-            statsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5F));   // Left margin
-            statsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 90F));  // Content
-            statsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5F));   // Right margin
-
-            // Set row styles
-            statsLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));           // Button row
-            statsLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));      // Stats display
-
-            // Top section for the button - but in a FlowLayoutPanel to center it
-            FlowLayoutPanel buttonPanel = new()
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                AutoSize = true
-            };
-            AppTheme.ApplyTo(buttonPanel);
-
-            // Create button with proper size
-            Button percentageButton = new()
-            {
-                Text = "Stats",
-                AutoSize = true,
-                Margin = new Padding(0, 0, 0, AppTheme.StandardMargin)
-            };
-            percentageButton.Click += PercentageButton_Click;
-            buttonPanel.Controls.Add(percentageButton);
-
-            // Add button panel to layout in the center column of the first row
-            statsLayout.Controls.Add(buttonPanel, 1, 0);
-
-            // Bottom section for the stats display - in the center column
-            Label percentageLabel = new()
-            {
-                Name = "percentageLabel",
-                Text = "",
-                Dock = DockStyle.Fill,
-                AutoSize = true,
-                Font = AppTheme.StatsFont
-            };
-            statsLayout.Controls.Add(percentageLabel, 1, 1);
-
-            // Add layout to the tab
-            statsTabPage.Controls.Add(statsLayout);
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Updates the stats display label with current game statistics
-        // Formats all statistics into a readable multi-line text output
-        // ==========MY NOTES==============
-        // Takes all the game stats and formats them into a readable display
-        // Shows percentages, collectibles, and all other tracked values
-        private static void UpdateStatsDisplay(Label label, int percent, float percentFloat, int viewpoints, int myan,
-            int treasure, int fragments, int assassin, int naval, int letters, int manuscripts,
-            int music, int forts, int taverns, int totalChests)
-        {
-            label.Text = $"Completion Percentage: {percent}%\n" +
-                $"Completion Percentage Exact: {Math.Round(percentFloat, 2)}%\n" +
-                $"Viewpoints Completed: {viewpoints}\n" +
-                $"Myan Stones Collected: {myan}\n" +
-                $"Buried Treasure Collected: {treasure}\n" +
-                $"AnimusFragments Collected: {fragments}\n" +
-                $"AssassinContracts Completed: {assassin}\n" +
-                $"NavalContracts Completed: {naval}\n" +
-                $"LetterBottles Collected: {letters}\n" +
-                $"Manuscripts Collected: {manuscripts}\n" +
-                $"Music Sheets Collected: {music}\n" +
-                $"Forts Captured: {forts}\n" +
-                $"Taverns unlocked: {taverns}\n" +
-                $"Total Chests Collected: {totalChests}";
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Event handler for Stats button clicks
-        // Retrieves and displays all game statistics from memory
-        // Handles error conditions and different game types
-        // ==========MY NOTES==============
-        // Gets all the game stats when you click the button
-        // Shows them in the label or displays an error message if something goes wrong
-        [SupportedOSPlatform("windows6.1")]
-        private void PercentageButton_Click(object? sender, EventArgs e)
-        {
-            if (statsTabPage.Controls[0] is TableLayoutPanel statsLayout &&
-            statsLayout.Controls["percentageLabel"] is Label percentageLabel)
-            {
-                if (gameConnectionManager.IsConnected && currentProcess == "AC4BFSP.exe")
-                {
-                    try
-                    {
-                        if (gameConnectionManager.GameStats == null)
-                        {
-                            percentageLabel.Text = "Error: gameStats is not initialized.";
-                            return;
-                        }
-
-                        // Get current stats
-                        (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure, int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music, int Forts, int Taverns, int TotalChests) = gameConnectionManager.GameStats.GetStats();
-
-                        // Update the display
-                        UpdateStatsDisplay(percentageLabel, Percent, PercentFloat, Viewpoints, Myan,
-                            Treasure, Fragments, Assassin, Naval, Letters, Manuscripts,
-                            Music, Forts, Taverns, TotalChests);
-
-                        // Set a tag to indicate we're in continuous update mode
-                        percentageLabel.Tag = "updating";
-                    }
-                    catch (Win32Exception ex)
-                    {
-                        percentageLabel.Text = $"Error: {ex.Message}";
-                    }
-                    catch (Exception ex)
-                    {
-                        percentageLabel.Text = $"Unexpected error: {ex.Message}";
-                    }
-                }
-                else if (gameConnectionManager.IsConnected && currentProcess == "GoW.exe")
-                    percentageLabel.Text = "Percentage feature not available for God of War 2018";
-                else
-                    percentageLabel.Text = "Not connected to a game";
-            }
-            else
-            {
-                MessageBox.Show("The percentage label control was not found.");
-            }
-        }
-        #endregion
-
         #region Route Tab
-        // ==========FORMAL COMMENT=========
-        // Adds save and load buttons to the route tab for progress persistence
-        // Creates and configures a button panel with appropriate styling and event handlers
-        // ==========MY NOTES==============
-        // Adds buttons that let the user manually save and load their progress
-        // Places them at the top of the route tab in a horizontal panel
-        private void AddProgressButtons()
-        {
-            // Create panel for buttons
-            FlowLayoutPanel buttonPanel = new()
-            {
-                Dock = DockStyle.Top,
-                AutoSize = true,
-                FlowDirection = FlowDirection.LeftToRight,
-                Padding = new Padding(5)
-            };
-            AppTheme.ApplyTo(buttonPanel);
-
-            // Create buttons
-            Button saveButton = new()
-            {
-                Text = "Save Progress",
-                AutoSize = true,
-                Margin = new Padding(5)
-            };
-            saveButton.Click += SaveButton_Click;
-
-            Button loadButton = new()
-            {
-                Text = "Load Progress",
-                AutoSize = true,
-                Margin = new Padding(5)
-            };
-            loadButton.Click += LoadButton_Click;
-
-            Button resetProgressButton = new()
-            {
-                Text = "Reset Progress",
-                AutoSize = true,
-                Margin = new Padding(5)
-            };
-            resetProgressButton.Click += ResetProgressButton_Click;
-
-            // Add buttons to panel
-            buttonPanel.Controls.Add(saveButton);
-            buttonPanel.Controls.Add(loadButton);
-            buttonPanel.Controls.Add(resetProgressButton);
-
-            // Add panel to route tab
-            routeTabPage.Controls.Add(buttonPanel);
-        }
 
         // ==========FORMAL COMMENT=========
         // Event handler for Save Progress button clicks
@@ -698,23 +579,31 @@ namespace Route_Tracker
         // Has RouteManager do the actual loading and shows a message if it worked
         private void LoadButton_Click(object? sender, EventArgs e)
         {
-            if (routeManager != null &&
-                routeTabPage.Controls["routeGrid"] is DataGridView routeGrid)
+            // Always ensure routeManager exists
+            routeManager ??= new RouteManager(
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Routes", "AC4 100 % Route - Main Route.tsv"),
+                new GameConnectionManager()
+            );
+
+            // Always ensure route entries are loaded before loading progress
+            if (routeManager.LoadEntries().Count == 0)
             {
-                if (routeManager.LoadProgress(routeGrid, this))
-                    MessageBox.Show("Progress loaded successfully.", "Load Complete",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("No route entries found. Make sure the route file exists.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Open file dialog and load progress
+            if (routeManager.LoadProgress(routeGrid, this))
+            {
+                MessageBox.Show("Progress loaded successfully.", "Load Complete",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void ResetProgressButton_Click(object? sender, EventArgs e)
         {
-            if (routeManager == null)
-                return;
-
-            // Find the route grid (adjust if you store it differently)
-            DataGridView? routeGrid = routeTabPage.Controls.OfType<DataGridView>().FirstOrDefault();
-            if (routeGrid == null)
+            if (routeManager == null || routeGrid == null)
                 return;
 
             var result = MessageBox.Show(
@@ -727,50 +616,6 @@ namespace Route_Tracker
             {
                 routeManager.ResetProgress(routeGrid);
             }
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Creates the Route tab with grid for displaying route entries
-        // Sets up the DataGridView and loads initial route data
-        // ==========MY NOTES==============
-        // Builds the route tracking view with the grid for showing tasks
-        // Adds placeholder content until we connect to a game
-        [SupportedOSPlatform("windows6.1")]
-        private void CreateRouteTab()
-        {
-            // Create and configure the Route TabPage
-            routeTabPage = new TabPage("Route")
-            {
-                BackColor = Color.Black
-            };
-
-            // Create the DataGridView for route entries
-            var routeGrid = CreateRouteGridView();
-
-            // Add the grid to the tabpage
-            routeTabPage.Controls.Add(routeGrid);
-
-            // Check if hotkeys are set
-            var (completeHotkey, skipHotkey) = settingsManager.GetHotkeys();
-            bool hotkeysSet = completeHotkey != Keys.None || skipHotkey != Keys.None;
-
-            // If not connected, but hotkeys are set, allow route loading
-            if (routeManager == null && hotkeysSet)
-            {
-                string routeFilePath = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    "Routes",
-                    "AC4 100 % Route - Main Route.tsv"); // Or let user pick
-
-                // Pass a dummy GameConnectionManager if needed
-                routeManager = new RouteManager(routeFilePath, gameConnectionManager);
-            }
-
-            // Load route data - this could happen after routeManager is initialized in ConnectButton_Click
-            LoadRouteData(routeGrid);
-
-            //add save and load buttons
-            AddProgressButtons();
         }
 
         // ==========FORMAL COMMENT=========
@@ -997,10 +842,7 @@ namespace Route_Tracker
                 routeManager = new RouteManager(routeFilePath, gameConnectionManager);
 
                 // Reload route data if we're on the route tab
-                if (routeTabPage.Controls["routeGrid"] is DataGridView routeGrid)
-                {
-                    LoadRouteData(routeGrid);
-                }
+                LoadRouteData(routeGrid);
             }
             else
             {
@@ -1043,27 +885,42 @@ namespace Route_Tracker
 
             _lastUIUpdateTime = DateTime.Now;
 
-            this.Invoke(() => {
-                // Use SuspendLayout to batch UI updates
-                tabControl.SuspendLayout();
-
-                // Update stats display if we're in updating mode
-                if (statsTabPage.Controls[0] is TableLayoutPanel statsLayout &&
-                    statsLayout.Controls["percentageLabel"] is Label percentageLabel &&
-                    percentageLabel.Tag?.ToString() == "updating")
-                {
-                    UpdateStatsDisplay(percentageLabel, e.Percent, e.PercentFloat, e.Viewpoints, e.Myan,
-                        e.Treasure, e.Fragments, e.Assassin, e.Naval, e.Letters, e.Manuscripts,
-                        e.Music, e.Forts, e.Taverns, e.TotalChests);
-                }
-
-                // Update route completion status if we're connected
-                if (routeTabPage.Controls["routeGrid"] is DataGridView routeGrid)
+            this.Invoke(() =>
+            {
+                // Update route completion status
+                if (routeGrid != null)
                 {
                     UpdateRouteCompletionStatus(routeGrid, e);
                 }
 
-                tabControl.ResumeLayout();
+                // Update stats window if open
+                if (statsWindow != null && statsWindow.Visible)
+                {
+                    var (storyMissions, templarHunts, legendaryShips, treasureMaps) =
+                        gameConnectionManager.GameStats?.GetSpecialActivityCounts() ?? (0, 0, 0, 0);
+
+                    string statsText =
+                        $"Completion Percentage: {e.Percent}%\n" +
+                        $"Completion Percentage Exact: {Math.Round(e.PercentFloat, 2)}%\n" +
+                        $"Viewpoints Completed: {e.Viewpoints}\n" +
+                        $"Myan Stones Collected: {e.Myan}\n" +
+                        $"Buried Treasure Collected: {e.Treasure}\n" +
+                        $"AnimusFragments Collected: {e.Fragments}\n" +
+                        $"AssassinContracts Completed: {e.Assassin}\n" +
+                        $"NavalContracts Completed: {e.Naval}\n" +
+                        $"LetterBottles Collected: {e.Letters}\n" +
+                        $"Manuscripts Collected: {e.Manuscripts}\n" +
+                        $"Music Sheets Collected: {e.Music}\n" +
+                        $"Forts Captured: {e.Forts}\n" +
+                        $"Taverns unlocked: {e.Taverns}\n" +
+                        $"Total Chests Collected: {e.TotalChests}\n" +
+                        $"Story Missions Completed: {storyMissions}\n" +
+                        $"Templar Hunts Completed: {templarHunts}\n" +
+                        $"Legendary Ships Defeated: {legendaryShips}\n" +
+                        $"Treasure Maps Collected: {treasureMaps}";
+
+                    statsWindow.UpdateStats(statsText);
+                }
             });
         }
 
@@ -1266,6 +1123,139 @@ namespace Route_Tracker
         {
             // Clean up any resources before closing
             CleanupGameStats();
+        }
+        #endregion
+
+
+        
+        #region Update Management
+        // Call this in your constructor or OnLoad (after UI is ready)
+        protected override async void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            await CheckForUpdatesAsync();
+        }
+
+        // Checks GitHub for a new release and prompts the user to update if one is available.
+        // Doesnt run if the user has disabled update checks in settings.
+        // Also if dev passcode is is entered in the settings, it will not check for updates.
+        private static async Task CheckForUpdatesAsync()
+        {
+            if (Properties.Settings.Default.DevMode)
+                return;
+
+            if (!Properties.Settings.Default.CheckForUpdateOnStartup)
+                return;
+
+            string apiUrl = $"https://api.github.com/repos/{AppInfo.GitHubRepo}/releases/latest";
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("RouteTrackerUpdater");
+
+            try
+            {
+                var response = await client.GetStringAsync(apiUrl);
+                using var doc = JsonDocument.Parse(response);
+                string? latestVersion = doc.RootElement.GetProperty("tag_name").GetString();
+                if (string.IsNullOrEmpty(latestVersion))
+                {
+                    MessageBox.Show("Could not determine the latest version from GitHub.", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (!string.Equals(latestVersion, AppInfo.Version, StringComparison.OrdinalIgnoreCase))
+                {
+                    var result = MessageBox.Show(
+                        $"A new version is available!\n\nCurrent: {AppInfo.Version}\nLatest: {latestVersion}\n\nDo you want to download and install it?",
+                        "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        var assets = doc.RootElement.GetProperty("assets");
+                        if (assets.GetArrayLength() > 0)
+                        {
+                            string? zipUrl = assets[0].GetProperty("browser_download_url").GetString();
+                            if (string.IsNullOrEmpty(zipUrl))
+                            {
+                                MessageBox.Show("No download URL found for the latest release.", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                            string tempZip = Path.GetTempFileName();
+                            using (var zipStream = await client.GetStreamAsync(zipUrl))
+                            using (var fileStream = File.Create(tempZip))
+                                await zipStream.CopyToAsync(fileStream);
+
+                            ZipFile.ExtractToDirectory(tempZip, AppDomain.CurrentDomain.BaseDirectory, true);
+
+                            MessageBox.Show("Update complete. Please restart the application.", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("No downloadable asset found in the latest release.", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Update check failed: {ex.Message}");
+            }
+        }
+
+        private static void AddUpdateCheckMenuItem(ToolStripMenuItem settingsMenuItem)
+        {
+            var checkForUpdatesMenuItem = new ToolStripMenuItem("Check for Updates on Startup")
+            {
+                CheckOnClick = true,
+                Checked = Properties.Settings.Default.CheckForUpdateOnStartup
+            };
+            checkForUpdatesMenuItem.CheckedChanged += (s, e) =>
+            {
+                Properties.Settings.Default.CheckForUpdateOnStartup = checkForUpdatesMenuItem.Checked;
+                Properties.Settings.Default.Save();
+            };
+            settingsMenuItem.DropDownItems.Add(checkForUpdatesMenuItem);
+            
+        }
+
+        private static void AddDevModeMenuItem(ToolStripMenuItem settingsMenuItem)
+        {
+            var devModeMenuItem = new ToolStripMenuItem("Enable Dev Mode")
+            {
+                CheckOnClick = true,
+                Checked = Properties.Settings.Default.DevMode
+            };
+            devModeMenuItem.CheckedChanged += (s, e) =>
+            {
+                if (devModeMenuItem.Checked)
+                {
+                    using var passForm = new DevPasscodeForm();
+                    if (passForm.ShowDialog() == DialogResult.OK)
+                    {
+                        if (passForm.Passcode == "1289")
+                        {
+                            Properties.Settings.Default.DevMode = true;
+                            Properties.Settings.Default.Save();
+                            MessageBox.Show("Dev Mode enabled. Update checks will be skipped.", "Dev Mode", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            devModeMenuItem.Checked = false;
+                            MessageBox.Show("Incorrect passcode.", "Dev Mode", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
+                    {
+                        devModeMenuItem.Checked = false;
+                    }
+                }
+                else
+                {
+                    Properties.Settings.Default.DevMode = false;
+                    Properties.Settings.Default.Save();
+                    MessageBox.Show("Dev Mode disabled.", "Dev Mode", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            };
+            settingsMenuItem.DropDownItems.Add(devModeMenuItem);
         }
         #endregion
     }

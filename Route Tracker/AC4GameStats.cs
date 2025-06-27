@@ -310,18 +310,16 @@ namespace Route_Tracker
             int totalChests = CountCollectibles(ChestStartOffset, ChestEndOffset);
             int heroupgrades = ReadCollectible(HeroUpgradeThirdOffset);
 
-            // Read story missions
-            treasuremaps = CountCollectibles(TreasureMapsStartOffset, TreasureMapsEndOffset);
-
             // Read resource spent values
             int moneySpent = ReadResourceSpent(moneySpentOffsets);
             int woodSpent = ReadResourceSpent(woodSpentOffsets);
             int metalSpent = ReadResourceSpent(metalSpentOffsets);
 
-            // legendary ship,templar hunt, and storymissions counts
+            // legendary ship,templar hunt, storymissions, and treasuremaps counts
             legendaryShips = ReadWithCache<int>("legendaryships", (nint)baseAddress + 0x00A0E21C, legendaryShipPtrOffsets);
             totalTemplarHunts = CountMissions(TemplarHuntFirstOffset, TemplarHuntEndOffset);
             completedStoryMissions = CountMissions(MissionFirstOffset, MissionEndOffset);
+            treasuremaps = CountCollectibles(TreasureMapsStartOffset, TreasureMapsEndOffset);
 
             // Detect upgrades using the resource values
             HandleUpgradeCases(heroupgrades, moneySpent, woodSpent, metalSpent);
@@ -494,7 +492,7 @@ namespace Route_Tracker
         // Tells the route tracker how many special activities we've completed.
         // This is how the UI knows when to check off story missions, legendary ships, and treasure maps.
         // Returns a tuple with all four counter values at once.
-        public (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
+        public override (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
         {
             return (completedStoryMissions, totalTemplarHunts, legendaryShips, treasuremaps);
         }
