@@ -23,6 +23,13 @@ See [Planned Stuff.md](Planned Stuff.md) for information about future game suppo
 - **Performance Optimizations**: Adaptive update rates reduce resource usage during idle periods
 - **Customizable Hotkeys**: Configure keyboard shortcuts to mark route entries as completed or skipped
 - **Manual Entry Management**: Ability to manually complete or skip route entries without game detection
+- **Stats Window**: The stats display has been moved to its own dedicated window for easier viewing and management
+
+### Update Management
+- **Automatic Update Check**: On startup, Route Tracker can automatically check for new releases on GitHub and prompt you to update.
+- **Update Settings**: Enable or disable automatic update checks via the Settings menu (`Check for Updates on Startup`).
+- **In-App Update Download**: If a new version is available, you can download and install it directly from the app UI.
+- **User-Friendly Error Handling**: Clear messages are shown if update information cannot be retrieved or if no downloadable asset is found.
 
 ### Assassin's Creed 4: Black Flag
 - **Real-time Collection Tracking**
@@ -31,9 +38,10 @@ See [Planned Stuff.md](Planned Stuff.md) for information about future game suppo
   - Taverns and other collectibles
 
 - **Mission Progress**
-  - Story Mission completion detection
-  - Templar Hunt tracking
-  - Legendary Ship battles
+  - Story Mission completion detection (now shown in stats window)
+  - Templar Hunt tracking (now shown in stats window)
+  - Legendary Ship battles (now shown in stats window)
+  - Treasure Map collection (now shown in stats window)
 
 - **Upgrade Tracking**
   - Weapons purchases
@@ -48,6 +56,14 @@ See [Planned Stuff.md](Planned Stuff.md) for information about future game suppo
 - **Basic Tracking Implementation**
   - Initial support for basic stats and progression
   - More features coming soon
+
+### Recent Improvements
+
+- **Stats Window**: Stats are now displayed in a separate window for better visibility.
+- **Expanded Stats**: Story missions, Templar hunts, treasure maps, and legendary ships are now included in the stats display.
+- **Save File Loading**: You can now load a save file even if you are not connected to a game.
+- **Completed Entry Sorting**: Completed route entries are now sorted by their ID, not by the order they were completed.
+- **UI and Option Enhancements**: Various new options and UI improvements have been added for a smoother experience.
 
 ### Important Notes
 
@@ -83,6 +99,7 @@ Areas where help is particularly welcome:
 - Uses memory reading techniques to access game data
 - Routes stored in editable files for customization
 - Memory caching system for improved performance
+- **Auto-update system**: Checks GitHub for new releases and can update in-app
 
 ## Credits
 
