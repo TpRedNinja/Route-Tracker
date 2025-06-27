@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,117 +13,140 @@ namespace Route_Tracker
 {
     public unsafe class AC4GameStats : GameStatsBase
     {
-        // ==========FORMAL COMMENT=========
-        // Memory offset arrays and constants for accessing game statistics
-        // Special cases (percent, percentFloat, forts) use unique memory paths
-        // Most collectibles share a common base address and offset pattern with varying third offsets
-        // ==========MY NOTES==============
-        // These offsets are our map to find values in the game's memory
-        // Most collectibles follow the same pattern 
-        // only third offset changes by a step (which is how much it increases by)
-        // 0x14 or 20 bytes if you are a nerd
-        // A few values like completion percentage and forts need special handling
-        private readonly int[] percentPtrOffsets = [0x284];
+        #region Memory Offsets Arrays
+        // Offsets for direct memory reads (special cases)
+        private readonly int[] characterPtrOffsets = []; // has no offsets
+        private readonly int[] mainMenuPtrOffsets = []; // has no offsets
         private readonly int[] percentFtPtrOffsets = [0x74];
-        private readonly int[] fortsPtrOffsets = [0x7F0, 0xD68, 0xD70, 0x30];
-        private readonly int[] loadingPtrOffsets = [0x7D8];
-        private readonly int[] characterPtrOffsets = [];
-        private readonly int[] mainMenuPtrOffsets = [];
         private readonly int[] legendaryShipPtrOffsets = [0x170];
-        private static readonly int[] TemplarHuntFirstOffsets = [-0x370, -0x310, -0x2B0, -0x250];
-        private static readonly int[] StoryMissionsFirstOffsets = [-0x850, -0x7F0, -0x790, -0x730, -0x6D0, -0x670, -0x610, -0x5B0, -0x550, -0x4F0, -0x490, -0x430, -0x3D0];
+        private readonly int[] percentPtrOffsets = [0x284];
+        private readonly int[] loadingPtrOffsets = [0x7D8];
+        private readonly int[] fortsPtrOffsets = [0x7F0, 0xD68, 0xD70, 0x30];
+        
+        #endregion
 
-        //fields to keep track of loading and main menu status
+        #region Game State Flag
+        // Tracks if the game is currently loading or at the main menu
         private bool isLoading = false;
         private bool isMainMenu = false;
+        #endregion
 
-        // Pre-calculated base address for most collectibles to avoid repeated calculations
+        #region Base Addresses
+        // Pre-calculated base addresses for memory reads
         private readonly nint collectiblesBaseAddress;
-        private readonly nint specialBaseAddress;
+        private readonly nint missionBaseAddress;
+        private readonly nint resourcesBaseAddress;
+        #endregion
 
-        // ==========FORMAL COMMENT=========
-        // Fields tracking completion of special activities detected through percentage changes
-        // Counters increment when specific percentage thresholds or ranges are detected
-        // Values are exposed through GetSpecialActivityCounts() for route tracking
-        // ==========MY NOTES==============
-        // These keep track of the special activities we complete
-        // They get updated when the game percentage changes by specific amounts
-        // The UI uses these values to check off items in the route
-        private int completedStoryMissions = 0;
-        private int treasuremaps = 0; // Total Treasure Maps collected
-        private int oldcharacter = 0; // Used to detect modern day missions
-
-        //for buying animal skins in upgrades function
-        private int skinPurchaseCheckpoint = 0;
-
-        // ==========FORMAL COMMENT=========
-        // Memory offset constants for locating collectible counters in game memory
-        // Each collectible type has a unique third offset for pointer traversal
-        // Values determined through memory scanning and pattern analysis
-        // ==========MY NOTES==============
-        // These tell us where to find each collectible counter in memory
-        // Each type of collectible is stored at a different offset
-        // Finding these took a lot of memory scanning and testing
+        #region Collectible/Progress Offsets
+        // Unique third offsets for each collectible type
         private const int ViewpointsThirdOffset = -0x1B30;
         private const int MyanThirdOffset = -0x1B1C;
         private const int TreasureThirdOffset = -0xBB8;
         private const int FragmentsThirdOffset = -0x1B58;
         private const int AssassinThirdOffset = -0xDD4;
         private const int NavalThirdOffset = 0x1950;
-        private const int HeroUpgradeThirdOffset = -0x19F0; // Not used yet, but defined for future use
+        private const int HeroUpgradeThirdOffset = -0x19F0; // Reserved for future use
         private const int LettersThirdOffset = -0x04EC;
         private const int ManuscriptsThirdOffset = -0x334;
         private const int MusicThirdOffset = 0x424;
 
-        // ==========FORMAL COMMENT=========
-        // Common offset constants used in pointer paths for collectibles
-        // Shared first, second, and last offsets in the memory traversal pattern
-        // ==========MY NOTES==============
-        // Most collectibles follow this same pattern of memory addresses
-        // This makes it easier to find all the different types of items
+        // Shared offsets for pointer traversal
         private const int FirstOffset = 0x2D0;
         private const int SecondOffset = 0x8BC;
         private const int LastOffset = 0x18;
         private const int OffsetStep = 0x14;
+        // Shared offsets for different Missions
+        private const int MissionFirstOffset = -0x850;
+        private const int MissionEndOffset = -0x3D0;
+        private const int TemplarHuntFirstOffset = -0x370;
+        private const int TemplarHuntEndOffset = -0x250;
+        private const int MissionOffsetStep = 0x60;
 
-        // ==========FORMAL COMMENT=========
-        // Memory offset ranges for chest and tavern collectibles
-        // Defines the start and end offsets for iterating through these collections
-        // ==========MY NOTES==============
-        // Chests and taverns are stored differently - as individual flags
-        // These ranges tell us where all those individual flags are located
+        // Ranges for flag-based collectibles
         private const int ChestStartOffset = 0x67C;
         private const int ChestEndOffset = 0xA8C;
         private const int TavernStartOffset = 0x319C;
         private const int TavernEndOffset = 0x3228;
         private const int TreasureMapsStartOffset = 0x3250;
         private const int TreasureMapsEndOffset = 0x3408;
+        #endregion
 
-        // ==========FORMAL COMMENT=========
-        // Memory offsets for resource expenditure tracking
-        // These point to counters that track total resources spent
-        // ==========MY NOTES==============
-        // These track how much money, wood, and metal have been spent
-        // Help detect specific upgrade purchases based on resource use patterns
+        #region Resource Tracking
+        // Offsets for tracking resources spent (used for upgrade detection)
         private const int RESOURCES_FIRST_OFFSET = 0x104;
         private readonly int[] moneySpentOffsets = [0xB0, 0xC, 0x58, 0x26C];
         private readonly int[] woodSpentOffsets = [0xA0, 0x3C, 0x80, 0x10C];
         private readonly int[] metalSpentOffsets = [0xB8, 0x4, 0x28, 0xAC];
+        #endregion
 
-        // Base address for resource tracking
-        private readonly nint resourcesBaseAddress;
+        #region Progress and Upgrade Tracking
+        // Special activity counters (updated via memory or logic)
+        private int completedStoryMissions = 0;
+        private int totalTemplarHunts = 0;
+        private int legendaryShips = 0;
+        private int treasuremaps = 0;
 
-        // Fields for tracking resources and upgrade progress
+        // Modern Day mission tracking
+        // Tracks the previous value of the 'character' variable to detect transitions in and out of modern day missions.
+        // Default is 0 (not in modern day). When entering modern day, value becomes 1. When returning to main game (1 -> 0),
+        // this is used to increment the completed modern day mission count and update the state for the next transition.
+        private int oldcharacter = 0;
+
+        // Upgrade tracking
         private int lastMoneySpent = 0;
         private int lastWoodSpent = 0;
         private int lastMetalSpent = 0;
         private int lastHeroUpgradeValue = 0;
         private int totalUpgrades = 0;
-        private int totalTemplarHunts = 0; // Total Templar Hunts completed
-        private int legendaryShips = 0; // Total Legendary Ships completed
+        private readonly bool[] upgradePurchased = new bool[42]; // Each index = a specific upgrade
+        private int skinPurchaseCheckpoint = 0; // Used for animal skin upgrade detection
 
-        // Upgrade tracking - each entry corresponds to upgrades in the route
-        private readonly bool[] upgradePurchased = new bool[42]; // 38 total upgrades in the route
+        // Main ship upgrades (excluding hero and animal skin upgrades)
+        private static readonly (int Index, int Money, int Wood, int Metal, string Name)[] MainUpgradeRequirements =
+        [
+            (2, 1000, 0, 0, "Hull 1"),
+            (3, 900, 0, 0, "Round Shot Strength 1"),
+            (4, 4000, 0, 0, "Round Shot Strength 2"),
+            (5, 800, 0, 0, "Mortar 1"),
+            (6, 900, 0, 0, "Heavy Shot 1"),
+            (7, 6000, 0, 0, "Heavy Shot 2"),
+            (8, 800, 0, 0, "Mortar Storage 1"),
+            (9, 2000, 0, 0, "Mortar Storage 2"),
+            (10, 0, 0, 70, "Cannons 1"),
+            (11, 12000, 0, 0, "Round Shot Strength 3"),
+            (12, 2500, 0, 0, "Chain Shot Strength 1"),
+            (13, 6000, 0, 0, "Chain Shot Strength 2"),
+            (14, 3000, 0, 0, "Fire Barrel Strength 1"),
+            (15, 500, 0, 0, "Heavy Shot Storage 1"),
+            (16, 1500, 0, 0, "Heavy Shot Storage 2"),
+            (17, 3500, 0, 200, "Mortar 2"),
+            (18, 700, 0, 0, "Swivel Strength 1"),
+            (19, 14000, 0, 0, "Officers Rapiers"),
+            (20, 9000, 0, 0, "Cannon-Barrel Pistols"),
+            (33, 4000, 200, 100, "Hull Armor 2"),
+            (34, 5000, 0, 0, "Diving Bell"),
+            (35, 5000, 0, 0, "Mortar Storage 3"),
+            (36, 500, 25, 0, "Ram Strength 1"),
+            (37, 5000, 250, 150, "Ram Strength 2"),
+            (38, 8000, 0, 300, "Mortar 3"),
+            (39, 2000, 0, 100, "Broadside Cannons 2"),
+            (40, 35000, 0, 0, "Round Shot Strength 4"),
+            (41, 25000, 0, 0, "Heavy Shot 3"),
+        ];
+
+        // Animal skin upgrades
+        private static readonly (int Index, int Cost, string Name)[] SkinUpgradeRequirements =
+        [
+            (21, 1400, "Rabbit Pelt"),
+            (22, 1700, "Hutia Pelt"),
+            (23, 2000, "Howler Monkey Skin"),
+            (24, 4000, "Crocodile Leather"),
+            (25, 6300, "Killer Whale Skin"),
+            (26, 7000, "Humpback Whale Skin"),
+        ];
+
+        #endregion
 
         // ==========FORMAL COMMENT=========
         // Initializes a new game statistics tracker for Assassin's Creed 4
@@ -139,7 +163,7 @@ namespace Route_Tracker
         {
             this.collectiblesBaseAddress = (nint)baseAddress + 0x026BEAC0;
             this.resourcesBaseAddress = (nint)baseAddress + 0x00E88810;
-            this.specialBaseAddress = (nint)baseAddress + 0x00A0E21C;
+            this.missionBaseAddress = (nint)baseAddress + 0x00A0E21C;
         }
 
         #region Memory Reading Methods
@@ -154,6 +178,13 @@ namespace Route_Tracker
         {
             string cacheKey = $"collectible_{thirdOffset}";
             return ReadWithCache<int>(cacheKey, collectiblesBaseAddress, [FirstOffset, SecondOffset, thirdOffset, LastOffset]);
+        }
+
+        // function made by me
+        private int ReadMission(int missionOffset)
+        {   
+            string cacheKey = $"mission_{missionOffset}";
+            return ReadWithCache<int>(cacheKey, missionBaseAddress, [missionOffset]);
         }
 
         // ==========FORMAL COMMENT=========
@@ -196,6 +227,7 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Used for things like chests and taverns that have many individual locations
         // Each location has its own memory address with a predictable pattern
+        // startOffset and endOffset are comes from getstats() we pass them through lol
         private int CountCollectibles(int startOffset, int endOffset)
         {
             string cacheKey = $"count_{startOffset}_{endOffset}";
@@ -211,6 +243,30 @@ namespace Route_Tracker
             for (int thirdOffset = startOffset; thirdOffset <= endOffset; thirdOffset += OffsetStep)
             {
                 count += ReadCollectible(thirdOffset);
+            }
+
+            // Store in cache
+            StoreInCache(cacheKey, count);
+            return count;
+        }
+
+        // startOffset and endOffset are comes from getstats() we pass them through lol
+        // function made by me
+        private int CountMissions(int startOffset, int endOffset) 
+        {
+            string cacheKey = $"count_{startOffset}_{endOffset}";
+
+            // Try to get from cache using the base class method
+            if (TryGetCachedValue(cacheKey, out int cachedCount))
+            {
+                return cachedCount;
+            }
+
+            // Count if not in cache
+            int count = 0;
+            for (int missionOffset = startOffset; missionOffset <= endOffset; missionOffset += MissionOffsetStep)
+            {
+                count += ReadMission(missionOffset);
             }
 
             // Store in cache
@@ -262,24 +318,10 @@ namespace Route_Tracker
             int woodSpent = ReadResourceSpent(woodSpentOffsets);
             int metalSpent = ReadResourceSpent(metalSpentOffsets);
 
-            // legendary ship
+            // legendary ship,templar hunt, and storymissions counts
             legendaryShips = ReadWithCache<int>("legendaryships", (nint)baseAddress + 0x00A0E21C, legendaryShipPtrOffsets);
-
-            // Templar Hunts: sum the values at each offset
-            int templarHunts = 0;
-            foreach (var offset in TemplarHuntFirstOffsets)
-            {
-                templarHunts += ReadWithCache<int>($"templar_{offset}", collectiblesBaseAddress, [offset]);
-            }
-            totalTemplarHunts = templarHunts;
-
-            // Story Missions: sum the values at each offset
-            int storyMissions = 0;
-            foreach (var offset in StoryMissionsFirstOffsets)
-            {
-                storyMissions += ReadWithCache<int>($"story_{offset}", collectiblesBaseAddress, [offset]);
-            }
-            completedStoryMissions = storyMissions;
+            totalTemplarHunts = CountMissions(TemplarHuntFirstOffset, TemplarHuntEndOffset);
+            completedStoryMissions = CountMissions(MissionFirstOffset, MissionEndOffset);
 
             // Detect upgrades using the resource values
             HandleUpgradeCases(heroupgrades, moneySpent, woodSpent, metalSpent);
@@ -373,297 +415,43 @@ namespace Route_Tracker
             // Only process if there's been a change
             if (moneyDelta > 0 || woodDelta > 0 || metalDelta > 0)
             {
-                // Check for specific upgrade patterns based on resource costs
-                // Hull 1 (upgrade #3) - 1000 money
-                if (moneyDelta >= 1000 && !upgradePurchased[2])
+                // Main upgrades (excluding hero and animal skin upgrades)
+                foreach (var req in MainUpgradeRequirements)
                 {
-                    upgradePurchased[2] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Hull 1 upgrade");
+                    if (!upgradePurchased[req.Index]
+                        && moneyDelta >= req.Money
+                        && woodDelta >= req.Wood
+                        && metalDelta >= req.Metal)
+                    {
+                        upgradePurchased[req.Index] = true;
+                        totalUpgrades++;
+                        Debug.WriteLine($"Detected {req.Name} upgrade");
+                        // If only one upgrade should be detected per call, uncomment the next line:
+                        // break;
+                    }
                 }
 
-                // Round Shot Strength 1 (upgrade #4) - 900 money
-                else if (moneyDelta >= 900 && !upgradePurchased[3])
+                // Animal skin upgrades (only after Cannon-Barrel Pistols)
+                if (skinPurchaseCheckpoint > 0)
                 {
-                    upgradePurchased[3] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Round Shot Strength 1 upgrade");
-                }
-
-                // Round Shot Strength 2 (upgrade #5) - 4000 money
-                else if (moneyDelta >= 4000 && !upgradePurchased[4])
-                {
-                    upgradePurchased[4] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Round Shot Strength 2 upgrade");
-                }
-
-                // Mortar 1 (upgrade #6) - 800 money
-                else if (moneyDelta >= 800 && !upgradePurchased[5])
-                {
-                    upgradePurchased[5] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Mortar 1 upgrade");
-                }
-
-                // Heavy Shot 1 (upgrade #7) - 900 money
-                else if (moneyDelta >= 900 && !upgradePurchased[6])
-                {
-                    upgradePurchased[6] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Heavy Shot 1 upgrade");
-                }
-
-                // Heavy Shot 2 (upgrade #8) - 6000 money
-                else if (moneyDelta >= 6000 && !upgradePurchased[7])
-                {
-                    upgradePurchased[7] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Heavy Shot 2 upgrade");
-                }
-
-                // Mortar Storage 1 (upgrade #9) - 800 money
-                else if (moneyDelta >= 800 && !upgradePurchased[8])
-                {
-                    upgradePurchased[8] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Mortar Storage 1 upgrade");
-                }
-
-                // Mortar Storage 2 (upgrade #10) - 2000 money
-                else if (moneyDelta >= 2000 && !upgradePurchased[9])
-                {
-                    upgradePurchased[9] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Mortar Storage 2 upgrade");
-                }
-
-                // Cannons 1 (upgrade #11) - 70 metal
-                else if (metalDelta >= 70 && !upgradePurchased[10])
-                {
-                    upgradePurchased[10] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Cannons 1 upgrade");
-                }
-
-                // Round Shot Strength 3 (upgrade #12) - 12000 money
-                else if (moneyDelta >= 12000 && !upgradePurchased[11])
-                {
-                    upgradePurchased[11] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Round Shot Strength 3 upgrade");
-                }
-
-                // Chain Shot Strength 1 (upgrade #13) - 2500 money
-                else if (moneyDelta >= 2500 && !upgradePurchased[12])
-                {
-                    upgradePurchased[12] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Chain Shot Strength 1 upgrade");
-                }
-
-                // Chain Shot Strength 2 (upgrade #14) - 6000 money
-                else if (moneyDelta >= 6000 && !upgradePurchased[13])
-                {
-                    upgradePurchased[13] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Chain Shot Strength 2 upgrade");
-                }
-
-                // Fire Barrel Strength 1 (upgrade #15) - 3000 money
-                else if (moneyDelta >= 3000 && !upgradePurchased[14])
-                {
-                    upgradePurchased[14] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Fire Barrel Strength 1 upgrade");
-                }
-
-                // Heavy Shot Storage 1 (upgrade #16) - 500 money
-                else if (moneyDelta >= 500 && !upgradePurchased[15])
-                {
-                    upgradePurchased[15] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Heavy Shot Storage 1 upgrade");
-                }
-
-                // Heavy Shot Storage 2 (upgrade #17) - 1500 money
-                else if (moneyDelta >= 1500 && !upgradePurchased[16])
-                {
-                    upgradePurchased[16] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Heavy Shot Storage 2 upgrade");
-                }
-
-                // Mortar 2 (upgrade #18) - 3500 money, 200 metal
-                else if (moneyDelta >= 3500 && metalDelta >= 200 && !upgradePurchased[17])
-                {
-                    upgradePurchased[17] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Mortar 2 upgrade");
-                }
-
-                // Swivel Strength 1 (upgrade #19) - 700 money
-                else if (moneyDelta >= 700 && !upgradePurchased[18])
-                {
-                    upgradePurchased[18] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Swivel Strength 1 upgrade");
-                }
-
-                // Officers Rapiers (upgrade #20) - 14000 money
-                else if (moneyDelta >= 14000 && !upgradePurchased[19])
-                {
-                    upgradePurchased[19] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Officers Rapiers upgrade");
-                }
-
-                // Cannon-Barrel Pistols (upgrade #21) - 9000 money
-                else if (moneyDelta >= 9000 && !upgradePurchased[20])
-                {
-                    upgradePurchased[20] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Cannon-Barrel Pistols upgrade");
-
-                    // Set the checkpoint for animal skin purchases after weapons are bought
-                    skinPurchaseCheckpoint = moneySpent;
-                }
-
-                // Animal skin purchases using the checkpoint
-                // Only check these if we've already established the checkpoint
-                else if (skinPurchaseCheckpoint > 0)
-                {
-                    // Calculate money spent since the checkpoint
                     int skinMoneyDelta = moneySpent - skinPurchaseCheckpoint;
-
-                    // Rabbit Pelt (upgrade #22) - 1400 money (700 × 2)
-                    if (skinMoneyDelta >= 1400 && !upgradePurchased[21])
+                    foreach (var (index, cost, name) in SkinUpgradeRequirements)
                     {
-                        upgradePurchased[21] = true;
-                        totalUpgrades++;
-                        Debug.WriteLine("Detected Rabbit Pelt upgrade");
-                        // Update the checkpoint for the next skin detection
-                        skinPurchaseCheckpoint = moneySpent;
-                    }
-
-                    // Hutia Pelt (upgrade #23) - 1700 money (850 × 2)
-                    else if (skinMoneyDelta >= 1700 && !upgradePurchased[22])
-                    {
-                        upgradePurchased[22] = true;
-                        totalUpgrades++;
-                        Debug.WriteLine("Detected Hutia Pelt upgrade");
-                        skinPurchaseCheckpoint = moneySpent;
-                    }
-
-                    // Howler Monkey Skin (upgrade #24) - 2000 money (1000 × 2)
-                    else if (skinMoneyDelta >= 2000 && !upgradePurchased[23])
-                    {
-                        upgradePurchased[23] = true;
-                        totalUpgrades++;
-                        Debug.WriteLine("Detected Howler Monkey Skin upgrade");
-                        skinPurchaseCheckpoint = moneySpent;
-                    }
-
-                    // Crocodile Leather (upgrade #25) - 4000 money (2000 × 2)
-                    else if (skinMoneyDelta >= 4000 && !upgradePurchased[24])
-                    {
-                        upgradePurchased[24] = true;
-                        totalUpgrades++;
-                        Debug.WriteLine("Detected Crocodile Leather upgrade");
-                        skinPurchaseCheckpoint = moneySpent;
-                    }
-
-                    // Killer Whale Skin (upgrade #26) - 6300 money (3150 × 2)
-                    else if (skinMoneyDelta >= 6300 && !upgradePurchased[25])
-                    {
-                        upgradePurchased[25] = true;
-                        totalUpgrades++;
-                        Debug.WriteLine("Detected Killer Whale Skin upgrade");
-                        skinPurchaseCheckpoint = moneySpent;
-                    }
-
-                    // Humpback Whale Skin (upgrade #27) - 7000 money (3500 × 2)
-                    else if (skinMoneyDelta >= 7000 && !upgradePurchased[26])
-                    {
-                        upgradePurchased[26] = true;
-                        totalUpgrades++;
-                        Debug.WriteLine("Detected Humpback Whale Skin upgrade");
-                        skinPurchaseCheckpoint = moneySpent;
+                        if (skinMoneyDelta >= cost && !upgradePurchased[index])
+                        {
+                            upgradePurchased[index] = true;
+                            totalUpgrades++;
+                            Debug.WriteLine($"Detected {name} upgrade");
+                            skinPurchaseCheckpoint = moneySpent;
+                            break; // Only one skin upgrade per purchase
+                        }
                     }
                 }
 
-                // Note: Hero upgrades #28-33 are handled earlier in the hero upgrade detection section
-
-                // Hull Armor 2 (upgrade #34) - 4000 money, 100 metal, 200 wood
-                else if (moneyDelta >= 4000 && metalDelta >= 100 && woodDelta >= 200 && !upgradePurchased[33])
+                // Set the checkpoint for animal skin purchases after Cannon-Barrel Pistols
+                if (moneyDelta >= 9000 && !upgradePurchased[20])
                 {
-                    upgradePurchased[33] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Hull Armor 2 upgrade");
-                }
-
-                // Diving Bell (upgrade #35) - 5000 money
-                else if (moneyDelta >= 5000 && !upgradePurchased[34])
-                {
-                    upgradePurchased[34] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Diving Bell upgrade");
-                }
-
-                // Mortar Storage 3 (upgrade #36) - 5000 money
-                else if (moneyDelta >= 5000 && !upgradePurchased[35])
-                {
-                    upgradePurchased[35] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Mortar Storage 3 upgrade");
-                }
-
-                // Ram Strength 1 (upgrade #37) - 500 money, 25 wood
-                else if (moneyDelta >= 500 && woodDelta >= 25 && !upgradePurchased[36])
-                {
-                    upgradePurchased[36] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Ram Strength 1 upgrade");
-                }
-
-                // Ram Strength 2 (upgrade #38) - 5000 money, 150 metal, 250 wood
-                else if (moneyDelta >= 5000 && metalDelta >= 150 && woodDelta >= 250 && !upgradePurchased[37])
-                {
-                    upgradePurchased[37] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Ram Strength 2 upgrade");
-                }
-
-                // Mortar 3 (upgrade #39) - 8000 money, 300 metal
-                else if (moneyDelta >= 8000 && metalDelta >= 300 && !upgradePurchased[38])
-                {
-                    upgradePurchased[38] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Mortar 3 upgrade");
-                }
-
-                // Broadside Cannons 2 (upgrade #40) - 2000 money, 100 metal
-                else if (moneyDelta >= 2000 && metalDelta >= 100 && !upgradePurchased[39])
-                {
-                    upgradePurchased[39] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Broadside Cannons 2 upgrade");
-                }
-
-                // Round Shot Strength 4 (upgrade #41) - 35000 money
-                else if (moneyDelta >= 35000 && !upgradePurchased[40])
-                {
-                    upgradePurchased[40] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Round Shot Strength 4 upgrade");
-                }
-
-                // Heavy Shot 3 (upgrade #42) - 25000 money
-                else if (moneyDelta >= 25000 && !upgradePurchased[41])
-                {
-                    upgradePurchased[41] = true;
-                    totalUpgrades++;
-                    Debug.WriteLine("Detected Heavy Shot 3 upgrade");
+                    skinPurchaseCheckpoint = moneySpent;
                 }
 
                 // Update the last spent values
@@ -699,13 +487,13 @@ namespace Route_Tracker
 
         #region Public Stats Interface
         // ==========FORMAL COMMENT=========
-        // Returns the current counters for special activities detected through percentage changes
-        // Provides access to story mission, templar hunt, and legendary ship completion counts
-        // Used by route tracking system to mark these activities as completed
+        // Returns the current counters for special activities tracked directly from memory.
+        // Provides access to story mission, templar hunt, legendary ship, and treasure map completion counts.
+        // Used by the route tracking system to mark these activities as completed.
         // ==========MY NOTES==============
-        // Tells the route tracker how many special activities we've completed
-        // This is how the UI knows when to check off story missions and legendary ships
-        // Returns a tuple with all three counter values at once
+        // Tells the route tracker how many special activities we've completed.
+        // This is how the UI knows when to check off story missions, legendary ships, and treasure maps.
+        // Returns a tuple with all four counter values at once.
         public (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
         {
             return (completedStoryMissions, totalTemplarHunts, legendaryShips, treasuremaps);
