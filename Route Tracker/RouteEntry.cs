@@ -29,8 +29,7 @@ namespace Route_Tracker
         public string LocationCondition { get; set; } = string.Empty;
         public string? ConditionType { get; set; } // e.g., "Viewpoints", "Myan", etc.
         public int? ConditionValue { get; set; } // The value needed for completion
-        // add unique ID for stable identification
-        public int Id { get; set; }
+        public int Id { get; set; } // add unique ID for stable identification
 
         // add skipped flag
         public bool IsSkipped { get; set; }

@@ -661,9 +661,18 @@ namespace Route_Tracker
             };
             loadButton.Click += LoadButton_Click;
 
+            Button resetProgressButton = new()
+            {
+                Text = "Reset Progress",
+                AutoSize = true,
+                Margin = new Padding(5)
+            };
+            resetProgressButton.Click += ResetProgressButton_Click;
+
             // Add buttons to panel
             buttonPanel.Controls.Add(saveButton);
             buttonPanel.Controls.Add(loadButton);
+            buttonPanel.Controls.Add(resetProgressButton);
 
             // Add panel to route tab
             routeTabPage.Controls.Add(buttonPanel);
@@ -698,6 +707,28 @@ namespace Route_Tracker
             }
         }
 
+        private void ResetProgressButton_Click(object? sender, EventArgs e)
+        {
+            if (routeManager == null)
+                return;
+
+            // Find the route grid (adjust if you store it differently)
+            DataGridView? routeGrid = routeTabPage.Controls.OfType<DataGridView>().FirstOrDefault();
+            if (routeGrid == null)
+                return;
+
+            var result = MessageBox.Show(
+                "Are you sure you want to reset your progress?\n\nThis will delete your autosave and cannot be undone.",
+                "Reset Progress",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                routeManager.ResetProgress(routeGrid);
+            }
+        }
+
         // ==========FORMAL COMMENT=========
         // Creates the Route tab with grid for displaying route entries
         // Sets up the DataGridView and loads initial route data
@@ -718,6 +749,22 @@ namespace Route_Tracker
 
             // Add the grid to the tabpage
             routeTabPage.Controls.Add(routeGrid);
+
+            // Check if hotkeys are set
+            var (completeHotkey, skipHotkey) = settingsManager.GetHotkeys();
+            bool hotkeysSet = completeHotkey != Keys.None || skipHotkey != Keys.None;
+
+            // If not connected, but hotkeys are set, allow route loading
+            if (routeManager == null && hotkeysSet)
+            {
+                string routeFilePath = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "Routes",
+                    "AC4 100 % Route - Main Route.tsv"); // Or let user pick
+
+                // Pass a dummy GameConnectionManager if needed
+                routeManager = new RouteManager(routeFilePath, gameConnectionManager);
+            }
 
             // Load route data - this could happen after routeManager is initialized in ConnectButton_Click
             LoadRouteData(routeGrid);
@@ -846,24 +893,25 @@ namespace Route_Tracker
         // Handles cases where we're not connected yet
         private void LoadRouteData(DataGridView routeGrid)
         {
-            // If routeManager is initialized, let it handle loading
             if (routeManager != null)
             {
                 string selectedGame = GetSelectedGameName();
-                if (!string.IsNullOrEmpty(selectedGame))
-                {
-                    routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame);
-                }
-                else
-                {
-                    // Show a placeholder message when no game is selected yet
-                    routeGrid.Rows.Add("Please select and connect to a game to load route data", "");
-                }
+                routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame);
             }
             else
             {
-                // Initial diagnostic message
-                routeGrid.Rows.Add("Connect to a game to load route tracking data", "");
+                var (completeHotkey, skipHotkey) = settingsManager.GetHotkeys();
+                bool hotkeysSet = completeHotkey != Keys.None || skipHotkey != Keys.None;
+
+                if (hotkeysSet)
+                {
+                    // This should not happen if you set up routeManager above, but just in case
+                    routeGrid.Rows.Add("Hotkeys are set, but route manager is not initialized.", "");
+                }
+                else
+                {
+                    routeGrid.Rows.Add("Connect to a game or set up hotkeys to load route tracking data", "");
+                }
             }
         }
 

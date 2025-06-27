@@ -28,6 +28,9 @@ namespace Route_Tracker
         private readonly int[] loadingPtrOffsets = [0x7D8];
         private readonly int[] characterPtrOffsets = [];
         private readonly int[] mainMenuPtrOffsets = [];
+        private readonly int[] legendaryShipPtrOffsets = [0x170];
+        private static readonly int[] TemplarHuntFirstOffsets = [-0x370, -0x310, -0x2B0, -0x250];
+        private static readonly int[] StoryMissionsFirstOffsets = [-0x850, -0x7F0, -0x790, -0x730, -0x6D0, -0x670, -0x610, -0x5B0, -0x550, -0x4F0, -0x490, -0x430, -0x3D0];
 
         //fields to keep track of loading and main menu status
         private bool isLoading = false;
@@ -35,6 +38,7 @@ namespace Route_Tracker
 
         // Pre-calculated base address for most collectibles to avoid repeated calculations
         private readonly nint collectiblesBaseAddress;
+        private readonly nint specialBaseAddress;
 
         // ==========FORMAL COMMENT=========
         // Fields tracking completion of special activities detected through percentage changes
@@ -44,26 +48,9 @@ namespace Route_Tracker
         // These keep track of the special activities we complete
         // They get updated when the game percentage changes by specific amounts
         // The UI uses these values to check off items in the route
-        private float lastPercentageValue = 0f;
         private int completedStoryMissions = 0;
+        private int treasuremaps = 0; // Total Treasure Maps collected
         private int oldcharacter = 0; // Used to detect modern day missions
-        private int completedTemplarHunts = 0;
-        private int defeatedLegendaryShips = 0;
-
-        // ==========FORMAL COMMENT=========
-        // Constants defining the exact percentage values for detecting special activities
-        // Precise values and ranges identified through testing and game memory analysis
-        // Used to determine which activity was completed based on percentage change
-        // ==========MY NOTES==============
-        // These are the magic percentage values that tell us what the player just did
-        // Each activity type increases the completion percentage by a specific amount
-        // Ranges account for slight variations that may occur due to rounding or other factors
-        private const float LEGENDARY_SHIP_PERCENT = 0.18750f;
-        private const float TEMPLAR_HUNT_MIN = 0.38579f;
-        private const float TEMPLAR_HUNT_MAX = 0.38582f;
-        private const float STORY_MISSION_MIN = 0.66666f;
-        private const float STORY_MISSION_MAX = 1.66668f;
-        //private const float DETECTION_THRESHOLD = 0.00001f;
 
         //for buying animal skins in upgrades function
         private int skinPurchaseCheckpoint = 0;
@@ -108,6 +95,8 @@ namespace Route_Tracker
         private const int ChestEndOffset = 0xA8C;
         private const int TavernStartOffset = 0x319C;
         private const int TavernEndOffset = 0x3228;
+        private const int TreasureMapsStartOffset = 0x3250;
+        private const int TreasureMapsEndOffset = 0x3408;
 
         // ==========FORMAL COMMENT=========
         // Memory offsets for resource expenditure tracking
@@ -129,6 +118,8 @@ namespace Route_Tracker
         private int lastMetalSpent = 0;
         private int lastHeroUpgradeValue = 0;
         private int totalUpgrades = 0;
+        private int totalTemplarHunts = 0; // Total Templar Hunts completed
+        private int legendaryShips = 0; // Total Legendary Ships completed
 
         // Upgrade tracking - each entry corresponds to upgrades in the route
         private readonly bool[] upgradePurchased = new bool[42]; // 38 total upgrades in the route
@@ -148,6 +139,7 @@ namespace Route_Tracker
         {
             this.collectiblesBaseAddress = (nint)baseAddress + 0x026BEAC0;
             this.resourcesBaseAddress = (nint)baseAddress + 0x00E88810;
+            this.specialBaseAddress = (nint)baseAddress + 0x00A0E21C;
         }
 
         #region Memory Reading Methods
@@ -262,13 +254,32 @@ namespace Route_Tracker
             int totalChests = CountCollectibles(ChestStartOffset, ChestEndOffset);
             int heroupgrades = ReadCollectible(HeroUpgradeThirdOffset);
 
+            // Read story missions
+            treasuremaps = CountCollectibles(TreasureMapsStartOffset, TreasureMapsEndOffset);
+
             // Read resource spent values
             int moneySpent = ReadResourceSpent(moneySpentOffsets);
             int woodSpent = ReadResourceSpent(woodSpentOffsets);
             int metalSpent = ReadResourceSpent(metalSpentOffsets);
 
-            // Detect percentage-based activities
-            HandlePercentageCases(percentFloat, loading);
+            // legendary ship
+            legendaryShips = ReadWithCache<int>("legendaryships", (nint)baseAddress + 0x00A0E21C, legendaryShipPtrOffsets);
+
+            // Templar Hunts: sum the values at each offset
+            int templarHunts = 0;
+            foreach (var offset in TemplarHuntFirstOffsets)
+            {
+                templarHunts += ReadWithCache<int>($"templar_{offset}", collectiblesBaseAddress, [offset]);
+            }
+            totalTemplarHunts = templarHunts;
+
+            // Story Missions: sum the values at each offset
+            int storyMissions = 0;
+            foreach (var offset in StoryMissionsFirstOffsets)
+            {
+                storyMissions += ReadWithCache<int>($"story_{offset}", collectiblesBaseAddress, [offset]);
+            }
+            completedStoryMissions = storyMissions;
 
             // Detect upgrades using the resource values
             HandleUpgradeCases(heroupgrades, moneySpent, woodSpent, metalSpent);
@@ -303,55 +314,6 @@ namespace Route_Tracker
             {
                 oldcharacter = character;
                 completedStoryMissions++;
-            }
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Detects special game activities based on percentage changes
-        // Identifies legendary ships, templar hunts, story missions, and other collectibles
-        // Prevents false detections during loading screens
-        // ==========MY NOTES==============
-        // Watches for specific percentage increases that happen when completing activities
-        // Updates the baseline after each detection to catch rapid sequential completions
-        // Has special handling for main activities and a catch-all for other collectibles
-        private void HandlePercentageCases(float currentPercentage, bool isLoading)
-        {
-            // Round currentPercentage to 5 decimal places
-            currentPercentage = (float)Math.Round(currentPercentage, 5);
-
-            // Only process if percentage changed and we're not in a loading screen
-            if (currentPercentage != lastPercentageValue && isLoading == false)
-            {
-                // Calculate the change since last reading
-                float percentageDelta = currentPercentage - lastPercentageValue;
-
-                // Detect legendary ships using EXACT equality
-                if (currentPercentage == lastPercentageValue + LEGENDARY_SHIP_PERCENT)
-                {
-                    defeatedLegendaryShips ++;
-                    // Update immediately after detection
-                    lastPercentageValue = currentPercentage;
-                }
-                // Detect Templar hunts (within range)
-                else if (percentageDelta >= TEMPLAR_HUNT_MIN && percentageDelta <= TEMPLAR_HUNT_MAX)
-                {
-                    completedTemplarHunts ++;
-                    // Update immediately after detection
-                    lastPercentageValue = currentPercentage;
-                }
-                // Detect story missions (within broader range)
-                else if (percentageDelta >= STORY_MISSION_MIN && percentageDelta <= STORY_MISSION_MAX)
-                {
-                    completedStoryMissions ++;
-                    // Update immediately after detection
-                    lastPercentageValue = currentPercentage;
-                }
-                // Catch-all for other collectibles that don't match specific patterns
-                else if (percentageDelta > 0)
-                {
-                    // Just update the baseline without specific tracking
-                    lastPercentageValue = currentPercentage;
-                }
             }
         }
 
@@ -744,9 +706,9 @@ namespace Route_Tracker
         // Tells the route tracker how many special activities we've completed
         // This is how the UI knows when to check off story missions and legendary ships
         // Returns a tuple with all three counter values at once
-        public (int StoryMissions, int TemplarHunts, int LegendaryShips) GetSpecialActivityCounts()
+        public (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
         {
-            return (completedStoryMissions, completedTemplarHunts, defeatedLegendaryShips);
+            return (completedStoryMissions, totalTemplarHunts, legendaryShips, treasuremaps);
         }
 
         public (bool IsLoading, bool IsMainMenu) GetGameStatus()

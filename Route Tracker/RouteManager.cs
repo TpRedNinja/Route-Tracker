@@ -487,80 +487,40 @@ namespace Route_Tracker
         // Handles special types like story missions differently from collectibles
         private bool CheckCompletion(RouteEntry entry, StatsUpdatedEventArgs stats)
         {
-            // Removed special 100% handling
-
             if (string.IsNullOrEmpty(entry.Type))
-                return false; // Default to false for entries with no type
+                return false;
 
-            // Normalize the type: lowercase and remove spaces
-            string normalizedType = entry.Type.ToLowerInvariant().Replace(" ", "");
+            // Normalize for comparison (trim and ignore case)
+            string normalizedType = entry.Type.Trim();
 
             // Get the special activity counts from the game stats
             var specialCounts = gameConnectionManager?.GameStats is AC4GameStats ac4GameStats
                 ? ac4GameStats.GetSpecialActivityCounts()
-                : (0, 0, 0);
+                : (0, 0, 0, 0);
 
-            // Check special percentage-based activities - access tuple elements by position
-            if (normalizedType.Contains("story") || normalizedType.Contains("mainstory"))
-            {
-                return specialCounts.Item1 >= entry.Condition;  // Item1 = StoryMissions
-            }
-            else if (normalizedType.Contains("templar"))
-            {
-                return specialCounts.Item2 >= entry.Condition;  // Item2 = TemplarHunts
-            }
-            else if (normalizedType.Contains("legendary"))
-            {
-                return specialCounts.Item3 >= entry.Condition;  // Item3 = LegendaryShips
-            }
-
+            // Use your exact names for matching
             return normalizedType switch
             {
-                // Viewpoints
-                "viewpoint" or "viewpoints" => stats.Viewpoints >= entry.Condition,
-
-                // Mayan stones
-                "mayan" or "myan" or "myanstones" or "mayanstones" => stats.Myan >= entry.Condition,
-
-                // Treasure
-                "treasure" or "treasures" or "burired treasure" or "buried treasure" or "buriredtreasure"
-                    or "buried treasure" => stats.Treasure >= entry.Condition,
-
-                // Animus fragments
-                "fragment" or "fragments" or "animusfragment" or "animusfragments" => stats.Fragments >= entry.Condition,
-
-                // Assassin contracts
-                "assassin" or "assassincontract" or "assassincontracts" => stats.Assassin >= entry.Condition,
-
-                // Naval contracts
-                "naval" or "navalcontract" or "navalcontracts" => stats.Naval >= entry.Condition,
-
-                // Message bottles
-                "letter" or "letters" or "letterbottle" or "letterbottles" => stats.Letters >= entry.Condition,
-
-                // Manuscripts
-                "manuscript" or "manuscripts" => stats.Manuscripts >= entry.Condition,
-
-                // Music/shanties
-                "music" or "musicsheet" or "musicsheets" or "shanty" or "shanties" => stats.Music >= entry.Condition,
-
-                // Forts
-                "fort" or "forts" => stats.Forts >= entry.Condition,
-
-                // Taverns
-                "tavern" or "taverns" => stats.Taverns >= entry.Condition,
-
-                // Chests
-                "chest" or "chests" => stats.TotalChests >= entry.Condition,
-
-                // Manual completion items - should return false by default
-                "upgrades" or "upgrade" => gameConnectionManager?.GameStats is AC4GameStats upgradeStats &&
-                           entry.Condition > 0 &&
-                           entry.Condition <= upgradeStats.GetPurchasedUpgrades().Length &&
-                           upgradeStats.GetPurchasedUpgrades()[entry.Condition - 1],
-
-                // Default: unrecognized types - default to false
-                _ => false
+                "Story" or "story" => specialCounts.Item1 >= entry.Condition,
+                "Viewpoint" or "viewpoint" => stats.Viewpoints >= entry.Condition,
+                "Chest" or "chest" => stats.TotalChests >= entry.Condition,
+                "Animus Fragment" or "animus fragment" => stats.Fragments >= entry.Condition,
+                "Myan Stones" or "myan stones" => stats.Myan >= entry.Condition,
+                "Buried Treasure" or "buried treasure" => stats.Treasure >= entry.Condition,
+                "Assassin Contracts" or "assassin contracts" => stats.Assassin >= entry.Condition,
+                "Naval Contracts" or "naval contracts" => stats.Naval >= entry.Condition,
+                "Letters" or "letters" => stats.Letters >= entry.Condition,
+                "Manuscripts" or "manuscripts" => stats.Manuscripts >= entry.Condition,
+                "Shanty" or "shanty" => stats.Music >= entry.Condition,
+                "Forts" or "forts" => stats.Forts >= entry.Condition,
+                "Taverns" or "taverns" => stats.Taverns >= entry.Condition,
+                "Upgrades" or "upgrades" => gameConnectionManager?.GameStats is AC4GameStats upgradeStats &&
+                entry.Condition > 0 && entry.Condition <= upgradeStats.GetPurchasedUpgrades().Length &&
+                upgradeStats.GetPurchasedUpgrades()[entry.Condition - 1],
+                "Legendary Ships" or "legendary ships" => specialCounts.Item3 >= entry.Condition,
+                "Templar Hunts" or "templar hunts" => specialCounts.Item2 >= entry.Condition,
+                "Treasure Map" or "treasure map" => specialCounts.Item4 >= entry.Condition,
+                _ => false,
             };
         }
         #endregion
@@ -967,6 +927,38 @@ namespace Route_Tracker
             {
                 Debug.WriteLine($"Failed to open save directory: {ex.Message}");
             }
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Resets all route progress, clears autosave, and updates the UI
+        // ==========MY NOTES==============
+        // Sets all entries to not completed/skipped, deletes autosave, and refreshes the grid
+        public void ResetProgress(DataGridView routeGrid)
+        {
+            // Clear completion/skipped state in memory
+            foreach (var entry in routeEntries)
+            {
+                entry.IsCompleted = false;
+                entry.IsSkipped = false;
+            }
+
+            // Delete autosave file if it exists
+            string saveDir = Path.Combine(
+                Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                "SavedProgress");
+            string routeName = Path.GetFileNameWithoutExtension(routeFilePath);
+            string autosaveFile = Path.Combine(saveDir, $"{routeName}_AutoSave.json");
+            if (File.Exists(autosaveFile))
+                File.Delete(autosaveFile);
+
+            // Refresh the UI
+            routeGrid.Rows.Clear();
+            foreach (var entry in routeEntries)
+            {
+                int rowIndex = routeGrid.Rows.Add(entry.DisplayText, "");
+                routeGrid.Rows[rowIndex].Tag = entry;
+            }
+            SortAndScrollToFirstIncomplete(routeGrid);
         }
         #endregion
     }
