@@ -26,19 +26,16 @@ state("AC4BFSP")
         int Letters: 0x026BEAC0, 0x2D0, 0x8BC, 0xFFFFFB14, 0x18; //Tracks total number of letters in a bottle collected
         int Manuscripts: 0x026BEAC0, 0x2D0, 0x8BC, 0xFFFFFCCC, 0x18; //Tracks total number of Manuscripts collected
         int MusicSheets: 0x026BEAC0, 0x2D0, 0x8BC, 0x424, 0x18; //Tracks total number of MusicSheets collected
-        int Forts: 0x026C0A28, 0x7F0, 0xD68, 0xD70, 0x30; //Tracks total number of forts captured
-        int UnchartedFragments: 0x026BEC04, 0x320, 0x100, 0x424, 0x18; //Tracks total number of uncharted animusfragments collected
-        int UnchartedSecrets: 0x026BEAC0, 0x2D0, 0x824, 0xB18, 0x18; //Tracks total number of uncharted secrets collected
-    //Taverns bools
+        int Forts: 0x00A0E21C, 0xFFFFFFF0; //Tracks total number of forts captured
         int TotalTaverns: 0x026BEAC0, 0x2D0, 0x8BC, 0x3188, 0x18; //Tracks total number of Taverns Completed
-        /*int KingstonCrown: 0x026BEAC0, 0x2D0, 0x8BC, 0x319C, 0x18; //Tracks wether the Kingston Tavern is completed 0 for not 1 for completed
-        int SaltKeyBanter: 0x026BEAC0, 0x2D0, 0x8BC, 0x31B0, 0x18; //Tracks wether the Salt Key Tavern is completed 0 for not 1 for completed
-        int TheRandyCayman: 0x026BEAC0, 0x2D0, 0x8BC, 0x31C4, 0x18; //Tracks wether the The Randy Cayman Tavern is completed 0 for not 1 for completed
-        int CrookedIslandCanter: 0x026BEAC0, 0x2D0, 0x8BC, 0x31D8, 0x18; //Tracks wether the Crooked Island Tavern is completed 0 for not 1 for completed
-        int ArroyosArms: 0x026BEAC0, 0x2D0, 0x8BC, 0x31EC, 0x18; //Tracks wether the Arroyos Tavern is completed 0 for not 1 for completed
-        int TheAndreasInn: 0x026BEAC0, 0x2D0, 0x8BC, 0x3200, 0x18; //Tracks wether the The Andreas Inn Tavern is completed 0 for not 1 for completed
-        int VinoAVache: 0x026BEAC0, 0x2D0, 0x8BC, 0x3214, 0x18; //Tracks wether the Vino A Vache Tavern is completed 0 for not 1 for completed
-        int CorozalTavern: 0x026BEAC0, 0x2D0, 0x8BC, 0x3228, 0x18; //Tracks wether the Corozal Tavern is completed 0 for not 1 for completed*/
+        int LGS: 0x00A0E21C, 0x170; //Tracks total number of Legendary Ships defeated
+
+    //--Templar Hunts Counters--
+        int Opia: 0x00A0E21C, 0xFFFFFE8A; //Tracks total number of Opia Templar Hunts completed
+        int Rhona: 0x00A0E21C, 0xFFFFFEDA; //Tracks total number of Rhona Templar Hunts completed
+        int Anto: 0x00A0E21C, 0xFFFFFD50; //Tracks total number of Anto Templar Hunts completed
+        int Upton: 0x00A0E21C, 0xFFFFFE06; //Tracks total number of Vance Templar Hunts completed
+
     //Chest Counters--
         int WaterChests: 0x026BEC04, 0x30C, 0x58C, 0x18; //Tracks total number of chests underwater collected
         int UnchartedChests: 0x026BEAC0, 0x2D0, 0x8BC, 0x94C, 0x18; //Tracks total number of uncharted chests collected
@@ -117,32 +114,44 @@ startup
 
     //Settings for splits
     settings.Add("Splits", true, "Splitting Options");
-    settings.Add("100%", false, "100%", "Splits");
-    settings.Add("Everything", false, "Everything", "Splits");
-    settings.Add("Viewpoints", false, "Viewpoints", "Splits");
-    settings.Add("MyanStele", false, "MyanStele", "Splits");
-    settings.Add("BuriedTreasure", false, "BuriedTreasure", "Splits");
-    settings.Add("Contracts", false, "Contracts", "Splits");
-    settings.Add("Templar Hunts", false, "Templar Hunts", "Splits");
-    settings.Add("Forts", false, "Forts", "Splits");
-    settings.Add("Taverns", false, "Taverns", "Splits");
-    settings.Add("Modern day", false, "Modern day", "Splits");
-    settings.Add("Shipwrecks", false, "Shipwrecks", "Splits");
-    settings.Add("Legendary Ships", false, "Legendary Ships", "Splits");
+        settings.Add("Any%", false, "Any%", "Splits");
+        settings.Add("Everything", false, "Everything", "Splits");
+        settings.Add("Viewpoints", false, "Viewpoints", "Splits");
+        settings.Add("MyanStele", false, "MyanStele", "Splits");
+        settings.Add("BuriedTreasure", false, "BuriedTreasure", "Splits");
+        settings.Add("Contracts", false, "Contracts", "Splits");
+        settings.Add("Templar Hunts", false, "Templar Hunts", "Splits");
+        settings.Add("Forts", false, "Forts", "Splits");
+        settings.Add("Taverns", false, "Taverns", "Splits");
+        settings.Add("Modern day", false, "Modern day", "Splits");
+        settings.Add("Shipwrecks", false, "Shipwrecks", "Splits");
+        settings.Add("Legendary Ships", false, "Legendary Ships", "Splits");
+        settings.Add("Collectibles", false, "Collectibles", "Splits");
+            settings.Add("Fragments", false, "Fragments", "Collectibles");
+            settings.Add("Chests", false, "Chests", "Collectibles");
+            settings.Add("Letters", false, "Letters", "Collectibles");
+            settings.Add("Manuscripts", false, "Manuscripts", "Collectibles");
+            settings.Add("Music Sheets", false, "Music Sheets", "Collectibles");
 
     settings.SetToolTip("Splits", "Gives options of where to split");
-    settings.SetToolTip("Everything", "Splits on everything. Missions, collectibles, etc. \n" + "This is only recommended for 100% runs & if you have a split for everything");
-    settings.SetToolTip("100%", "Splits after getting all uncharted Collectibles");
-    settings.SetToolTip("Viewpoints", "Splits after syncing a viewpoint");
-    settings.SetToolTip("MyanStele", "Splits after lotting the myan stele stone ");
-    settings.SetToolTip("BuriedTreasure", "Splits after edwards opens the treasure chest");
-    settings.SetToolTip("Contracts", "Splits when gaining money from completing a contract");
-    settings.SetToolTip("Templar Hunts", "Splits when completing a templar hunt mission");
-    settings.SetToolTip("Forts", "Splits when fort turns green in map");
-    settings.SetToolTip("Taverns", "Splits on defeating all guards in for a tavern");
-    settings.SetToolTip("Modern day", "Splits when entering the animus for the modern day missions");
-    settings.SetToolTip("Shipwrecks", "Splits when getting a x amount of chests from the shipwrecks");
-    settings.SetToolTip("Legendary Ships", "Splits when defeating legendary ships");
+        settings.SetToolTip("Everything", "Splits on everything. Missions, collectibles, etc. \n" + "This is only recommended for 100% runs & if you have a split for everything");
+        settings.SetToolTip("Any%", "Splits after every mission");
+        settings.SetToolTip("Viewpoints", "Splits after syncing a viewpoint");
+        settings.SetToolTip("MyanStele", "Splits after lotting the myan stele stone ");
+        settings.SetToolTip("BuriedTreasure", "Splits after edwards opens the treasure chest");
+        settings.SetToolTip("Contracts", "Splits when gaining money from completing a contract");
+        settings.SetToolTip("Templar Hunts", "Splits when completing a templar hunt mission");
+        settings.SetToolTip("Forts", "Splits when fort turns green in map");
+        settings.SetToolTip("Taverns", "Splits on defeating all guards in for a tavern");
+        settings.SetToolTip("Modern day", "Splits when entering the animus for the modern day missions");
+        settings.SetToolTip("Shipwrecks", "Splits when getting a x amount of chests from the shipwrecks");
+        settings.SetToolTip("Legendary Ships", "Splits when defeating legendary ships");
+        settings.SetToolTip("Collectibles", "Collectibles splits");
+            settings.SetToolTip("Chests", "Splits when collecting a chest");
+            settings.SetToolTip("Fragments", "Splits when collecting an animus fragment");
+            settings.SetToolTip("Letters", "Splits when collecting a letter in a bottle");
+            settings.SetToolTip("Manuscripts", "Splits when collecting a manuscript");
+            settings.SetToolTip("Music Sheets", "Splits when collecting a music sheet");
 
     //not splitting settings
     settings.Add("Percentage Display", false);
@@ -150,8 +159,7 @@ startup
     settings.Add("Uncharted Display", false);
     settings.Add("Debug", false, "Debug");
     settings.Add("Calculator", false, "Calculator","Debug");
-    settings.SetToolTip("Debug", "This will show the current MainMenu value and loading.\n" + 
-    "Along with the calculator if u use it");
+    settings.SetToolTip("Debug", "This will show the current MainMenu value and loading.\n" + "Along with the calculator if u use it");
     /*for any future settings i want to add
     settings.Add("", false, "", "Splits");
     settings.SetToolTip("", "Splits when ");
@@ -177,6 +185,7 @@ init
     vars.CastilloChests = 0;
     vars.CruzChests = 0;
     vars.TotalChests = 0;
+    vars.OldTotalChests = 0;
     
     if (current.MainMenu == 65540 && current.loading == 0)
     {
@@ -235,20 +244,6 @@ update
         } else
         {
             vars.SetTextComponent("Percentage Completion", null + "%");
-        }
-    }
-
-    if (settings["Uncharted Display"])
-    {
-        if (current.UnchartedChests != null && current.UnchartedFragments != null && current.UnchartedSecrets != null){
-        vars.SetTextComponent("UnchartedChests Collected", current.UnchartedChests + "/46");
-        vars.SetTextComponent("UnchartedFragments Collected", current.UnchartedFragments + "/30");
-        vars.SetTextComponent("UnchartedSecrets Collected", current.UnchartedSecrets + "/3");   
-        } else
-        {
-            vars.SetTextComponent("UnchartedChests Collected", null + "/46");
-            vars.SetTextComponent("UnchartedFragments Collected", null + "/30");
-            vars.SetTextComponent("UnchartedSecrets Collected", null + "/3");
         }
     }
 
@@ -318,12 +313,21 @@ onStart
 split
 {
     //should work for most splits
-    if ((current.PercentageF >= old.PercentageF + 0.66666 && current.PercentageF <= old.PercentageF + 1.66668) && current.loading == 0)
+    if (settings["Any%"])
     {
-        print("MainMission Split");
-        vars.stopwatch.Restart();
-        return true;
+        if ((current.PercentageF >= old.PercentageF + 0.66666 && current.PercentageF <= old.PercentageF + 1.66668) && current.loading == 0 && vars.SplitTime > 2)
+        {
+            vars.Log("Any% Split Version = 1 at: "+ vars.TotalTime.ToString("F2"));
+            vars.stopwatch.Restart();
+            return true;
+        } else if (current.Percentage > old.Percentage && current.loading == 0 && vars.SplitTime > 2)
+        {
+            vars.Log("Any% Split Version = 2 at: "+ vars.TotalTime.ToString("F2"));
+            vars.stopwatch.Restart();
+            return true;
+        }
     }
+    
     
     if (settings["Everything"])
     {
@@ -335,15 +339,7 @@ split
         }
     }
 
-    if (settings["100%"])
-    {
-        if (current.UnchartedChests == 46 && old.UnchartedChests == 45 && current.UnchartedFragments == 30 && current.UnchartedSecrets == 3)
-        {
-            print("all uncharted collectibles collected and splitted");
-            vars.stopwatch.Restart();
-            return true;
-        }
-    }
+   
 
     if(settings["Viewpoints"])
     {
@@ -466,9 +462,10 @@ split
     if(settings["Modern day"])
     {
         //splits when entering the animus
-        if ((current.Money != null || current.Health != null) && current.MainMenu == 1311076 && current.Character == 0 && current.loading == 0)
+        if (current.Character == 0 && old.Character == 1 && current.loading == 0 && vars.SplitTime > 2)
         {
             print("Modern day Split");
+            vars.stopwatch.Restart();
             return true;
         }
     }
@@ -521,21 +518,53 @@ split
 
     if (settings["Templar Hunts"])
     {
-        if ((current.PercentageF >= old.PercentageF + 0.38579 && current.PercentageF <= old.PercentageF + 0.38582) 
+        if ((current.Opia == old.Opia + 1 || current.Rhona == old.Rhona + 1 || current.Anto == old.Anto + 1 || current.Upton == old.Upton + 1) 
+        && current.loading == 0 && old.loading != 1 && vars.SplitTime > 2)
+        {
+            vars.Log("Templar Hunts Split Version = Counter, at: "+ vars.TotalTime.ToString("F2"));
+            vars.stopwatch.Restart();
+            return true;
+        } else if ((current.PercentageF >= old.PercentageF + 0.38579 && current.PercentageF <= old.PercentageF + 0.38582) 
         && current.loading == 0)
         {
-            print("Templar Hunts Split");
+            vars.Log("Templar Hunts Split Version = %, at: "+ vars.TotalTime.ToString("F2"));
+            vars.stopwatch.Restart();
             return true;
         }
     }
 
     if (settings["Legendary Ships"])
     {
-
         //splits when defeating one of the legendary ships
-        if (current.PercentageF == old.PercentageF + 0.18750 && current.loading == 0)
+        if (current.LGS == old.LGS + 1 && current.loading == 0 && vars.SplitTime > 2)
         {
-            print("Legendary Ships Split");
+            vars.Log("Legendary Ships Split Version = Counter, at: "+ vars.TotalTime.ToString("F2"));
+            vars.stopwatch.Restart();
+            return true;
+        } else if (current.PercentageF == old.PercentageF + 0.18750 && current.loading == 0 && vars.SplitTime > 2)
+        {
+            vars.Log("Legendary Ships Split Version = %, at: "+ vars.TotalTime.ToString("F2"));
+            vars.stopwatch.Restart();
+            return true;
+        }
+    }
+
+    if (settings["Collectibles"])
+    {
+        if(current.animusfragments > old.animusfragments && current.loading == 0 && vars.SplitTime > 2 && settings["Fragments"])
+        {
+            return true;
+        } else if (vars.TotalChests > vars.OldTotalChests && current.loading == 0 && vars.SplitTime > 2 && settings["Chests"])
+        {
+            return true;
+        } else if (current.Letters > old.Letters && current.loading == 0 && vars.SplitTime > 2 && settings["Letters"])
+        {
+            return true;
+        } else if(current.MusicSheets > old.MusicSheets && current.loading == 0 && vars.SplitTime > 2 && settings["Music Sheets"])
+        {
+            return true;
+        } else if(current.Manuscripts > old.Manuscripts && current.loading == 0 && vars.SplitTime > 2 && settings["Manuscripts"])
+        {
             return true;
         }
     }
@@ -596,4 +625,15 @@ exit
     20000-Legendary ships(4)
 
     0x003AA368, 0x64, 0x9E8;
+
+
+    --bools for taverns dont need--
+    int KingstonCrown: 0x026BEAC0, 0x2D0, 0x8BC, 0x319C, 0x18; //Tracks wether the Kingston Tavern is completed 0 for not 1 for completed
+    int SaltKeyBanter: 0x026BEAC0, 0x2D0, 0x8BC, 0x31B0, 0x18; //Tracks wether the Salt Key Tavern is completed 0 for not 1 for completed
+    int TheRandyCayman: 0x026BEAC0, 0x2D0, 0x8BC, 0x31C4, 0x18; //Tracks wether the The Randy Cayman Tavern is completed 0 for not 1 for completed
+    int CrookedIslandCanter: 0x026BEAC0, 0x2D0, 0x8BC, 0x31D8, 0x18; //Tracks wether the Crooked Island Tavern is completed 0 for not 1 for completed
+    int ArroyosArms: 0x026BEAC0, 0x2D0, 0x8BC, 0x31EC, 0x18; //Tracks wether the Arroyos Tavern is completed 0 for not 1 for completed
+    int TheAndreasInn: 0x026BEAC0, 0x2D0, 0x8BC, 0x3200, 0x18; //Tracks wether the The Andreas Inn Tavern is completed 0 for not 1 for completed
+    int VinoAVache: 0x026BEAC0, 0x2D0, 0x8BC, 0x3214, 0x18; //Tracks wether the Vino A Vache Tavern is completed 0 for not 1 for completed
+    int CorozalTavern: 0x026BEAC0, 0x2D0, 0x8BC, 0x3228, 0x18; //Tracks wether the Corozal Tavern is completed 0 for not 1 for completed
 */
