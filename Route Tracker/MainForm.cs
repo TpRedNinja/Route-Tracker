@@ -1163,7 +1163,7 @@ namespace Route_Tracker
             if (!Properties.Settings.Default.CheckForUpdateOnStartup)
                 return;
 
-            string apiUrl = $"https://api.github.com/repos/{AppInfo.GitHubRepo}/releases/latest";
+            string apiUrl = $"https://api.github.com/repos/{AppInfo.GitHubRepo}/releases";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.UserAgent.ParseAdd("RouteTrackerUpdater");
 
@@ -1171,7 +1171,36 @@ namespace Route_Tracker
             {
                 var response = await client.GetStringAsync(apiUrl);
                 using var doc = JsonDocument.Parse(response);
-                string? latestVersion = doc.RootElement.GetProperty("tag_name").GetString();
+
+                // Find the latest release (including pre-releases)
+                JsonElement? latestRelease = null;
+                DateTime latestDate = DateTime.MinValue;
+
+                foreach (var release in doc.RootElement.EnumerateArray())
+                {
+                    // Skip drafts
+                    if (release.GetProperty("draft").GetBoolean())
+                        continue;
+
+                    // Get published date
+                    if (release.TryGetProperty("published_at", out var publishedAtProp) &&
+                        DateTime.TryParse(publishedAtProp.GetString(), out var publishedAt))
+                    {
+                        if (publishedAt > latestDate)
+                        {
+                            latestDate = publishedAt;
+                            latestRelease = release;
+                        }
+                    }
+                }
+
+                if (latestRelease == null)
+                {
+                    MessageBox.Show("Could not find any releases on GitHub.", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string? latestVersion = latestRelease.Value.GetProperty("tag_name").GetString();
                 if (string.IsNullOrEmpty(latestVersion))
                 {
                     MessageBox.Show("Could not determine the latest version from GitHub.", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1186,7 +1215,7 @@ namespace Route_Tracker
 
                     if (result == DialogResult.Yes)
                     {
-                        var assets = doc.RootElement.GetProperty("assets");
+                        var assets = latestRelease.Value.GetProperty("assets");
                         if (assets.GetArrayLength() > 0)
                         {
                             string? zipUrl = assets[0].GetProperty("browser_download_url").GetString();
