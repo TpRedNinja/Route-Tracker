@@ -15,7 +15,7 @@ namespace Route_Tracker
     // static class so version number can be displayed and so we can get updates
     public static class AppInfo
     {
-        public const string Version = "v0.2-Beta";
+        public const string Version = "v0.2.5-Beta";
         public const string GitHubRepo = "TpRedNinja/Route-Tracker"; // e.g. "myuser/RouteTracker"
     }
 
@@ -133,113 +133,154 @@ namespace Route_Tracker
             this.Text = "Route Tracker";
             AppTheme.ApplyTo(this);
 
-            CreateMainMenu();
+            //minimum window size
+            this.MinimumSize = new Size(400, 200);
+
             InitializeHiddenControls();
 
-            // Progress buttons (manual position)
-            int buttonWidth = 100;
-            int buttonHeight = 25;
-            int spacing = 10;
-            int menuHeight = this.MainMenuStrip?.Height ?? 24;
+            // Create a TableLayoutPanel to control layout
+            var mainLayout = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = AppTheme.BackgroundColor,
+                ColumnCount = 1,
+                RowCount = 2,
+                AutoSize = false,
+                Padding = new Padding(0),
+                Margin = new Padding(0)
+            };
+            // Row 0: Top bar (auto size)
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            // Row 1: Route grid (fills remaining space)
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
+            // --- Top bar for menu and buttons ---
+            var topBar = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = true,
+                BackColor = AppTheme.BackgroundColor,
+                Padding = new Padding(0, 0, 0, 0),
+                Margin = new Padding(0, 0, 0, 0)
+            };
+
+            // MenuStrip (settings only)
+            var menuStrip = new MenuStrip
+            {
+                BackColor = AppTheme.BackgroundColor,
+                ForeColor = AppTheme.TextColor,
+                Dock = DockStyle.None
+            };
+            CreateSettingsMenu(menuStrip);
+            topBar.Controls.Add(menuStrip);
+
+            // Progress buttons
             saveButton = new Button
             {
                 Text = "Save Progress",
-                Width = buttonWidth,
-                Height = buttonHeight,
-                Left = spacing,
-                Top = menuHeight + spacing,
+                MinimumSize = new Size(100, 25),
+                AutoSize = true,
                 ForeColor = AppTheme.TextColor,
-                Font = AppTheme.DefaultFont
+                Font = AppTheme.DefaultFont,
+                Margin = new Padding(5, 2, 0, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
             saveButton.Click += SaveButton_Click;
-            this.Controls.Add(saveButton);
+            topBar.Controls.Add(saveButton);
 
             loadButton = new Button
             {
                 Text = "Load Progress",
-                Width = buttonWidth,
-                Height = buttonHeight,
-                Left = saveButton.Right + spacing,
-                Top = menuHeight + spacing,
+                MinimumSize = new Size(100, 25),
+                AutoSize = true,
                 ForeColor = AppTheme.TextColor,
-                Font = AppTheme.DefaultFont
+                Font = AppTheme.DefaultFont,
+                Margin = new Padding(5, 2, 0, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
             loadButton.Click += LoadButton_Click;
-            this.Controls.Add(loadButton);
+            topBar.Controls.Add(loadButton);
 
             resetButton = new Button
             {
                 Text = "Reset Progress",
-                Width = buttonWidth,
-                Height = buttonHeight,
-                Left = loadButton.Right + spacing,
-                Top = menuHeight + spacing,
+                MinimumSize = new Size(100, 25),
+                AutoSize = true,
                 ForeColor = AppTheme.TextColor,
-                Font = AppTheme.DefaultFont
+                Font = AppTheme.DefaultFont,
+                Margin = new Padding(5, 2, 0, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
             resetButton.Click += ResetProgressButton_Click;
-            this.Controls.Add(resetButton);
+            topBar.Controls.Add(resetButton);
 
-            // Keep buttons in place on resize (optional, if you want them to stay at the top left)
-            this.Resize += (s, e) =>
+            // Connect to Game button (opens ConnectionWindow)
+            var connectWindowButton = new Button
             {
-                int y = (this.MainMenuStrip?.Height ?? 24) + spacing;
-                saveButton.Top = y;
-                loadButton.Top = y;
-                resetButton.Top = y;
-                loadButton.Left = saveButton.Right + spacing;
-                resetButton.Left = loadButton.Right + spacing;
+                Text = "Connect to Game",
+                MinimumSize = new Size(100, 25),
+                AutoSize = true,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont,
+                Margin = new Padding(5, 2, 0, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
+            connectWindowButton.Click += (s, e) =>
+            {
+                using var connectionWindow = new ConnectionWindow(gameConnectionManager, settingsManager);
+                if (connectionWindow.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Always set routeManager after connecting
+                    string selectedGame = connectionWindow.SelectedGame;
+                    string routeFilePath = Path.Combine(
+                        AppDomain.CurrentDomain.BaseDirectory,
+                        "Routes",
+                        "AC4 100 % Route - Main Route.tsv");
 
-            // Add the Show Stats button at the bottom-right (as before)
+                    routeManager = new RouteManager(routeFilePath, gameConnectionManager);
+                    LoadRouteData(routeGrid);
+                }
+            };
+            topBar.Controls.Add(connectWindowButton);
+
+            // Show Stats button (now in top bar)
             showStatsButton = new Button
             {
                 Text = "Show Stats",
-                Width = 90,
-                Height = 25,
+                MinimumSize = new Size(100, 25),
+                AutoSize = true,
                 ForeColor = AppTheme.TextColor,
-                Font = AppTheme.DefaultFont
+                Font = AppTheme.DefaultFont,
+                Margin = new Padding(5, 2, 0, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
             showStatsButton.Click += ShowStatsMenuItem_Click;
-            this.Controls.Add(showStatsButton);
-            showStatsButton.Left = this.ClientSize.Width - showStatsButton.Width - 20;
-            showStatsButton.Top = this.ClientSize.Height - showStatsButton.Height - 20;
-            this.Resize += (s, e) =>
-            {
-                showStatsButton.Left = this.ClientSize.Width - showStatsButton.Width - 20;
-                showStatsButton.Top = this.ClientSize.Height - showStatsButton.Height - 20;
-            };
+            topBar.Controls.Add(showStatsButton);
 
+            // Add topBar to the TableLayoutPanel
+            mainLayout.Controls.Add(topBar, 0, 0);
+
+            // --- RouteGrid Panel (fills remaining area) ---
             routeGrid = CreateRouteGridView();
-            this.Controls.Add(routeGrid);
-        }
+            routeGrid.Dock = DockStyle.Fill;
 
-        // ==========FORMAL COMMENT=========
-        // Creates and configures the main menu bar at the top of the form
-        // Adds settings, tab selection buttons, and connection controls
-        // ==========MY NOTES==============
-        // Builds the top menu bar with all its buttons and dropdown menus
-        // Sets up the styling and attaches event handlers
-        [SupportedOSPlatform("windows6.1")]
-        private void CreateMainMenu()
-        {
-            // Create and configure the MenuStrip
-            MenuStrip menuStrip = new()
+            var routeGridPanel = new Panel
             {
-                Dock = DockStyle.Top,
-                BackColor = AppTheme.BackgroundColor,
-                ForeColor = AppTheme.TextColor
+                Name = "routeGridPanel",
+                Dock = DockStyle.Fill,
+                Padding = new Padding(10, 0, 10, 10),
+                BackColor = AppTheme.BackgroundColor
             };
+            routeGridPanel.Controls.Add(routeGrid);
 
-            // Create settings menu with sub-items
-            CreateSettingsMenu(menuStrip);
+            // Add routeGridPanel to the TableLayoutPanel
+            mainLayout.Controls.Add(routeGridPanel, 0, 1);
 
-            // Create connection controls
-            CreateConnectionControls(menuStrip);
-
-            this.MainMenuStrip = menuStrip;
-            this.Controls.Add(menuStrip);
+            // Add the TableLayoutPanel to the form
+            this.Controls.Add(mainLayout);
         }
 
         private void ShowStatsMenuItem_Click(object? sender, EventArgs e)
@@ -557,8 +598,7 @@ namespace Route_Tracker
         }
         #endregion
 
-        #region Route Tab
-
+        #region Route
         // ==========FORMAL COMMENT=========
         // Event handler for Save Progress button clicks
         // Delegates to the RouteManager to handle the file dialog and saving process
@@ -951,15 +991,6 @@ namespace Route_Tracker
 
             // Apply the Always On Top setting
             this.TopMost = settingsManager.GetAlwaysOnTop();
-
-            // Update menu item if it exists
-            if (MainMenuStrip?.Items.OfType<ToolStripMenuItem>().FirstOrDefault(i => i.Text == "Settings") is ToolStripMenuItem settingsMenuItem)
-            {
-                if (settingsMenuItem.DropDownItems.OfType<ToolStripMenuItem>().FirstOrDefault(i => i.Text == "Always On Top") is ToolStripMenuItem alwaysOnTopMenuItem)
-                {
-                    alwaysOnTopMenuItem.Checked = this.TopMost;
-                }
-            }
         }
 
         // ==========FORMAL COMMENT=========
@@ -1060,11 +1091,13 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Shows or hides the settings panel when you click the menu item
         [SupportedOSPlatform("windows6.1")]
-        private void SettingsMenuItem_Click(object? sender, EventArgs e)
+        private void SettingsButton_Click(object? sender, EventArgs e)
         {
+            // Assumes you have a Panel named "settingsPanel" already created and added to the form
             if (this.Controls["settingsPanel"] is Panel settingsPanel)
             {
                 settingsPanel.Visible = !settingsPanel.Visible;
+                settingsPanel.BringToFront();
             }
         }
 
@@ -1109,25 +1142,8 @@ namespace Route_Tracker
                 settingsManager.SaveAlwaysOnTop(alwaysOnTopMenuItem.Checked);
             }
         }
-
         #endregion
 
-        #region Form Events
-        // ==========FORMAL COMMENT=========
-        // Form closing event handler that ensures proper resource cleanup
-        // Triggers cleanup operations before the form is destroyed
-        // ==========MY NOTES==============
-        // Runs when you close the application
-        // Makes sure we clean up everything properly before exiting
-        private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
-        {
-            // Clean up any resources before closing
-            CleanupGameStats();
-        }
-        #endregion
-
-
-        
         #region Update Management
         // Call this in your constructor or OnLoad (after UI is ready)
         protected override async void OnLoad(EventArgs e)
@@ -1203,7 +1219,7 @@ namespace Route_Tracker
 
         private static void AddUpdateCheckMenuItem(ToolStripMenuItem settingsMenuItem)
         {
-            var checkForUpdatesMenuItem = new ToolStripMenuItem("Check for Updates on Startup")
+            ToolStripMenuItem checkForUpdatesMenuItem = new("Check for Updates on Startup")
             {
                 CheckOnClick = true,
                 Checked = Properties.Settings.Default.CheckForUpdateOnStartup
@@ -1214,7 +1230,7 @@ namespace Route_Tracker
                 Properties.Settings.Default.Save();
             };
             settingsMenuItem.DropDownItems.Add(checkForUpdatesMenuItem);
-            
+
         }
 
         private static void AddDevModeMenuItem(ToolStripMenuItem settingsMenuItem)
@@ -1256,6 +1272,20 @@ namespace Route_Tracker
                 }
             };
             settingsMenuItem.DropDownItems.Add(devModeMenuItem);
+        }
+        #endregion
+
+        #region Form Events
+        // ==========FORMAL COMMENT=========
+        // Form closing event handler that ensures proper resource cleanup
+        // Triggers cleanup operations before the form is destroyed
+        // ==========MY NOTES==============
+        // Runs when you close the application
+        // Makes sure we clean up everything properly before exiting
+        private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            // Clean up any resources before closing
+            CleanupGameStats();
         }
         #endregion
     }
