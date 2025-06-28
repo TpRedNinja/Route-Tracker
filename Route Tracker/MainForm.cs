@@ -15,7 +15,7 @@ namespace Route_Tracker
     // static class so version number can be displayed and so we can get updates
     public static class AppInfo
     {
-        public const string Version = "v0.2-Beta";
+        public const string Version = "v0.2.5-Beta";
         public const string GitHubRepo = "TpRedNinja/Route-Tracker"; // e.g. "myuser/RouteTracker"
     }
 
@@ -557,8 +557,7 @@ namespace Route_Tracker
         }
         #endregion
 
-        #region Route Tab
-
+        #region Route
         // ==========FORMAL COMMENT=========
         // Event handler for Save Progress button clicks
         // Delegates to the RouteManager to handle the file dialog and saving process
@@ -1109,25 +1108,8 @@ namespace Route_Tracker
                 settingsManager.SaveAlwaysOnTop(alwaysOnTopMenuItem.Checked);
             }
         }
-
         #endregion
 
-        #region Form Events
-        // ==========FORMAL COMMENT=========
-        // Form closing event handler that ensures proper resource cleanup
-        // Triggers cleanup operations before the form is destroyed
-        // ==========MY NOTES==============
-        // Runs when you close the application
-        // Makes sure we clean up everything properly before exiting
-        private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
-        {
-            // Clean up any resources before closing
-            CleanupGameStats();
-        }
-        #endregion
-
-
-        
         #region Update Management
         // Call this in your constructor or OnLoad (after UI is ready)
         protected override async void OnLoad(EventArgs e)
@@ -1203,7 +1185,7 @@ namespace Route_Tracker
 
         private static void AddUpdateCheckMenuItem(ToolStripMenuItem settingsMenuItem)
         {
-            var checkForUpdatesMenuItem = new ToolStripMenuItem("Check for Updates on Startup")
+            ToolStripMenuItem checkForUpdatesMenuItem = new("Check for Updates on Startup")
             {
                 CheckOnClick = true,
                 Checked = Properties.Settings.Default.CheckForUpdateOnStartup
@@ -1214,7 +1196,7 @@ namespace Route_Tracker
                 Properties.Settings.Default.Save();
             };
             settingsMenuItem.DropDownItems.Add(checkForUpdatesMenuItem);
-            
+
         }
 
         private static void AddDevModeMenuItem(ToolStripMenuItem settingsMenuItem)
@@ -1256,6 +1238,20 @@ namespace Route_Tracker
                 }
             };
             settingsMenuItem.DropDownItems.Add(devModeMenuItem);
+        }
+        #endregion
+
+        #region Form Events
+        // ==========FORMAL COMMENT=========
+        // Form closing event handler that ensures proper resource cleanup
+        // Triggers cleanup operations before the form is destroyed
+        // ==========MY NOTES==============
+        // Runs when you close the application
+        // Makes sure we clean up everything properly before exiting
+        private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            // Clean up any resources before closing
+            CleanupGameStats();
         }
         #endregion
     }
