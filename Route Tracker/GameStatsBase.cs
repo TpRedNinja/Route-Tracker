@@ -76,7 +76,7 @@ namespace Route_Tracker
         // Timer-related fields for automatic stat updates
         private System.Threading.CancellationTokenSource? _updateCancellationTokenSource;
         private bool _isUpdating = false;
-        private readonly int _updateIntervalMs = 2500; // Default update interval of 1 second
+        private readonly int _updateIntervalMs = 1000; // Default update interval of 1 second
         private System.Threading.Timer? _updateTimer; // Timer that controls the periodic stat updates
         
         // for updating stats?
@@ -85,7 +85,7 @@ namespace Route_Tracker
 
         //for performance optimizations
         private readonly int _activeUpdateIntervalMs = 500;  // Fast updates during active gameplay
-        private readonly int _idleUpdateIntervalMs = 2500;   // Slower updates when idle
+        private readonly int _idleUpdateIntervalMs = 1000;   // Slower updates when idle
         private DateTime _lastActivityTime = DateTime.Now;
         private bool _inActiveGameplay = true;
         private (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,

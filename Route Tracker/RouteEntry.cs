@@ -37,6 +37,8 @@ namespace Route_Tracker
         // Runtime state
         public bool IsCompleted { get; set; } = false;
 
+        public RouteEntry? Prerequisite { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290",
         Justification = "it breaks everything")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",

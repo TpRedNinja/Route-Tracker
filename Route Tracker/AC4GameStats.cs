@@ -70,6 +70,7 @@ namespace Route_Tracker
         private const int TavernEndOffset = 0x3228;
         private const int TreasureMapsStartOffset = 0x3250;
         private const int TreasureMapsEndOffset = 0x3408;
+        private static readonly int [] SpecialTreasureMapOffsets = [0x33B8, 0x33CC, 0x33E0, 0x33F4]; // Special treasure map offset we dont count this one
         #endregion
 
         #region Resource Tracking
@@ -86,6 +87,7 @@ namespace Route_Tracker
         private int totalTemplarHunts = 0;
         private int legendaryShips = 0;
         private int treasuremaps = 0;
+        private int modernDayMissions = 0;
 
         // Modern Day mission tracking
         // Tracks the previous value of the 'character' variable to detect transitions in and out of modern day missions.
@@ -99,40 +101,41 @@ namespace Route_Tracker
         private int lastMetalSpent = 0;
         private int lastHeroUpgradeValue = 0;
         private int totalUpgrades = 0;
-        private readonly bool[] upgradePurchased = new bool[42]; // Each index = a specific upgrade
+        private readonly bool[] upgradePurchased = new bool[43]; // Each index = a specific upgrade
         private int skinPurchaseCheckpoint = 0; // Used for animal skin upgrade detection
 
         // Main ship upgrades (excluding hero and animal skin upgrades)
         private static readonly (int Index, int Money, int Wood, int Metal, string Name)[] MainUpgradeRequirements =
         [
-            (2, 1000, 0, 0, "Hull 1"),
-            (3, 900, 0, 0, "Round Shot Strength 1"),
-            (4, 4000, 0, 0, "Round Shot Strength 2"),
-            (5, 800, 0, 0, "Mortar 1"),
-            (6, 900, 0, 0, "Heavy Shot 1"),
-            (7, 6000, 0, 0, "Heavy Shot 2"),
-            (8, 800, 0, 0, "Mortar Storage 1"),
-            (9, 2000, 0, 0, "Mortar Storage 2"),
-            (10, 0, 0, 70, "Cannons 1"),
-            (11, 12000, 0, 0, "Round Shot Strength 3"),
-            (12, 2500, 0, 0, "Chain Shot Strength 1"),
-            (13, 6000, 0, 0, "Chain Shot Strength 2"),
-            (14, 3000, 0, 0, "Fire Barrel Strength 1"),
-            (15, 500, 0, 0, "Heavy Shot Storage 1"),
-            (16, 1500, 0, 0, "Heavy Shot Storage 2"),
-            (17, 3500, 0, 200, "Mortar 2"),
-            (18, 700, 0, 0, "Swivel Strength 1"),
-            (19, 14000, 0, 0, "Officers Rapiers"),
-            (20, 9000, 0, 0, "Cannon-Barrel Pistols"),
-            (33, 4000, 200, 100, "Hull Armor 2"),
-            (34, 5000, 0, 0, "Diving Bell"),
-            (35, 5000, 0, 0, "Mortar Storage 3"),
-            (36, 500, 25, 0, "Ram Strength 1"),
-            (37, 5000, 250, 150, "Ram Strength 2"),
-            (38, 8000, 0, 300, "Mortar 3"),
-            (39, 2000, 0, 100, "Broadside Cannons 2"),
-            (40, 35000, 0, 0, "Round Shot Strength 4"),
-            (41, 25000, 0, 0, "Heavy Shot 3"),
+            (0, 500, 0, 0, "Swords 1"),
+            (3, 1000, 0, 0, "Hull 1"),
+            (4, 900, 0, 0, "Round Shot Strength 1"),
+            (5, 4000, 0, 0, "Round Shot Strength 2"),
+            (6, 800, 0, 0, "Mortar 1"),
+            (7, 900, 0, 0, "Heavy Shot 1"),
+            (8, 6000, 0, 0, "Heavy Shot 2"),
+            (9, 800, 0, 0, "Mortar Storage 1"),
+            (10, 2000, 0, 0, "Mortar Storage 2"),
+            (11, 0, 0, 70, "Cannons 1"),
+            (12, 12000, 0, 0, "Round Shot Strength 3"),
+            (13, 2500, 0, 0, "Chain Shot Strength 1"),
+            (14, 6000, 0, 0, "Chain Shot Strength 2"),
+            (15, 3000, 0, 0, "Fire Barrel Strength 1"),
+            (16, 500, 0, 0, "Heavy Shot Storage 1"),
+            (17, 1500, 0, 0, "Heavy Shot Storage 2"),
+            (18, 3500, 0, 200, "Mortar 2"),
+            (19, 700, 0, 0, "Swivel Strength 1"),
+            (20, 14000, 0, 0, "Officers Rapiers"),
+            (21, 9000, 0, 0, "Cannon-Barrel Pistols"),
+            (34, 4000, 200, 100, "Hull Armor 2"),
+            (35, 5000, 0, 0, "Diving Bell"),
+            (36, 5000, 0, 0, "Mortar Storage 3"),
+            (37, 500, 25, 0, "Ram Strength 1"),
+            (38, 5000, 250, 150, "Ram Strength 2"),
+            (39, 8000, 0, 300, "Mortar 3"),
+            (40, 2000, 0, 100, "Broadside Cannons 2"),
+            (41, 35000, 0, 0, "Round Shot Strength 4"),
+            (42, 25000, 0, 0, "Heavy Shot 3"),
         ];
 
         // Animal skin upgrades
@@ -242,6 +245,8 @@ namespace Route_Tracker
             int count = 0;
             for (int thirdOffset = startOffset; thirdOffset <= endOffset; thirdOffset += OffsetStep)
             {
+                // skip these maps as the user should have them collected already or the map isnt used anyways
+                if (SpecialTreasureMapOffsets.Contains(thirdOffset)) continue;
                 count += ReadCollectible(thirdOffset);
             }
 
@@ -353,7 +358,7 @@ namespace Route_Tracker
             else if(character == 0 && oldcharacter == 1)
             {
                 oldcharacter = character;
-                completedStoryMissions++;
+                modernDayMissions++;
             }
         }
 
@@ -384,14 +389,14 @@ namespace Route_Tracker
                     // Map hero upgrade value to the correct upgrade in the list
                     switch (lastHeroUpgradeValue + i + 1) // +1 because hero upgrades start at 1
                     {
-                        case 1: upgradeIndex = 0; break;  // Pistol Holster 2/Health 1
-                        case 2: upgradeIndex = 1; break;  // Pistol Holster 2/Health 1 (second option)
-                        case 3: upgradeIndex = 27; break; // Pistol Holster 3
-                        case 4: upgradeIndex = 28; break; // Pistol Holster 4
-                        case 5: upgradeIndex = 29; break; // Smoke Bomb Pouch 1
-                        case 6: upgradeIndex = 30; break; // Smoke Bomb Pouch 2
-                        case 7: upgradeIndex = 31; break; // Dart Pouch 1
-                        case 8: upgradeIndex = 32; break; // Dart Pouch 2
+                        case 1: upgradeIndex = 1; break;  // Pistol Holster 2/Health 1
+                        case 2: upgradeIndex = 2; break;  // Pistol Holster 2/Health 1 (second option)
+                        case 3: upgradeIndex = 28; break; // Pistol Holster 3
+                        case 4: upgradeIndex = 29; break; // Pistol Holster 4
+                        case 5: upgradeIndex = 30; break; // Smoke Bomb Pouch 1
+                        case 6: upgradeIndex = 31; break; // Smoke Bomb Pouch 2
+                        case 7: upgradeIndex = 32; break; // Dart Pouch 1
+                        case 8: upgradeIndex = 33; break; // Dart Pouch 2
                     }
 
                     if (upgradeIndex >= 0 && upgradeIndex < upgradePurchased.Length && !upgradePurchased[upgradeIndex])
@@ -416,6 +421,9 @@ namespace Route_Tracker
                 // Main upgrades (excluding hero and animal skin upgrades)
                 foreach (var req in MainUpgradeRequirements)
                 {
+                    if (req.Index > 0 && !upgradePurchased[req.Index - 1])
+                        continue;
+                    
                     if (!upgradePurchased[req.Index]
                         && moneyDelta >= req.Money
                         && woodDelta >= req.Wood
@@ -494,7 +502,7 @@ namespace Route_Tracker
         // Returns a tuple with all four counter values at once.
         public override (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
         {
-            return (completedStoryMissions, totalTemplarHunts, legendaryShips, treasuremaps);
+            return (completedStoryMissions + modernDayMissions, totalTemplarHunts, legendaryShips, treasuremaps);
         }
 
         public (bool IsLoading, bool IsMainMenu) GetGameStatus()

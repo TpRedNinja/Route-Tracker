@@ -68,6 +68,8 @@ namespace Route_Tracker
                 for (int i = 0; i < routeEntries.Count; i++)
                 {
                     routeEntries[i].Id = i + 1;
+                    // Set prerequisite to previous entry (null for first)
+                    routeEntries[i].Prerequisite = i > 0 ? routeEntries[i - 1] : null;
                 }
             }
             return routeEntries;
@@ -149,7 +151,8 @@ namespace Route_Tracker
                 routeEntries = entries;
 
                 // Sort and scroll
-                SortAndScrollToFirstIncomplete(routeGrid);
+                SortRouteGridByCompletion(routeGrid);
+                ScrollToFirstIncomplete(routeGrid);
             }
             catch (Exception ex)
             {
@@ -460,7 +463,8 @@ namespace Route_Tracker
                 // If changes were made, sort and scroll
                 if (anyChanges)
                 {
-                    SortAndScrollToFirstIncomplete(routeGrid);
+                    SortRouteGridByCompletion(routeGrid);
+                    ScrollToFirstIncomplete(routeGrid);
 
                     // Auto-save whenever any entry is marked as completed
                     AutoSaveProgress();
@@ -490,6 +494,10 @@ namespace Route_Tracker
             if (string.IsNullOrEmpty(entry.Type))
                 return false;
 
+            // Enforce prerequisite for ALL entries (not just upgrades)
+            if (entry.Prerequisite != null && !entry.Prerequisite.IsCompleted)
+                return false;
+
             // Normalize for comparison (trim and ignore case)
             string normalizedType = entry.Type.Trim();
 
@@ -506,7 +514,7 @@ namespace Route_Tracker
                 "Chest" or "chest" => stats.TotalChests >= entry.Condition,
                 "Animus Fragment" or "animus fragment" => stats.Fragments >= entry.Condition,
                 "Myan Stones" or "myan stones" => stats.Myan >= entry.Condition,
-                "Buried Treasure" or "buried treasure" => stats.Treasure >= entry.Condition,
+                "Burired Treasure" or "burired treasure" => stats.Treasure >= entry.Condition,
                 "Assassin Contracts" or "assassin contracts" => stats.Assassin >= entry.Condition,
                 "Naval Contracts" or "naval contracts" => stats.Naval >= entry.Condition,
                 "Letters" or "letters" => stats.Letters >= entry.Condition,
@@ -527,51 +535,61 @@ namespace Route_Tracker
 
         #region UI Management
         // ==========FORMAL COMMENT=========
-        // Sorts the route grid to show completed entries first, followed by incomplete entries
-        // Automatically scrolls to the first incomplete entry to focus user attention
-        // Preserves original ordering within completion groups for logical progression
+        // Sorts the route grid so completed entries are at the top (by Id), followed by incomplete entries (by Id).
+        // Does not change the current scroll position or selection in the grid.
+        // Maintains original route order within completed and incomplete groups.
         // ==========MY NOTES==============
-        // Sorts the route grid so completed items move to the top
-        // Automatically jumps to the first thing you still need to do
-        // Makes it easy to see what's done and what's next at a glance
-        public static void SortAndScrollToFirstIncomplete(DataGridView routeGrid)
+        // Just puts all the checked-off stuff at the top, but doesn't scroll or highlight anything.
+        // Keeps everything in the order from the route file so it's easy to see what's done and what's left.
+        public static void SortRouteGridByCompletion(DataGridView routeGrid)
         {
             if (routeGrid == null || routeGrid.Rows.Count == 0)
                 return;
 
-            // Get all entries from the grid
             List<RouteEntry> entries = [];
             for (int i = 0; i < routeGrid.Rows.Count; i++)
             {
                 if (routeGrid.Rows[i].Tag is RouteEntry entry)
-                {
                     entries.Add(entry);
-                }
             }
 
-            // Sort: completed first (by Id), then incomplete (by Id)
             var sortedEntries = entries
                 .OrderByDescending(e => e.IsCompleted)
                 .ThenBy(e => e.Id)
                 .ToList();
 
-            // Clear and re-add rows in sorted order
             routeGrid.Rows.Clear();
-            int firstIncompleteIndex = -1;
-
-            for (int i = 0; i < sortedEntries.Count; i++)
+            foreach (var entry in sortedEntries)
             {
-                var entry = sortedEntries[i];
                 string completionMark = entry.IsCompleted ? "X" : "";
                 int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
                 routeGrid.Rows[rowIndex].Tag = entry;
+            }
+        }
 
-                // Track first non-completed entry
-                if (firstIncompleteIndex == -1 && !entry.IsCompleted)
-                    firstIncompleteIndex = rowIndex;
+        // ==========FORMAL COMMENT=========
+        // Scrolls the route grid to the first incomplete entry and selects it for user attention.
+        // Does not change the order of entries in the grid.
+        // If all entries are complete, scrolls to the top of the grid.
+        // ==========MY NOTES==============
+        // Jumps the list to the first thing you haven't finished yet and highlights it.
+        // Doesn't move anything around, just helps you find what to do next.
+        // If everything is done, scrolls to the very top.
+        public static void ScrollToFirstIncomplete(DataGridView routeGrid)
+        {
+            if (routeGrid == null || routeGrid.Rows.Count == 0)
+                return;
+
+            int firstIncompleteIndex = -1;
+            for (int i = 0; i < routeGrid.Rows.Count; i++)
+            {
+                if (routeGrid.Rows[i].Tag is RouteEntry entry && !entry.IsCompleted)
+                {
+                    firstIncompleteIndex = i;
+                    break;
+                }
             }
 
-            // Scroll to first non-completed entry
             if (firstIncompleteIndex >= 0)
             {
                 routeGrid.FirstDisplayedScrollingRowIndex = Math.Max(0, firstIncompleteIndex - 2);
@@ -714,7 +732,8 @@ namespace Route_Tracker
 
                 if (anyChanges)
                 {
-                    SortAndScrollToFirstIncomplete(routeGrid);
+                    SortRouteGridByCompletion(routeGrid);
+                    ScrollToFirstIncomplete(routeGrid);
                     Debug.WriteLine($"Loaded autosave from {autosaveFile}");
                     return true;
                 }
@@ -881,7 +900,8 @@ namespace Route_Tracker
                         routeGrid.Rows[rowIndex].Tag = entry;
                     }
 
-                    SortAndScrollToFirstIncomplete(routeGrid);
+                    SortRouteGridByCompletion(routeGrid);
+                    ScrollToFirstIncomplete(routeGrid);
 
                     // After loading manually, update autosave as well
                     AutoSaveProgress();
@@ -960,7 +980,8 @@ namespace Route_Tracker
                 int rowIndex = routeGrid.Rows.Add(entry.DisplayText, "");
                 routeGrid.Rows[rowIndex].Tag = entry;
             }
-            SortAndScrollToFirstIncomplete(routeGrid);
+            SortRouteGridByCompletion(routeGrid);
+            ScrollToFirstIncomplete(routeGrid);
         }
         #endregion
     }

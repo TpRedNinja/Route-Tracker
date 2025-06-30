@@ -37,10 +37,10 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AutoStart {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AutoStart {
             get {
-                return ((bool)(this["AutoStart"]));
+                return ((string)(this["AutoStart"]));
             }
             set {
                 this["AutoStart"] = value;

@@ -15,7 +15,7 @@ namespace Route_Tracker
     // static class so version number can be displayed and so we can get updates
     public static class AppInfo
     {
-        public const string Version = "v0.2.5-Beta";
+        public const string Version = "v0.3-Beta";
         public const string GitHubRepo = "TpRedNinja/Route-Tracker"; // e.g. "myuser/RouteTracker"
     }
 
@@ -71,12 +71,14 @@ namespace Route_Tracker
         private Button saveButton = null!;
         private Button loadButton = null!;
         private Button resetButton = null!;
-        
+        private readonly string lastSelectedGame = string.Empty;
+
 
         private DataGridView routeGrid = null!;
 
         private TextBox gameDirectoryTextBox = null!; // Same approach
-        private CheckBox autoStartCheckBox = null!; // Same approach
+        private ToolStripComboBox? autoStartGameComboBox;
+        private ToolStripMenuItem? enableAutoStartMenuItem;
 
         private bool isHotkeysEnabled = false;
 
@@ -176,6 +178,7 @@ namespace Route_Tracker
             };
             CreateSettingsMenu(menuStrip);
             topBar.Controls.Add(menuStrip);
+            this.MainMenuStrip = menuStrip;
 
             // Progress buttons
             saveButton = new Button
@@ -334,44 +337,68 @@ namespace Route_Tracker
         [SupportedOSPlatform("windows6.1")]
         private void CreateSettingsMenu(MenuStrip menuStrip)
         {
-            // Create and configure the Settings menu item
             ToolStripMenuItem settingsMenuItem = new("Settings");
 
             AddUpdateCheckMenuItem(settingsMenuItem);
-
             AddDevModeMenuItem(settingsMenuItem);
 
-            // Create and configure the Auto-Start Game menu item
-            ToolStripMenuItem autoStartMenuItem = new("Auto-Start Game")
+            // --- New Auto-Start Game UI ---
+            // ComboBox for selecting the game to auto-start
+            autoStartGameComboBox = new ToolStripComboBox
             {
-                CheckOnClick = true
+                Name = "autoStartGameComboBox",
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                AutoSize = false,
+                Width = 180
             };
-            autoStartMenuItem.CheckedChanged += AutoStartMenuItem_CheckedChanged;
+            // Populate with games that have directories set
+            var gamesWithDirs = settingsManager.GetGamesWithDirectoriesSet();
+            autoStartGameComboBox.Items.AddRange([.. gamesWithDirs]);
+            autoStartGameComboBox.SelectedIndex = -1;
 
-            // Create and configure the Game Directory menu item
+            // Set selected item if already set in settings
+            string savedAutoStart = Settings.Default.AutoStart;
+            if (!string.IsNullOrEmpty(savedAutoStart) && gamesWithDirs.Contains(savedAutoStart))
+            {
+                autoStartGameComboBox.SelectedItem = savedAutoStart;
+            }
+
+            autoStartGameComboBox.SelectedIndexChanged += AutoStartGameComboBox_SelectedIndexChanged;
+            settingsMenuItem.DropDownItems.Add(new ToolStripLabel("Auto-Start Game:"));
+            settingsMenuItem.DropDownItems.Add(autoStartGameComboBox);
+
+            // Checkbox to enable/disable auto-start
+            enableAutoStartMenuItem = new ToolStripMenuItem("Enable Auto-Start")
+            {
+                CheckOnClick = true,
+                Checked = !string.IsNullOrEmpty(savedAutoStart),
+                Enabled = autoStartGameComboBox.SelectedItem != null
+            };
+            enableAutoStartMenuItem.CheckedChanged += EnableAutoStartMenuItem_CheckedChanged;
+            settingsMenuItem.DropDownItems.Add(enableAutoStartMenuItem);
+
+            // --- End New Auto-Start Game UI ---
+
+            // Game Directory menu item
             ToolStripMenuItem gameDirectoryMenuItem = new("Game Directory");
             gameDirectoryMenuItem.Click += GameDirectoryMenuItem_Click;
 
-            // Create and configure the Always On Top menu item
+            // Always On Top menu item
             ToolStripMenuItem alwaysOnTopMenuItem = new("Always On Top")
             {
                 CheckOnClick = true,
-                Checked = this.TopMost // Initialize with current state
+                Checked = this.TopMost
             };
             alwaysOnTopMenuItem.CheckedChanged += AlwaysOnTopMenuItem_CheckedChanged;
 
-            // Add the menu items to the Settings menu item
-            settingsMenuItem.DropDownItems.Add(autoStartMenuItem);
+            // Add the rest of the menu items
             settingsMenuItem.DropDownItems.Add(gameDirectoryMenuItem);
             settingsMenuItem.DropDownItems.Add(alwaysOnTopMenuItem);
 
-            // Add the Settings menu item to the MenuStrip
             menuStrip.Items.Add(settingsMenuItem);
 
-            // Add separator
             settingsMenuItem.DropDownItems.Add(new ToolStripSeparator());
 
-            // Add hotkeys menu items
             ToolStripMenuItem hotkeysMenuItem = new("Configure Hotkeys");
             hotkeysMenuItem.Click += HotkeysMenuItem_Click;
             settingsMenuItem.DropDownItems.Add(hotkeysMenuItem);
@@ -384,12 +411,43 @@ namespace Route_Tracker
             enableHotkeysMenuItem.CheckedChanged += EnableHotkeysMenuItem_CheckedChanged;
             settingsMenuItem.DropDownItems.Add(enableHotkeysMenuItem);
 
-            // Initialize hotkey state
             isHotkeysEnabled = settingsManager.GetHotkeysEnabled();
 
             ToolStripMenuItem showSaveLocationMenuItem = new("Show Save Location");
             showSaveLocationMenuItem.Click += ShowSaveLocationMenuItem_Click;
             settingsMenuItem.DropDownItems.Add(showSaveLocationMenuItem);
+        }
+
+        private void AutoStartGameComboBox_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (autoStartGameComboBox == null || enableAutoStartMenuItem == null)
+                return;
+
+            // Enable the checkbox only if a game is selected
+            enableAutoStartMenuItem.Enabled = autoStartGameComboBox.SelectedItem != null;
+
+            // If a game is selected and the checkbox is checked, update the setting
+            if (enableAutoStartMenuItem.Checked && autoStartGameComboBox.SelectedItem is string selectedGame)
+            {
+                Settings.Default.AutoStart = selectedGame;
+                Settings.Default.Save();
+            }
+        }
+
+        private void EnableAutoStartMenuItem_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (autoStartGameComboBox == null || enableAutoStartMenuItem == null)
+                return;
+
+            if (enableAutoStartMenuItem.Checked && autoStartGameComboBox.SelectedItem is string selectedGame)
+            {
+                Settings.Default.AutoStart = selectedGame;
+            }
+            else
+            {
+                Settings.Default.AutoStart = string.Empty;
+            }
+            Settings.Default.Save();
         }
 
         private void ShowSaveLocationMenuItem_Click(object? sender, EventArgs e)
@@ -488,7 +546,8 @@ namespace Route_Tracker
                 routeGrid.CurrentRow.Cells[1].Value = "X";
 
                 // Update grid
-                RouteManager.SortAndScrollToFirstIncomplete(routeGrid);
+                RouteManager.SortRouteGridByCompletion(routeGrid);
+                RouteManager.ScrollToFirstIncomplete(routeGrid);
 
                 // Auto-save progress
                 routeManager?.AutoSaveProgress();
@@ -561,16 +620,8 @@ namespace Route_Tracker
                 Dock = DockStyle.Top
             };
             this.Controls.Add(gameDirectoryTextBox);
-
-            autoStartCheckBox = new CheckBox
-            {
-                Text = "Auto-Start Game",
-                Visible = false,
-                Dock = DockStyle.Top
-            };
-            autoStartCheckBox.CheckedChanged += AutoStartCheckBox_CheckedChanged;
-            this.Controls.Add(autoStartCheckBox);
         }
+
         private void AutoDetectButton_Click(object? sender, EventArgs e)
         {
             ToolStripComboBox? gameDropdown = this.MainMenuStrip?.Items.OfType<ToolStripComboBox>().FirstOrDefault();
@@ -867,7 +918,7 @@ namespace Route_Tracker
             };
 
             // Use GameConnectionManager to handle the connection
-            bool connected = await gameConnectionManager.ConnectToGameAsync(selectedGame, autoStartCheckBox.Checked);
+            bool connected = await gameConnectionManager.ConnectToGameAsync(selectedGame, enableAutoStartMenuItem?.Checked == true);
 
             // Use actual route file path when initializing RouteManager
             if (connected)
@@ -987,9 +1038,7 @@ namespace Route_Tracker
         [SupportedOSPlatform("windows6.1")]
         private void LoadSettings()
         {
-            settingsManager.LoadSettings(gameDirectoryTextBox, autoStartCheckBox);
-
-            // Apply the Always On Top setting
+            settingsManager.LoadSettings(gameDirectoryTextBox);
             this.TopMost = settingsManager.GetAlwaysOnTop();
         }
 
@@ -1002,7 +1051,7 @@ namespace Route_Tracker
         [SupportedOSPlatform("windows6.1")]
         private void SaveSettings()
         {
-            settingsManager.SaveSettings(gameDirectoryTextBox.Text, autoStartCheckBox.Checked);
+            settingsManager.SaveSettings(gameDirectoryTextBox.Text, Settings.Default.AutoStart);
         }
 
         // ==========FORMAL COMMENT=========
@@ -1015,74 +1064,6 @@ namespace Route_Tracker
         {
             GameDirectoryForm gameDirectoryForm = new();
             gameDirectoryForm.ShowDialog();
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Event handler for auto-start menu item state changes
-        // Synchronizes checkbox with menu item and saves settings
-        // ==========MY NOTES==============
-        // Makes sure the checkbox matches the menu item when you click it
-        [SupportedOSPlatform("windows6.1")]
-        private void AutoStartMenuItem_CheckedChanged(object? sender, EventArgs e)
-        {
-            ToolStripMenuItem? autoStartMenuItem = sender as ToolStripMenuItem;
-            autoStartCheckBox.Checked = autoStartMenuItem?.Checked ?? false;
-            SaveSettings();
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Event handler for auto-start checkbox state changes
-        // Updates settings and prompts for game directory if needed
-        // ==========MY NOTES==============
-        // Runs when the auto-start checkbox is checked or unchecked
-        // Asks for the game folder if we don't know where it is yet
-        [SupportedOSPlatform("windows6.1")]
-        private void AutoStartCheckBox_CheckedChanged(object? sender, EventArgs e)
-        {
-            if (settingsManager.IsLoadingSettings)
-            {
-                return;
-            }
-
-            // Add null check for MainMenuStrip
-            if (this.MainMenuStrip == null)
-            {
-                MessageBox.Show("Menu strip not found.");
-                autoStartCheckBox.Checked = false;
-                return;
-            }
-            
-            ToolStripComboBox? gameDropdown = this.MainMenuStrip.Items.OfType<ToolStripComboBox>().FirstOrDefault();
-            if (gameDropdown == null)
-            {
-                MessageBox.Show("Game dropdown not found.");
-                autoStartCheckBox.Checked = false;
-                return;
-            }
-
-            string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
-            string gameDirectory = settingsManager.GetGameDirectory(selectedGame);
-
-            if (string.IsNullOrEmpty(gameDirectory))
-            {
-                using FolderBrowserDialog folderBrowserDialog = new();
-                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
-                {
-                    gameDirectoryTextBox.Text = folderBrowserDialog.SelectedPath;
-                    // Save the directory to the settings manager
-                    settingsManager.SaveDirectory(selectedGame, folderBrowserDialog.SelectedPath);
-                    SaveSettings();
-                }
-                else
-                {
-                    autoStartCheckBox.Checked = false;
-                }
-            }
-            else
-            {
-                gameDirectoryTextBox.Text = gameDirectory;
-                SaveSettings();
-            }
         }
 
         // ==========FORMAL COMMENT=========
@@ -1146,9 +1127,28 @@ namespace Route_Tracker
 
         #region Update Management
         // Call this in your constructor or OnLoad (after UI is ready)
+        [SupportedOSPlatform("windows6.1")]
         protected override async void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+
+            // Auto-start logic
+            string autoStartGame = Settings.Default.AutoStart;
+            if (!string.IsNullOrEmpty(autoStartGame) && !string.IsNullOrEmpty(settingsManager.GetGameDirectory(autoStartGame)))
+            {
+                bool connected = await gameConnectionManager.ConnectToGameAsync(autoStartGame, true);
+                if (connected)
+                {
+                    // Load route data for the auto-started game
+                    string routeFilePath = Path.Combine(
+                        AppDomain.CurrentDomain.BaseDirectory,
+                        "Routes",
+                        $"{autoStartGame} 100 % Route - Main Route.tsv"); // Adjust this pattern for your game/route file naming
+                    routeManager = new RouteManager(routeFilePath, gameConnectionManager);
+                    LoadRouteData(routeGrid);
+                }
+            }
+
             await CheckForUpdatesAsync();
         }
 

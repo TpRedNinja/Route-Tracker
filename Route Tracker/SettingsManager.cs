@@ -27,11 +27,10 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Fills UI controls with saved settings when app starts
         [SupportedOSPlatform("windows6.1")]
-        public void LoadSettings(TextBox gameDirectoryTextBox, CheckBox autoStartCheckBox)
+        public void LoadSettings(TextBox gameDirectoryTextBox)
         {
             isLoadingSettings = true;
             gameDirectoryTextBox.Text = Settings.Default.GameDirectory;
-            autoStartCheckBox.Checked = Settings.Default.AutoStart;
             isLoadingSettings = false;
         }
 
@@ -67,12 +66,10 @@ namespace Route_Tracker
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
         Justification = "it breaks shit")]
         [SupportedOSPlatform("windows6.1")]
-        public void SaveSettings(string gameDirectory, bool autoStart)
+        public void SaveSettings(string gameDirectory, string autoStartGame)
         {
-            // Keep existing code
             Settings.Default.GameDirectory = gameDirectory;
-            Settings.Default.AutoStart = autoStart;
-            // Don't modify AlwaysOnTop here as it's handled separately
+            Settings.Default.AutoStart = autoStartGame;
             Settings.Default.Save();
         }
         #endregion
@@ -181,5 +178,16 @@ namespace Route_Tracker
         }
         #endregion
 
+        public List<string> GetGamesWithDirectoriesSet()
+        {
+            var games = new List<string>();
+            var supportedGames = new[] { "Assassin's Creed 4", "God of War 2018" };
+            foreach (var game in supportedGames)
+            {
+                if (!string.IsNullOrEmpty(GetGameDirectory(game)))
+                    games.Add(game);
+            }
+            return games;
+        }
     }
 }
