@@ -36,9 +36,9 @@ namespace Route_Tracker
         private System.Threading.Timer? completionCheckTimer = null;
         private bool wasPreviouslyInNonGameplay = false;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290: Use primary constructure",
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290",
         Justification = "NO")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
         public RouteManager(string routeFilePath, GameConnectionManager gameConnectionManager)
         {
@@ -83,9 +83,9 @@ namespace Route_Tracker
         // Fills the route grid with entries from the best matching file
         // Shows progress messages while it searches for files
         // Shows errors if files can't be found or loaded properly
-        public void LoadRouteDataIntoGrid(DataGridView routeGrid,
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Required for interface compatibility")]
-    string gameName)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:",
+        Justification = "Required for interface compatibility")]
+        public void LoadRouteDataIntoGrid(DataGridView routeGrid, string gameName)
         {
             routeGrid.Rows.Clear();
             routeGrid.Rows.Add("Searching everywhere for route files...", "");
@@ -365,110 +365,115 @@ namespace Route_Tracker
         // Checks all route entries to see if they're complete based on game stats
         // Marks entries as complete or incomplete with checkmarks
         // Returns true if anything changed so we can update the display
-        public bool UpdateCompletionStatus(DataGridView routeGrid, StatsUpdatedEventArgs stats)
+        public bool UpdateCompletionStatus(DataGridView routeGrid, GameStatsEventArgs stats)
         {
             bool anyChanges = false;
 
-            // Round percentage to 2 decimal places for 100% detection
-            bool isGameCompleted = Math.Round(stats.PercentFloat, 2) >= 100.0f;
+            // Only check for 100% completion in AC4
+            bool isAC4Game = gameConnectionManager?.GameStats is AC4GameStats;
+            bool isGameCompleted = false;
 
-            // Log stats for debugging
-            string statsInfo = $"Stats: Percent={stats.Percent}%, PercentFloat={stats.PercentFloat}%, " +
-                 $"Viewpoints={stats.Viewpoints}, Myan={stats.Myan}, " +
-                 $"Treasure={stats.Treasure}, Fragments={stats.Fragments}, " +
-                 $"Assassin={stats.Assassin}, Naval={stats.Naval}";
-            Debug.WriteLine(statsInfo);
-
-            // Handle the case when dropping below 100% after being at 100%
-            if (isAt100Percent && !isGameCompleted)
+            if (isAC4Game)
             {
-                // If we dropped below 100%, stop the timer and reset the flag
-                isAt100Percent = false;
-                completionCheckTimer?.Dispose();
-                completionCheckTimer = null;
-                Debug.WriteLine("Game dropped below 100% completion - resuming normal updates");
-            }
+                // Round percentage to 2 decimal places for 100% detection - AC4 specific
+                isGameCompleted = Math.Round(stats.GetValue<float>("Exact Percentage", 0f), 2) >= 100.0f;
 
-            // If we're at 100% and already marked as such, skip the update to prevent scrolling issues
-            if (isAt100Percent && isGameCompleted)
-            {
-                // We're already at 100% and still at 100%, no need to update the UI
-                return false;
-            }
+                // Log stats for debugging
+                string statsInfo = $"Stats: Percent={stats.GetValue<int>("Completion Percentage", 0)}%, " +
+                    $"PercentFloat={stats.GetValue<float>("Exact Percentage", 0f):F2}%, " +
+                    $"Viewpoints={stats.GetValue<int>("Viewpoints", 0)}, Myan={stats.GetValue<int>("Myan Stones", 0)}, " +
+                    $"Treasure={stats.GetValue<int>("Buried Treasure", 0)}, Fragments={stats.GetValue<int>("Animus Fragments", 0)}, " +
+                    $"Assassin={stats.GetValue<int>("Assassin Contracts", 0)}, Naval={stats.GetValue<int>("Naval Contracts", 0)}";
+                Debug.WriteLine(statsInfo);
 
-            // If game just reached 100% complete, mark all entries as complete
-            if (isGameCompleted && !isAt100Percent)
-            {
-                // Clear the grid and re-add all entries as completed
-                List<RouteEntry> entries = [];
-
-                foreach (DataGridViewRow row in routeGrid.Rows)
+                // Handle the case when dropping below 100% after being at 100%
+                if (isAt100Percent && !isGameCompleted)
                 {
-                    if (row.Tag is RouteEntry entry)
-                    {
-                        entry.IsCompleted = true;  // Mark all entries as complete
-                        entries.Add(entry);
-                    }
+                    // If we dropped below 100%, stop the timer and reset the flag
+                    isAt100Percent = false;
+                    completionCheckTimer?.Dispose();
+                    completionCheckTimer = null;
+                    Debug.WriteLine("Game dropped below 100% completion - resuming normal updates");
                 }
 
-                // Clear and rebuild the grid with all entries as completed
-                routeGrid.Rows.Clear();
-                foreach (var entry in entries)
+                // If we're at 100% and already marked as such, skip the update to prevent scrolling issues
+                if (isAt100Percent && isGameCompleted)
                 {
-                    int rowIndex = routeGrid.Rows.Add(entry.DisplayText, "X");
-                    routeGrid.Rows[rowIndex].Tag = entry;
+                    // We're already at 100% and still at 100%, no need to update the UI
+                    return false;
                 }
 
-                // Scroll to top since all entries are complete
-                if (routeGrid.Rows.Count > 0)
-                    routeGrid.FirstDisplayedScrollingRowIndex = 0;
-
-                Debug.WriteLine("Game at 100% completion - marked all route entries as complete");
-
-                // Set the 100% flag and start the timer
-                isAt100Percent = true;
-                completionCheckTimer?.Dispose();  // Dispose any existing timer
-                completionCheckTimer = new System.Threading.Timer(
-                    _ => isAt100Percent = isGameCompleted,  // Keep the flag aligned with game state
-                    null,
-                    10000,  // Check after 10 seconds
-                    10000); // And continue checking every 10 seconds
-
-                // Auto-save when reaching 100%
-                AutoSaveProgress();
-                return true;
-            }
-
-            // Normal flow for non-100% completion state
-            if (!isGameCompleted)
-            {
-                // Regular individual checking
-                foreach (DataGridViewRow row in routeGrid.Rows)
+                // If game just reached 100% complete, mark all entries as complete
+                if (isGameCompleted && !isAt100Percent)
                 {
-                    if (row.Tag is RouteEntry entry)
-                    {
-                        // Check if this entry should be completed based on its conditions
-                        bool shouldBeCompleted = CheckCompletion(entry, stats);
+                    // Clear the grid and re-add all entries as completed
+                    List<RouteEntry> entries = [];
 
-                        // Only update if completion status has changed
-                        if (shouldBeCompleted != entry.IsCompleted)
+                    foreach (DataGridViewRow row in routeGrid.Rows)
+                    {
+                        if (row.Tag is RouteEntry entry)
                         {
-                            entry.IsCompleted = shouldBeCompleted;
-                            row.Cells[1].Value = shouldBeCompleted ? "X" : "";
-                            anyChanges = true;
+                            entry.IsCompleted = true;  // Mark all entries as complete
+                            entries.Add(entry);
                         }
                     }
-                }
 
-                // If changes were made, sort and scroll
-                if (anyChanges)
-                {
-                    SortRouteGridByCompletion(routeGrid);
-                    ScrollToFirstIncomplete(routeGrid);
+                    // Clear and rebuild the grid with all entries as completed
+                    routeGrid.Rows.Clear();
+                    foreach (var entry in entries)
+                    {
+                        int rowIndex = routeGrid.Rows.Add(entry.DisplayText, "X");
+                        routeGrid.Rows[rowIndex].Tag = entry;
+                    }
 
-                    // Auto-save whenever any entry is marked as completed
+                    // Scroll to top since all entries are complete
+                    if (routeGrid.Rows.Count > 0)
+                        routeGrid.FirstDisplayedScrollingRowIndex = 0;
+
+                    Debug.WriteLine("Game at 100% completion - marked all route entries as complete");
+
+                    // Set the 100% flag and start the timer
+                    isAt100Percent = true;
+                    completionCheckTimer?.Dispose();  // Dispose any existing timer
+                    completionCheckTimer = new System.Threading.Timer(
+                        _ => isAt100Percent = isGameCompleted,  // Keep the flag aligned with game state
+                        null,
+                        10000,  // Check after 10 seconds
+                        10000); // And continue checking every 10 seconds
+
+                    // Auto-save when reaching 100%
                     AutoSaveProgress();
+                    return true;
                 }
+            }
+
+            // Regular processing for all games
+            // Check individual entries regardless of completion percentage
+            foreach (DataGridViewRow row in routeGrid.Rows)
+            {
+                if (row.Tag is RouteEntry entry)
+                {
+                    // Check if this entry should be completed based on its conditions
+                    bool shouldBeCompleted = CheckCompletion(entry, stats);
+
+                    // Only update if completion status has changed
+                    if (shouldBeCompleted != entry.IsCompleted)
+                    {
+                        entry.IsCompleted = shouldBeCompleted;
+                        row.Cells[1].Value = shouldBeCompleted ? "X" : "";
+                        anyChanges = true;
+                    }
+                }
+            }
+
+            // If changes were made, sort and scroll
+            if (anyChanges)
+            {
+                SortRouteGridByCompletion(routeGrid);
+                ScrollToFirstIncomplete(routeGrid);
+
+                // Auto-save whenever any entry is marked as completed
+                AutoSaveProgress();
             }
 
             return anyChanges;
@@ -489,7 +494,7 @@ namespace Route_Tracker
         // Decides if a specific route entry is complete or not
         // Looks at the entry type (viewpoint, chest, etc.) and checks the right stat
         // Handles special types like story missions differently from collectibles
-        private bool CheckCompletion(RouteEntry entry, StatsUpdatedEventArgs stats)
+        private bool CheckCompletion(RouteEntry entry, GameStatsEventArgs stats)
         {
             if (string.IsNullOrEmpty(entry.Type))
                 return false;
@@ -502,32 +507,39 @@ namespace Route_Tracker
             string normalizedType = entry.Type.Trim();
 
             // Get the special activity counts from the game stats
-            var specialCounts = gameConnectionManager?.GameStats is AC4GameStats ac4GameStats
-                ? ac4GameStats.GetSpecialActivityCounts()
-                : (0, 0, 0, 0);
+            // NOTE: This code is currently unused but kept for possible future use
+            /*
+            var specialCounts = new Dictionary<string, int>();
+            if (stats.Stats.TryGetValue("Special Activities", out var specialActivitiesObj) &&
+                specialActivitiesObj is Dictionary<string, int> specialActivities)
+            {
+                specialCounts = specialActivities;
+            }
+            */
 
-            // Use your exact names for matching
+            // Use your exact names for matching with dictionary-based approach
             return normalizedType switch
             {
-                "Story" or "story" => specialCounts.Item1 >= entry.Condition,
-                "Viewpoint" or "viewpoint" => stats.Viewpoints >= entry.Condition,
-                "Chest" or "chest" => stats.TotalChests >= entry.Condition,
-                "Animus Fragment" or "animus fragment" => stats.Fragments >= entry.Condition,
-                "Myan Stones" or "myan stones" => stats.Myan >= entry.Condition,
-                "Burired Treasure" or "burired treasure" => stats.Treasure >= entry.Condition,
-                "Assassin Contracts" or "assassin contracts" => stats.Assassin >= entry.Condition,
-                "Naval Contracts" or "naval contracts" => stats.Naval >= entry.Condition,
-                "Letters" or "letters" => stats.Letters >= entry.Condition,
-                "Manuscripts" or "manuscripts" => stats.Manuscripts >= entry.Condition,
-                "Shanty" or "shanty" => stats.Music >= entry.Condition,
-                "Forts" or "forts" => stats.Forts >= entry.Condition,
-                "Taverns" or "taverns" => stats.Taverns >= entry.Condition,
+                "Story" or "story" => stats.GetValue<int>("Story Missions", 0) >= entry.Condition,
+                "Viewpoint" or "viewpoint" => stats.GetValue<int>("Viewpoints", 0) >= entry.Condition,
+                "Chest" or "chest" => stats.GetValue<int>("Chests", 0) >= entry.Condition,
+                "Animus Fragment" or "animus fragment" => stats.GetValue<int>("Animus Fragments", 0) >= entry.Condition,
+                "Myan Stones" or "myan stones" => stats.GetValue<int>("Myan Stones", 0) >= entry.Condition,
+                "Burired Treasure" or "burired treasure" => stats.GetValue<int>("Buried Treasure", 0) >= entry.Condition,
+                "Assassin Contracts" or "assassin contracts" => stats.GetValue<int>("Assassin Contracts", 0) >= entry.Condition,
+                "Naval Contracts" or "naval contracts" => stats.GetValue<int>("Naval Contracts", 0) >= entry.Condition,
+                "Letters" or "letters" => stats.GetValue<int>("Letter Bottles", 0) >= entry.Condition,
+                "Manuscripts" or "manuscripts" => stats.GetValue<int>("Manuscripts", 0) >= entry.Condition,
+                "Shanty" or "shanty" => stats.GetValue<int>("Music Sheets", 0) >= entry.Condition,
+                "Forts" or "forts" => stats.GetValue<int>("Forts", 0) >= entry.Condition,
+                "Taverns" or "taverns" => stats.GetValue<int>("Taverns", 0) >= entry.Condition,
+                "Legendary Ships" or "legendary ships" => stats.GetValue<int>("Legendary Ships", 0) >= entry.Condition,
+                "Templar Hunts" or "templar hunts" => stats.GetValue<int>("Templar Hunts", 0) >= entry.Condition,
+                "Treasure Map" or "treasure map" => stats.GetValue<int>("Treasure Maps", 0) >= entry.Condition,
+                // Special case for upgrades
                 "Upgrades" or "upgrades" => gameConnectionManager?.GameStats is AC4GameStats upgradeStats &&
-                entry.Condition > 0 && entry.Condition <= upgradeStats.GetPurchasedUpgrades().Length &&
-                upgradeStats.GetPurchasedUpgrades()[entry.Condition - 1],
-                "Legendary Ships" or "legendary ships" => specialCounts.Item3 >= entry.Condition,
-                "Templar Hunts" or "templar hunts" => specialCounts.Item2 >= entry.Condition,
-                "Treasure Map" or "treasure map" => specialCounts.Item4 >= entry.Condition,
+                    entry.Condition > 0 && entry.Condition <= upgradeStats.GetPurchasedUpgrades().Length &&
+                    upgradeStats.GetPurchasedUpgrades()[entry.Condition - 1],
                 _ => false,
             };
         }
@@ -610,9 +622,9 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Silently saves progress whenever route entries change
         // Used for preserving progress between game sessions and crashes
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1869:",
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1869:",
         Justification = "Performance optimizations are minimal")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:",
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079:",
         Justification = "because i said so")]
         public void AutoSaveProgress()
         {
@@ -755,23 +767,23 @@ namespace Route_Tracker
         // Preserves progress across these state changes
         public void HandleGameStateTransition(DataGridView routeGrid)
         {
-            // Get current states from the game
-            (bool IsLoading, bool IsMainMenu) = (gameConnectionManager?.GameStats as AC4GameStats)?.GetGameStatus() ?? (false, false);
-            bool isLoading = IsLoading;
-            bool isMainMenu = IsMainMenu;
+            // Get current states from the game through base class method (works with any game)
+            (bool IsLoading, bool IsMainMenu) = gameConnectionManager?.GameStats?.GetGameStatus() ?? (false, false);
 
-            bool isCurrentlyInNonGameplay = isLoading || isMainMenu;
+            bool isCurrentlyInNonGameplay = IsLoading || IsMainMenu;
 
             // Entering loading or menu from gameplay
             if (isCurrentlyInNonGameplay && !wasPreviouslyInNonGameplay)
             {
-                Debug.WriteLine($"AC4: Entering non-gameplay state (Loading: {isLoading}, Menu: {isMainMenu}) - saving progress");
+                string gameName = gameConnectionManager?.GameStats?.GetType().Name ?? "Game";
+                Debug.WriteLine($"{gameName}: Entering non-gameplay state (Loading: {IsLoading}, Menu: {IsMainMenu}) - saving progress");
                 AutoSaveProgress();
             }
             // Returning to gameplay from loading or menu
             else if (!isCurrentlyInNonGameplay && wasPreviouslyInNonGameplay)
             {
-                Debug.WriteLine($"AC4: Returning to gameplay - loading saved progress");
+                string gameName = gameConnectionManager?.GameStats?.GetType().Name ?? "Game";
+                Debug.WriteLine($"{gameName}: Returning to gameplay - loading saved progress");
                 LoadAutoSave(routeGrid);
             }
 
@@ -982,6 +994,23 @@ namespace Route_Tracker
             }
             SortRouteGridByCompletion(routeGrid);
             ScrollToFirstIncomplete(routeGrid);
+        }
+        #endregion
+
+        #region completion percentage
+        public (float CompletionPercentage, int CompletedCount, int TotalCount) CalculateCompletionStats()
+        {
+            if (routeEntries == null || routeEntries.Count == 0)
+                return (0.00f, 0, 0);
+
+            int totalEntries = routeEntries.Count(e => !e.IsSkipped);
+            int completedEntries = routeEntries.Count(e => e.IsCompleted && !e.IsSkipped);
+
+            float percentage = totalEntries > 0
+                ? (float)Math.Round((float)completedEntries / totalEntries * 100, 2)
+                : 0.00f;
+
+            return (percentage, completedEntries, totalEntries);
         }
         #endregion
     }

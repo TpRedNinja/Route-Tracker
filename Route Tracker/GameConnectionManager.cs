@@ -28,8 +28,8 @@ namespace Route_Tracker
 
         private const int PROCESS_WM_READ = 0x0010;
 
-        // Forward the StatsUpdated event from GameStats
-        public event EventHandler<StatsUpdatedEventArgs>? StatsUpdated;
+        // Forward the GameStatsEventArgs event from GameStats
+        public event EventHandler<GameStatsEventArgs>? StatsUpdated;
 
         public bool IsConnected => processHandle != IntPtr.Zero && baseAddress != IntPtr.Zero;
         public GameStatsBase? GameStats => gameStats;
@@ -274,7 +274,7 @@ namespace Route_Tracker
         // Passes stats updates from the game reader to whoever's listening
         // Simple relay that forwards events without changing them
         // Uses ?. to avoid null reference exceptions if there are no listeners
-        private void OnGameStatsUpdated(object? sender, StatsUpdatedEventArgs e)
+        private void OnGameStatsUpdated(object? sender, GameStatsEventArgs e)
         {
             StatsUpdated?.Invoke(this, e);
         }

@@ -19,7 +19,11 @@ namespace Route_Tracker
 
         // Placeholder implementation of GetStats for God of War 2018
         // This satisfies the abstract method requirement but won't be used until fully implemented
-        public override (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        Justification = "Place holder function for now")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:",
+        Justification = "because i said so/ read above message")]
+        public (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,
             int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music,
             int Forts, int Taverns, int TotalChests) GetStats()
         {
@@ -37,6 +41,13 @@ namespace Route_Tracker
                 ["Game"] = "God of War 2018",
                 ["Status"] = "Placeholder - implementation pending"
             };
+        }
+
+        public override (bool IsLoading, bool IsMainMenu) GetGameStatus()
+        {
+            // For now, return false for both since we don't have implementation
+            // Later you can implement actual detection for GoW
+            return (false, false);
         }
     }
 }
