@@ -287,7 +287,7 @@ namespace Route_Tracker
         // The main method that gets all the stats from the game
         // Reads everything from memory: percentage, collectibles, etc.
         // Also checks if you've completed any special activities
-        public override (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,
+        public (int Percent, float PercentFloat, int Viewpoints, int Myan, int Treasure,
             int Fragments, int Assassin, int Naval, int Letters, int Manuscripts, int Music,
             int Forts, int Taverns, int TotalChests) GetStats()
         {
@@ -500,12 +500,12 @@ namespace Route_Tracker
         // Tells the route tracker how many special activities we've completed.
         // This is how the UI knows when to check off story missions, legendary ships, and treasure maps.
         // Returns a tuple with all four counter values at once.
-        public override (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
+        public (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
         {
             return (completedStoryMissions + modernDayMissions, totalTemplarHunts, legendaryShips, treasuremaps);
         }
 
-        public (bool IsLoading, bool IsMainMenu) GetGameStatus()
+        public override (bool IsLoading, bool IsMainMenu) GetGameStatus()
         {
             return (isLoading, isMainMenu);
         }
@@ -532,6 +532,55 @@ namespace Route_Tracker
         {
             return upgradePurchased;
         }
+
+        // ==========FORMAL COMMENT=========
+        // Returns all game statistics as a dictionary for flexible usage
+        // Gathers data from all memory reading methods into a single structure
+        // ==========MY NOTES==============
+        // This is the primary method that the UI uses to get all stats
+        // Returns everything in a dictionary so different games can have different stats
+        public override Dictionary<string, object> GetStatsAsDictionary()
+        {
+            // Get stats using existing methods
+            var (Percent, PercentFloat, Viewpoints, Myan, Treasure, Fragments, Assassin, Naval, Letters, Manuscripts, Music, Forts, Taverns, TotalChests) = GetStats();
+            var (StoryMissions, TemplarHunts, LegendaryShips, TreasureMaps) = GetSpecialActivityCounts();
+            var (IsLoading, IsMainMenu) = GetGameStatus();
+
+            // Return everything in a dictionary
+            return new Dictionary<string, object>
+            {
+                // Core stats
+                ["Completion Percentage"] = Percent,
+                ["Exact Percentage"] = Math.Round(PercentFloat, 2),
+                ["Viewpoints"] = Viewpoints,
+                ["Myan Stones"] = Myan,
+                ["Buried Treasure"] = Treasure,
+                ["Animus Fragments"] = Fragments,
+                ["Assassin Contracts"] = Assassin,
+                ["Naval Contracts"] = Naval,
+                ["Letter Bottles"] = Letters,
+                ["Manuscripts"] = Manuscripts,
+                ["Music Sheets"] = Music,
+                ["Forts"] = Forts,
+                ["Taverns"] = Taverns,
+                ["Chests"] = TotalChests,
+
+                // Special activities
+                ["Story Missions"] = StoryMissions,
+                ["Templar Hunts"] = TemplarHunts,
+                ["Legendary Ships"] = LegendaryShips,
+                ["Treasure Maps"] = TreasureMaps,
+
+                // Other stats
+                ["Total Upgrades"] = GetUpgradeCount(),
+                ["Modern Day Missions"] = modernDayMissions,
+
+                // Game state
+                ["Is Loading"] = IsLoading,
+                ["Is Main Menu"] = IsMainMenu
+            };
+        }
+
         #endregion
     }
 }

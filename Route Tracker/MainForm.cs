@@ -15,8 +15,19 @@ namespace Route_Tracker
     // static class so version number can be displayed and so we can get updates
     public static class AppInfo
     {
-        public const string Version = "v0.3-Beta";
+        public const string Version = "v0.4-Beta";
         public const string GitHubRepo = "TpRedNinja/Route-Tracker"; // e.g. "myuser/RouteTracker"
+    }
+
+    // Helper extension method for safe dictionary lookups
+    public static class DictionaryExtensions
+    {
+        public static T GetValueOrDefault<T>(this Dictionary<string, object> dict, string key, T defaultValue)
+        {
+            if (dict.TryGetValue(key, out var value) && value is T typedValue)
+                return typedValue;
+            return defaultValue;
+        }
     }
 
     // ==========FORMAL COMMENT=========
@@ -71,16 +82,16 @@ namespace Route_Tracker
         private Button saveButton = null!;
         private Button loadButton = null!;
         private Button resetButton = null!;
-        private readonly string lastSelectedGame = string.Empty;
-
-
+        private readonly string lastSelectedGame = string.Empty; //tbh idk if i should remove this keeping here for now
         private DataGridView routeGrid = null!;
-
         private TextBox gameDirectoryTextBox = null!; // Same approach
         private ToolStripComboBox? autoStartGameComboBox;
         private ToolStripMenuItem? enableAutoStartMenuItem;
-
         private bool isHotkeysEnabled = false;
+
+        private Label completionLabel = null!;
+        private Button showCompletionButton = null!;
+        private CompletionStatsWindow? completionStatsWindow;
 
         // ==========FORMAL COMMENT=========
         // Constructor - initializes the form and loads user settings
@@ -146,20 +157,22 @@ namespace Route_Tracker
                 Dock = DockStyle.Fill,
                 BackColor = AppTheme.BackgroundColor,
                 ColumnCount = 1,
-                RowCount = 2,
+                RowCount = 3, // Now using 3 rows
                 AutoSize = false,
                 Padding = new Padding(0),
                 Margin = new Padding(0)
             };
-            // Row 0: Top bar (auto size)
+            // Row 0: Top bar with buttons (auto size)
             mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            // Row 1: Route grid (fills remaining space)
+            // Row 1: Completion label row (auto size)
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            // Row 2: Route grid (fills remaining space)
             mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
             // --- Top bar for menu and buttons ---
             var topBar = new FlowLayoutPanel
             {
-                Dock = DockStyle.Top,
+                Dock = DockStyle.Fill,
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 FlowDirection = FlowDirection.LeftToRight,
@@ -252,8 +265,8 @@ namespace Route_Tracker
             // Show Stats button (now in top bar)
             showStatsButton = new Button
             {
-                Text = "Show Stats",
-                MinimumSize = new Size(100, 25),
+                Text = "Game Stats",
+                MinimumSize = new Size(80, 25),
                 AutoSize = true,
                 ForeColor = AppTheme.TextColor,
                 Font = AppTheme.DefaultFont,
@@ -263,10 +276,48 @@ namespace Route_Tracker
             showStatsButton.Click += ShowStatsMenuItem_Click;
             topBar.Controls.Add(showStatsButton);
 
+            // Completion stats button
+            showCompletionButton = new Button
+            {
+                Text = "Route Stats",
+                MinimumSize = new Size(80, 25),
+                AutoSize = true,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont,
+                Margin = new Padding(5, 2, 0, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+            showCompletionButton.Click += ShowCompletionStatsButton_Click;
+            topBar.Controls.Add(showCompletionButton);
+
             // Add topBar to the TableLayoutPanel
             mainLayout.Controls.Add(topBar, 0, 0);
 
-            // --- RouteGrid Panel (fills remaining area) ---
+            // --- Completion Label Row (second row) ---
+            var labelPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = AppTheme.BackgroundColor,
+                Padding = new Padding(10, 0, 0, 0) // Left padding to align with left edge
+            };
+
+            // Then add the completion label to this panel
+            completionLabel = new Label
+            {
+                Text = "Completion: 0.00%",
+                AutoSize = true,
+                TextAlign = ContentAlignment.MiddleLeft,
+                ForeColor = AppTheme.TextColor,
+                Font = new Font(AppTheme.DefaultFont.FontFamily, AppTheme.DefaultFont.Size + 2),  // Slightly larger font
+                Location = new Point(10, 0),  // Position at the left edge
+                Padding = new Padding(0, 3, 0, 3)
+            };
+            labelPanel.Controls.Add(completionLabel);
+
+            // Add the label panel to the second row
+            mainLayout.Controls.Add(labelPanel, 0, 1);
+
+            // --- RouteGrid Panel (third row, fills remaining area) ---
             routeGrid = CreateRouteGridView();
             routeGrid.Dock = DockStyle.Fill;
 
@@ -279,11 +330,30 @@ namespace Route_Tracker
             };
             routeGridPanel.Controls.Add(routeGrid);
 
-            // Add routeGridPanel to the TableLayoutPanel
-            mainLayout.Controls.Add(routeGridPanel, 0, 1);
+            // Add routeGridPanel to the TableLayoutPanel (now in row 2)
+            mainLayout.Controls.Add(routeGridPanel, 0, 2);
 
             // Add the TableLayoutPanel to the form
             this.Controls.Add(mainLayout);
+        }
+
+        private void ShowCompletionStatsButton_Click(object? sender, EventArgs e)
+        {
+            if (completionStatsWindow == null || completionStatsWindow.IsDisposed)
+                completionStatsWindow = new CompletionStatsWindow();
+
+            if (routeManager != null)
+            {
+                var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+                completionStatsWindow.UpdateStats(percentage, completed, total);
+            }
+            else
+            {
+                completionStatsWindow.UpdateStats(0.00f, 0, 0);
+            }
+
+            completionStatsWindow.Show();
+            completionStatsWindow.BringToFront();
         }
 
         private void ShowStatsMenuItem_Click(object? sender, EventArgs e)
@@ -294,28 +364,27 @@ namespace Route_Tracker
             // Try to get stats from the current game connection
             if (gameConnectionManager.GameStats is IGameStats stats)
             {
-                var (Percent, PercentFloat, Viewpoints, Myan, Treasure, Fragments, Assassin, Naval, Letters, Manuscripts, Music, Forts, Taverns, TotalChests) = stats.GetStats();
-                var (StoryMissions, TemplarHunts, LegendaryShips, TreasureMaps) = stats.GetSpecialActivityCounts();
+                var statsDict = stats.GetStatsAsDictionary();
 
                 string statsText =
-                    $"Completion Percentage: {Percent}%\n" +
-                    $"Completion Percentage Exact: {Math.Round(PercentFloat, 2)}%\n" +
-                    $"Viewpoints Completed: {Viewpoints}\n" +
-                    $"Myan Stones Collected: {Myan}\n" +
-                    $"Buried Treasure Collected: {Treasure}\n" +
-                    $"AnimusFragments Collected: {Fragments}\n" +
-                    $"AssassinContracts Completed: {Assassin}\n" +
-                    $"NavalContracts Completed: {Naval}\n" +
-                    $"LetterBottles Collected: {Letters}\n" +
-                    $"Manuscripts Collected: {Manuscripts}\n" +
-                    $"Music Sheets Collected: {Music}\n" +
-                    $"Forts Captured: {Forts}\n" +
-                    $"Taverns unlocked: {Taverns}\n" +
-                    $"Total Chests Collected: {TotalChests}\n" +
-                    $"Story Missions Completed: {StoryMissions}\n" +
-                    $"Templar Hunts Completed: {TemplarHunts}\n" +
-                    $"Legendary Ships Defeated: {LegendaryShips}\n" +
-                    $"Treasure Maps Collected: {TreasureMaps}";
+                    $"Completion Percentage: {statsDict.GetValueOrDefault("Completion Percentage", 0)}%\n" +
+                    $"Completion Percentage Exact: {statsDict.GetValueOrDefault("Exact Percentage", 0):F2}%\n" +
+                    $"Viewpoints Completed: {statsDict.GetValueOrDefault("Viewpoints", 0)}\n" +
+                    $"Myan Stones Collected: {statsDict.GetValueOrDefault("Myan Stones", 0)}\n" +
+                    $"Buried Treasure Collected: {statsDict.GetValueOrDefault("Buried Treasure", 0)}\n" +
+                    $"AnimusFragments Collected: {statsDict.GetValueOrDefault("Animus Fragments", 0)}\n" +
+                    $"AssassinContracts Completed: {statsDict.GetValueOrDefault("Assassin Contracts", 0)}\n" +
+                    $"NavalContracts Completed: {statsDict.GetValueOrDefault("Naval Contracts", 0)}\n" +
+                    $"LetterBottles Collected: {statsDict.GetValueOrDefault("Letter Bottles", 0)}\n" +
+                    $"Manuscripts Collected: {statsDict.GetValueOrDefault("Manuscripts", 0)}\n" +
+                    $"Music Sheets Collected: {statsDict.GetValueOrDefault("Music Sheets", 0)}\n" +
+                    $"Forts Captured: {statsDict.GetValueOrDefault("Forts", 0)}\n" +
+                    $"Taverns unlocked: {statsDict.GetValueOrDefault("Taverns", 0)}\n" +
+                    $"Total Chests Collected: {statsDict.GetValueOrDefault("Chests", 0)}\n" +
+                    $"Story Missions Completed: {statsDict.GetValueOrDefault("Story Missions", 0)}\n" +
+                    $"Templar Hunts Completed: {statsDict.GetValueOrDefault("Templar Hunts", 0)}\n" +
+                    $"Legendary Ships Defeated: {statsDict.GetValueOrDefault("Legendary Ships", 0)}\n" +
+                    $"Treasure Maps Collected: {statsDict.GetValueOrDefault("Treasure Maps", 0)}";
 
                 statsWindow.UpdateStats(statsText);
             }
@@ -551,6 +620,19 @@ namespace Route_Tracker
 
                 // Auto-save progress
                 routeManager?.AutoSaveProgress();
+
+                // Update completion percentage display
+                if (routeManager != null)
+                {
+                    var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+                    completionLabel.Text = $"Completion: {percentage:F2}%";
+
+                    // Also update the stats window if it's open
+                    if (completionStatsWindow != null && !completionStatsWindow.IsDisposed && completionStatsWindow.Visible)
+                    {
+                        completionStatsWindow.UpdateStats(percentage, completed, total);
+                    }
+                }
             }
         }
 
@@ -566,6 +648,18 @@ namespace Route_Tracker
 
                 // Auto-save progress
                 routeManager?.AutoSaveProgress();
+
+                if (routeManager != null)
+                {
+                    var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+                    completionLabel.Text = $"Completion: {percentage:F2}%";
+
+                    // Also update the stats window if it's open
+                    if (completionStatsWindow != null && !completionStatsWindow.IsDisposed && completionStatsWindow.Visible)
+                    {
+                        completionStatsWindow.UpdateStats(percentage, completed, total);
+                    }
+                }
             }
         }
 
@@ -827,12 +921,20 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Fills the route grid with actual data or shows a message
         // Handles cases where we're not connected yet
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059", 
+        Justification = "Values needed for clarity and completion tracking")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079", 
+        Justification = "Suppression required for code consistency")]
         private void LoadRouteData(DataGridView routeGrid)
         {
             if (routeManager != null)
             {
                 string selectedGame = GetSelectedGameName();
                 routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame);
+
+                // Update completion percentage after loading route data
+                var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+                completionLabel.Text = $"Completion: {percentage:F2}%";
             }
             else
             {
@@ -857,11 +959,29 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // This tells the RouteManager to check if any route items are complete
         // Gets called automatically whenever the game stats update
-        private void UpdateRouteCompletionStatus(DataGridView routeGrid, StatsUpdatedEventArgs stats)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style","IDE0059", 
+        Justification = "Values needed for clarity and completion tracking")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style","IDE0079", 
+        Justification = "Suppression required for code consistency")]
+        private void UpdateRouteCompletionStatus(DataGridView routeGrid, GameStatsEventArgs stats)
         {
             // Delegate all the route checking logic to the RouteManager
-            routeManager?.UpdateCompletionStatus(routeGrid, stats);
+            bool changed = routeManager?.UpdateCompletionStatus(routeGrid, stats) ?? false;
+
+            // Update the completion percentage label
+            if (routeManager != null)
+            {
+                var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+                completionLabel.Text = $"Completion: {percentage:F2}%";
+
+                // Also update the stats window if it's open
+                if (completionStatsWindow != null && !completionStatsWindow.IsDisposed && completionStatsWindow.Visible)
+                {
+                    completionStatsWindow.UpdateStats(percentage, completed, total);
+                }
+            }
         }
+
         #endregion
 
         #region Game Connection
@@ -968,7 +1088,7 @@ namespace Route_Tracker
         // This catches the stats when they update automatically
         // Updates the UI safely across threads to show the new numbers
         // The real workhorse that keeps the display current without clicking buttons
-        private void GameStats_StatsUpdated(object? sender, StatsUpdatedEventArgs e)
+        private void GameStats_StatsUpdated(object? sender, GameStatsEventArgs e)
         {
             // Throttle UI updates to prevent excessive redraws
             if (DateTime.Now - _lastUIUpdateTime < _minimumUIUpdateInterval)
@@ -987,28 +1107,28 @@ namespace Route_Tracker
                 // Update stats window if open
                 if (statsWindow != null && statsWindow.Visible)
                 {
-                    var (storyMissions, templarHunts, legendaryShips, treasureMaps) =
-                        gameConnectionManager.GameStats?.GetSpecialActivityCounts() ?? (0, 0, 0, 0);
+                    var stats = e.Stats;
 
+                    // Build the stats text using the dictionary approach
                     string statsText =
-                        $"Completion Percentage: {e.Percent}%\n" +
-                        $"Completion Percentage Exact: {Math.Round(e.PercentFloat, 2)}%\n" +
-                        $"Viewpoints Completed: {e.Viewpoints}\n" +
-                        $"Myan Stones Collected: {e.Myan}\n" +
-                        $"Buried Treasure Collected: {e.Treasure}\n" +
-                        $"AnimusFragments Collected: {e.Fragments}\n" +
-                        $"AssassinContracts Completed: {e.Assassin}\n" +
-                        $"NavalContracts Completed: {e.Naval}\n" +
-                        $"LetterBottles Collected: {e.Letters}\n" +
-                        $"Manuscripts Collected: {e.Manuscripts}\n" +
-                        $"Music Sheets Collected: {e.Music}\n" +
-                        $"Forts Captured: {e.Forts}\n" +
-                        $"Taverns unlocked: {e.Taverns}\n" +
-                        $"Total Chests Collected: {e.TotalChests}\n" +
-                        $"Story Missions Completed: {storyMissions}\n" +
-                        $"Templar Hunts Completed: {templarHunts}\n" +
-                        $"Legendary Ships Defeated: {legendaryShips}\n" +
-                        $"Treasure Maps Collected: {treasureMaps}";
+                        $"Completion Percentage: {e.GetValue<int>("Completion Percentage", 0)}%\n" +
+                        $"Completion Percentage Exact: {e.GetValue<float>("Exact Percentage", 0f):F2}%\n" +
+                        $"Viewpoints Completed: {e.GetValue<int>("Viewpoints", 0)}\n" +
+                        $"Myan Stones Collected: {e.GetValue<int>("Myan Stones", 0)}\n" +
+                        $"Buried Treasure Collected: {e.GetValue<int>("Buried Treasure", 0)}\n" +
+                        $"AnimusFragments Collected: {e.GetValue<int>("Animus Fragments", 0)}\n" +
+                        $"AssassinContracts Completed: {e.GetValue<int>("Assassin Contracts", 0)}\n" +
+                        $"NavalContracts Completed: {e.GetValue<int>("Naval Contracts", 0)}\n" +
+                        $"LetterBottles Collected: {e.GetValue<int>("Letter Bottles", 0)}\n" +
+                        $"Manuscripts Collected: {e.GetValue<int>("Manuscripts", 0)}\n" +
+                        $"Music Sheets Collected: {e.GetValue<int>("Music Sheets", 0)}\n" +
+                        $"Forts Captured: {e.GetValue<int>("Forts", 0)}\n" +
+                        $"Taverns unlocked: {e.GetValue<int>("Taverns", 0)}\n" +
+                        $"Total Chests Collected: {e.GetValue<int>("Chests", 0)}\n" +
+                        $"Story Missions Completed: {e.GetValue<int>("Story Missions", 0)}\n" +
+                        $"Templar Hunts Completed: {e.GetValue<int>("Templar Hunts", 0)}\n" +
+                        $"Legendary Ships Defeated: {e.GetValue<int>("Legendary Ships", 0)}\n" +
+                        $"Treasure Maps Collected: {e.GetValue<int>("Treasure Maps", 0)}";
 
                     statsWindow.UpdateStats(statsText);
                 }
