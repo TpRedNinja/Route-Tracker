@@ -18,8 +18,9 @@ namespace Route_Tracker
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.StartPosition = FormStartPosition.CenterParent;
-            this.BackColor = Color.Black;
-            this.ForeColor = Color.White;
+
+            // Apply AppTheme
+            AppTheme.ApplyTo(this);
 
             // Title label
             titleLabel = new Label
@@ -27,10 +28,11 @@ namespace Route_Tracker
                 Text = "Route Completion Statistics",
                 Dock = DockStyle.Top,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 12f, FontStyle.Bold),
-                ForeColor = Color.White,
+                Font = AppTheme.HeaderFont,
+                ForeColor = AppTheme.TextColor,
+                BackColor = AppTheme.BackgroundColor,
                 Height = 30,
-                Margin = new Padding(0, 10, 0, 10)
+                Margin = new Padding(0, AppTheme.StandardPadding, 0, AppTheme.StandardPadding)
             };
 
             // Percentage label
@@ -39,10 +41,11 @@ namespace Route_Tracker
                 Text = "Completion: 0.00%",
                 Dock = DockStyle.Top,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 14f),
-                ForeColor = Color.White,
+                Font = AppTheme.StatsFont,
+                ForeColor = AppTheme.TextColor, // Use accent color for main stat
+                BackColor = AppTheme.BackgroundColor,
                 Height = 40,
-                Margin = new Padding(0, 10, 0, 0)
+                Margin = new Padding(0, AppTheme.StandardPadding, 0, 0)
             };
 
             // Fraction label
@@ -51,8 +54,9 @@ namespace Route_Tracker
                 Text = "Completed: 0/0 entries",
                 Dock = DockStyle.Top,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 12f),
-                ForeColor = Color.White,
+                Font = AppTheme.DefaultFont,
+                ForeColor = AppTheme.TextColor,
+                BackColor = AppTheme.BackgroundColor,
                 Height = 30
             };
 

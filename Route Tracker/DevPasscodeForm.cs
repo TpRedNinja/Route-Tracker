@@ -22,6 +22,8 @@ namespace Route_Tracker
             this.Text = "Developer Passcode";
             this.TopMost = true;
 
+            AppTheme.ApplyToSettingsForm(this);
+
             var label = new Label
             {
                 Text = "Enter developer passcode:",
@@ -58,6 +60,11 @@ namespace Route_Tracker
 
             this.AcceptButton = okButton;
             this.CancelButton = cancelButton;
+
+            // Apply theme to buttons and other stuff
+            AppTheme.ApplyToButton(okButton);
+            AppTheme.ApplyToButton(cancelButton);
+            AppTheme.ApplyToTextBox(passcodeTextBox);
         }
     }
 }

@@ -157,9 +157,9 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Sets up our tracker to read AC4's memory
         // Calculates the starting point for finding all the collectibles
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290: Use primary constructure",
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290",
         Justification = "NO")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
         public AC4GameStats(IntPtr processHandle, IntPtr baseAddress)
     : base(processHandle, baseAddress)

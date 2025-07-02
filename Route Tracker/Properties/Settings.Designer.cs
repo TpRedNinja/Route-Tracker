@@ -142,5 +142,29 @@ namespace Route_Tracker.Properties {
                 this["DevMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LayoutMode {
+            get {
+                return ((string)(this["LayoutMode"]));
+            }
+            set {
+                this["LayoutMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TransparentBackground {
+            get {
+                return ((bool)(this["TransparentBackground"]));
+            }
+            set {
+                this["TransparentBackground"] = value;
+            }
+        }
     }
 }

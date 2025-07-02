@@ -12,6 +12,8 @@ namespace Route_Tracker
     // Used for the auto-start feature to know where to find the games
     public partial class GameDirectoryForm : Form
     {
+        public event EventHandler? DirectoryChanged;
+
         // ==========FORMAL COMMENT=========
         // Initializes a new game directory configuration form
         // Sets up the UI and prepares the form for user interaction
@@ -37,6 +39,7 @@ namespace Route_Tracker
         {
             this.Text = "Game Directory Settings";
             this.Size = new System.Drawing.Size(400, 200);
+            AppTheme.ApplyToSettingsForm(this);
 
             Label gameLabel = new()
             {
@@ -73,6 +76,11 @@ namespace Route_Tracker
             };
             browseButton.Click += BrowseButton_Click;
             this.Controls.Add(browseButton);
+
+            AppTheme.ApplyToButton(browseButton);
+            AppTheme.ApplyToComboBox(gameDropdown);
+            AppTheme.ApplyToTextBox(directoryTextBox);
+
         }
 
         // ==========FORMAL COMMENT=========
@@ -125,6 +133,8 @@ namespace Route_Tracker
                 Settings.Default.Gow2018Directory = directoryTextBox.Text;
             }
             Settings.Default.Save();
+
+            DirectoryChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }
