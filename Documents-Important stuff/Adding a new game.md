@@ -8,7 +8,7 @@ No prior experience required!
 
 ---
 
-[Target] 1. Gather What You Need
+🎯 1. Gather What You Need
 
 Before you start, make sure you have:
 
@@ -18,11 +18,11 @@ Before you start, make sure you have:
 
 - Route file data listing all the items/collectibles you want to track (see step 7 for details)
 
-[Tip] Use memory scanning tools like Cheat Engine to find memory addresses for collectibles.
+💡 Use memory scanning tools like Cheat Engine to find memory addresses for collectibles.
 
 ---
 
-[Tool] 2. Create the Game Stats Class
+🛠️ 2. Create the Game Stats Class
 
 File: Route Tracker\GoW2018GameStats.cs
 
@@ -92,7 +92,7 @@ What's happening here?
 
 ---
 
-[Link] 3. Update GameConnectionManager
+🔗 3. Update GameConnectionManager
 
 File: Route Tracker\GameConnectionManager.cs
 
@@ -194,7 +194,7 @@ This tells the program which executable to look for, how to start the game, and 
 
 ---
 
-[Settings] 4. Update SettingsManager
+⚙️ 4. Update SettingsManager
 
 File: Route Tracker\SettingsManager.cs
 
@@ -250,7 +250,7 @@ The program needs to know where your game is installed to launch it and attach t
 
 ---
 
-[UI] 5. Update UI Elements
+🖥️ 5. Update UI Elements
 
 The UI system has been reorganized into helper classes. You'll need to update multiple files:
 
@@ -343,7 +343,7 @@ The UI has been reorganized for better maintainability. The ConnectionWindow pro
 
 ---
 
-[SettingsProperty] 6. Add Settings Property
+🧩 6. Add Settings Property
 
 In your application settings (Settings.settings or Settings.Designer.cs), add a new property for your game's directory.
 ```csharp
@@ -369,7 +369,7 @@ Alternative: You can add this through Visual Studio's Settings editor:
 
 ---
 
-[RouteFile] 7. Create a Route File
+📄 7. Create a Route File
 
 Folder: Routes/
 
@@ -410,7 +410,7 @@ The enhanced route system now supports:
 
 ---
 
-[RouteManager] 8. Update RouteManager (If Needed)
+🧭 8. Update RouteManager (If Needed)
 
 File: Route Tracker\RouteManager.cs
 
@@ -451,7 +451,7 @@ This function matches the route file's "Type" column to the correct stat in your
 
 ---
 
-[StatsDisplay] 9. Update Stats Display (If Needed)
+📊 9. Update Stats Display (If Needed)
 
 File: Route Tracker\RouteHelpers.cs
 
@@ -496,7 +496,7 @@ private static string BuildStatsText(Dictionary<string, object> statsDict)
 ```
 ---
 
-[Testing] 10. Testing Your Implementation
+🧪 10. Testing Your Implementation
 
 Step-by-Step Testing
 
@@ -525,7 +525,7 @@ Debugging Checklist
 
 ---
 
-[Architecture] 11. Understanding the New Architecture
+🏗️ 11. Understanding the New Architecture
 
 The codebase has been reorganized for better maintainability:
 
@@ -553,7 +553,7 @@ The codebase has been reorganized for better maintainability:
 
 ---
 
-[Checklist] 12. Complete Implementation Checklist
+✅ 12. Complete Implementation Checklist
 - [ ] Create GoW2018GameStats.cs with proper memory reading
 - [ ] Add all pointer offsets for collectibles/stats
 - [ ] Update GameConnectionManager.DetectRunningGame()
@@ -575,7 +575,7 @@ The codebase has been reorganized for better maintainability:
 
 ---
 
-[RouteFileFormat] 13. Route File Format Reference
+🗂️ 13. Route File Format Reference
 
 AC4 vs GoW Example Comparison
 
@@ -601,7 +601,7 @@ Important Notes
 
 ---
 
-[Advanced] 14. Advanced Features (Optional)
+🚀 14. Advanced Features (Optional)
 
 The enhanced architecture now supports:
 
@@ -629,7 +629,7 @@ The enhanced architecture now supports:
 
 ---
 
-[Troubleshooting] 15. Troubleshooting Common Issues
+🛑 15. Troubleshooting Common Issues
 
 **Game Not Detected**
 - Verify the exact process name using Task Manager
@@ -662,7 +662,7 @@ The enhanced architecture now supports:
 
 ---
 
-[Congrats] 16. Congratulations!
+🎉 16. Congratulations!
 
 You've successfully added God of War 2018 to Route Tracker using the enhanced architecture. The same process can be applied to add any other game with the appropriate memory addresses and route data.
 
