@@ -1,10 +1,10 @@
 # Route Tracker
 
-A specialized tool designed for speedrunners to track their progress across multiple games.
+A specialized tool designed for speedrunners to track their progress across multiple games with real-time memory reading and advanced route management features.
 
 ## Overview
 
-Route Tracker reads game memory in real-time to track collectibles, missions, and progress during speedruns. This tool is specifically designed for speedrunners following pre-determined routes.
+Route Tracker reads game memory in real-time to track collectibles, missions, and progress during speedruns. This tool is specifically designed for speedrunners following pre-determined routes with comprehensive tracking and management capabilities.
 
 ## Game Support
 
@@ -17,19 +17,42 @@ See [Planned Stuff.md](Planned Stuff.md) for information about future game suppo
 
 ### Core Features
 - **Always On Top**: Keep the tracker visible while playing by toggling "Always On Top" in Settings
-- **Progress Saving/Loading**: Save your progress and load it later to continue tracking where you left off
-- **Text Wrapping**: Better readability for long route descriptions
 - **Automatic Game Detection**: Tool automatically detects supported games that are running
-- **Performance Optimizations**: Adaptive update rates reduce resource usage during idle periods
-- **Customizable Hotkeys**: Configure keyboard shortcuts to mark route entries as completed or skipped
-- **Manual Entry Management**: Ability to manually complete or skip route entries without game detection
-- **Stats Window**: The stats display has been moved to its own dedicated window for easier viewing and management
+- **Real-time Memory Reading**: Live tracking of game statistics without modifying game files
+- **Performance Optimizations**: Adaptive update rates and memory caching reduce resource usage
+- **Progress Saving/Loading**: Save your progress and load it later with cycling backup system
+- **Manual Entry Management**: Mark route entries as completed or skipped manually
+- **Right-click Context Menu**: Quick access to save/load progress and route file management
+
+### Advanced UI Features
+- **Multiple Layout Modes**: 
+  - Normal - Full interface with all controls
+  - Compact - Reduced interface, hidden filters
+  - Mini - Essential completion tracking only
+  - Overlay - Minimal vertical layout perfect for streaming
+- **Search and Filtering**: Real-time search through route entries with type-based filtering
+- **Customizable Hotkeys**: Configure keyboard shortcuts to mark entries as completed or skipped
+- **Separate Statistics Windows**: Dedicated windows for game stats and route completion stats
+- **Text Wrapping**: Better readability for long route descriptions
+- **Dark Theme**: Consistent dark theme throughout the application
+
+### Connection and Game Management
+- **Connection Window**: Streamlined game connection interface
+- **Auto-Start Game Support**: Automatically launch and connect to configured games on startup
+- **Game Directory Management**: Set custom game installation paths for each supported game
+- **Connection Status Indicators**: Clear feedback on connection state
 
 ### Update Management
-- **Automatic Update Check**: On startup, Route Tracker can automatically check for new releases on GitHub and prompt you to update.
-- **Update Settings**: Enable or disable automatic update checks via the Settings menu (`Check for Updates on Startup`).
-- **In-App Update Download**: If a new version is available, you can download and install it directly from the app UI.
-- **User-Friendly Error Handling**: Clear messages are shown if update information cannot be retrieved or if no downloadable asset is found.
+- **Automatic Update Check**: On startup, Route Tracker can automatically check for new releases on GitHub
+- **Update Settings**: Enable or disable automatic update checks via Settings menu
+- **In-App Update Download**: Download and install updates directly from the app
+- **Developer Mode**: Passcode-protected dev mode that disables update checks for development
+
+### Enhanced Data Management
+- **Cycling Autosave System**: Multiple numbered backup files with automatic rotation
+- **Settings Backup**: Automatic backup of all settings to AppData with restore functionality
+- **Progress Recovery**: Fallback system to load from backup files if main save is corrupted
+- **Settings Restoration**: First-run detection with option to restore from previous installation
 
 ### Assassin's Creed 4: Black Flag
 - **Real-time Collection Tracking**
@@ -38,46 +61,50 @@ See [Planned Stuff.md](Planned Stuff.md) for information about future game suppo
   - Taverns and other collectibles
 
 - **Mission Progress**
-  - Story Mission completion detection (now shown in stats window)
-  - Templar Hunt tracking (now shown in stats window)
-  - Legendary Ship battles (now shown in stats window)
-  - Treasure Map collection (now shown in stats window)
+  - Story Mission completion detection
+  - Templar Hunt tracking
+  - Legendary Ship battles
+  - Treasure Map collection
+  - Modern Day mission detection
 
 - **Upgrade Tracking**
-  - Weapons purchases
-  - Ship upgrades
+  - Ship upgrades with resource expenditure detection
   - Hero equipment upgrades
+  - Animal skin upgrades with checkpoint system
 
 - **Game State Detection**
-  - Automatically detects loading screens and main menu
-  - Preserves tracking data through game transitions
+  - Loading screen detection
+  - Main menu detection
+  - Automatic save/load during state transitions
 
 ### God of War (2018)
 - **Basic Tracking Implementation**
-  - Initial support for basic stats and progression
-  - More features coming soon
+  - little to no support
+  - full support coming after v1.0 releases
 
 ### Recent Improvements
 
-- **Stats Window**: Stats are now displayed in a separate window for better visibility.
-- **Expanded Stats**: Story missions, Templar hunts, treasure maps, and legendary ships are now included in the stats display.
-- **Save File Loading**: You can now load a save file even if you are not connected to a game.
-- **Completed Entry Sorting**: Completed route entries are now sorted by their ID, not by the order they were completed.
-- **UI and Option Enhancements**: Various new options and UI improvements have been added for a smoother experience.
+- **Enhanced UI Layout System**: Four distinct layout modes for different use cases
+- **Improved Connection Management**: Streamlined connection window with better game detection
+- **Advanced Backup Systems**: Both progress and settings now have robust backup mechanisms
+- **Memory Optimization**: Caching system reduces redundant memory reads
+- **UI Update Throttling**: Prevents excessive redraws for better performance
+- **Developer Tools**: Protected developer mode for testing and development
 
 ### Important Notes
 
-- **Speedrun Focus**: This tool is designed for speedrunners following specific routes. Casual players must follow routes exactly from the beginning.
-- **Route Files**: Routes are customizable by editing local files.
-- **Release Status**: Version 1.0 released with full AC4 support; additional game support in progress.
+- **Speedrun Focus**: This tool is designed for speedrunners following specific routes
+- **Route Files**: Routes are fully customizable by editing local TSV files
+- **Memory Safety**: Only reads game memory, never modifies game files or data
+- **Tournament Legal**: Memory reading approach is legal for tournaments where such tools are permitted
 
 ## How It Works
 
-Route Tracker reads game memory to access progression data without modifying game files or gameplay, making it tournament-legal for speedruns where such tools are permitted.
+Route Tracker uses Windows API calls to read game memory and access progression data without modifying game files or gameplay. The application features a sophisticated memory caching system and adaptive update frequencies for optimal performance.
 
 ## System Requirements
 
-- Windows 10 or later
+- Windows 10 or later (Windows 6.1+ supported)
 - .NET 8 Runtime
 - Supported games (installed separately)
 - Administrator privileges (required for memory reading)
@@ -88,18 +115,21 @@ If you're interested in contributing to this project, please reach out via Disco
 - **Discord**: NotTpRedNinja
 
 Areas where help is particularly welcome:
-- Memory address discovery
-- Route optimization
-- Additional game support
-- UI improvements
+- Memory address discovery for new games
+- Route optimization and creation
+- Additional game support implementation
+- UI/UX improvements
+- Performance optimizations
 
 ## Technical Details
 
-- Built with C# and .NET 8
-- Uses memory reading techniques to access game data
-- Routes stored in editable files for customization
-- Memory caching system for improved performance
-- **Auto-update system**: Checks GitHub for new releases and can update in-app
+- Built with C# 12.0 and .NET 8
+- Uses ProcessMemory64 library for memory access
+- Routes stored in editable TSV files for easy customization
+- Memory caching system with configurable cache duration
+- Adaptive timer system for performance optimization
+- JSON-based settings and backup system
+- **Auto-update system**: Checks GitHub releases API for updates
 
 ## Credits
 
@@ -109,14 +139,14 @@ Areas where help is particularly welcome:
 
 ## Developer's Note
 
-This project was developed through a combination of my own code and assistance from GitHub Copilot. I wrote some of the code not much but some or modify code when it was shit, discovered all memory addresses and pointers, and designed the overall architecture.
+This project was developed through a combination of custom implementation and assistance from GitHub Copilot. I personally discovered all memory addresses and pointers, designed the overall architecture, and wrote/modified significant portions of the code.
 
-The extensive comments throughout the code serve as reminders when I return after breaks from development. They help me quickly understand what each component does without having to relearn the entire codebase.
+The extensive comments throughout the code serve as documentation and reminders when returning to development after breaks. They help quickly understand component functionality without having to relearn the entire codebase.
 
-This project represents my learning journey in software development, combining my game knowledge with programming concepts to create a useful tool for the speedrunning community.
+This project represents my journey in software development, combining game knowledge with programming concepts to create a comprehensive tool for the speedrunning community.
 
 ## Legal Notice
 
 This tool does not modify any game files or game memory. It only reads data already accessible within the games. Use at your own discretion as terms of service for online components may vary.
 
-**Disclaimer**: This project was developed with some AI assistance through GitHub Copilot alongside significant custom implementation and game memory research by the author.
+**Disclaimer**: This project was developed with AI assistance through GitHub Copilot alongside significant custom implementation and game memory research by the author.
