@@ -515,13 +515,13 @@ Step-by-Step Testing
 
 Debugging Checklist
 
-[ ] Game executable name matches exactly (GoW.exe)
-[ ] Memory addresses are correct for your game version
-[ ] Route file is properly formatted (tab-separated, not spaces)
-[ ] Collectible types in route file match the switch statement
-[ ] Settings directory is set correctly
-[ ] ConnectionWindow shows your game in the dropdown
-[ ] Autosave system creates backup files correctly
+- [ ] Game executable name matches exactly (GoW.exe)
+- [ ] Memory addresses are correct for your game version
+- [ ] Route file is properly formatted (tab-separated, not spaces)
+- [ ] Collectible types in route file match the switch statement
+- [ ] Settings directory is set correctly
+- [ ] ConnectionWindow shows your game in the dropdown
+- [ ] Autosave system creates backup files correctly
 
 ---
 
