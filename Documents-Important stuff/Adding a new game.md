@@ -657,8 +657,11 @@ The enhanced architecture now supports:
 
 **UI Issues**
 • Ensure all helper classes are updated
+
 • Check that SettingsMenuManager includes your game
+
 • Verify ConnectionWindow shows your game option
+
 • Test different layout modes work correctly
 
 ---
