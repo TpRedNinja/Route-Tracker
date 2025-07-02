@@ -1,6 +1,6 @@
 # How to Add a New Game to Route Tracker (Updated Guide)
 
-This guide walks you through adding a new game—using God of War 2018 as an example—to Route Tracker.
+This guide walks you through adding a new gameâ€”using God of War 2018 as an exampleâ€”to Route Tracker.
 
 It covers everything: memory pointers, code changes, UI, settings, and route file structure, reflecting the current architecture after code reorganization.
 
@@ -12,11 +12,11 @@ No prior experience required!
 
 Before you start, make sure you have:
 
-• Game executable name (for God of War 2018, it's GoW.exe)
+â€¢ Game executable name (for God of War 2018, it's GoW.exe)
 
-• Memory pointers/offsets for each collectible or stat you want to track (e.g., ravens, chests, artifacts)
+â€¢ Memory pointers/offsets for each collectible or stat you want to track (e.g., ravens, chests, artifacts)
 
-• Route file data listing all the items/collectibles you want to track (see step 7 for details)
+â€¢ Route file data listing all the items/collectibles you want to track (see step 7 for details)
 
 [Tip] Use memory scanning tools like Cheat Engine to find memory addresses for collectibles.
 
@@ -82,13 +82,13 @@ namespace Route_Tracker
 
 What's happening here?
 
-• You define memory pointers for each collectible/stat as int[] arrays
+â€¢ You define memory pointers for each collectible/stat as int[] arrays
 
-• GetStatsAsDictionary() uses the enhanced ReadWithCache method for better performance
+â€¢ GetStatsAsDictionary() uses the enhanced ReadWithCache method for better performance
 
-• GetGameStatus() detects loading screens or main menu (implement based on your game's memory structure)
+â€¢ GetGameStatus() detects loading screens or main menu (implement based on your game's memory structure)
 
-• The base class now handles automatic updates, caching, and performance optimization
+â€¢ The base class now handles automatic updates, caching, and performance optimization
 
 ---
 
@@ -362,10 +362,10 @@ public string Gow2018Directory {
 
 Alternative: You can add this through Visual Studio's Settings editor:
 
-• Name: Gow2018Directory
-• Type: string
-• Scope: User
-• Value: (empty)
+â€¢ Name: Gow2018Directory
+â€¢ Type: string
+â€¢ Scope: User
+â€¢ Value: (empty)
 
 ---
 
@@ -398,10 +398,10 @@ Raven #2	Raven	2	Midgard - The River Pass
 
 Column Definitions
 
-• Name/Hint: What the player is looking for (displayed in the UI)
-• Type: The type of collectible (must match what your code checks for)
-• Number: Unique ID for that collectible (used for progress tracking)
-• Coordinates: (Optional) Location information for the player
+â€¢ Name/Hint: What the player is looking for (displayed in the UI)
+â€¢ Type: The type of collectible (must match what your code checks for)
+â€¢ Number: Unique ID for that collectible (used for progress tracking)
+â€¢ Coordinates: (Optional) Location information for the player
 
 The enhanced route system now supports:
 - Automatic progress saving with cycling backups
@@ -507,21 +507,21 @@ Step-by-Step Testing
 5. In Route Tracker, click "Connect to Game" and use the new ConnectionWindow
 6. Verify that:
 
-• Stats are updating in the Game Stats window
-• Route entries load from your TSV file
-• Items are marked complete when you collect them in-game
-• Progress is automatically saved with cycling backups
-• The enhanced UI features work correctly
+â€¢ Stats are updating in the Game Stats window
+â€¢ Route entries load from your TSV file
+â€¢ Items are marked complete when you collect them in-game
+â€¢ Progress is automatically saved with cycling backups
+â€¢ The enhanced UI features work correctly
 
 Debugging Checklist
 
-• [ ] Game executable name matches exactly (GoW.exe)
-• [ ] Memory addresses are correct for your game version
-• [ ] Route file is properly formatted (tab-separated, not spaces)
-• [ ] Collectible types in route file match the switch statement
-• [ ] Settings directory is set correctly
-• [ ] ConnectionWindow shows your game in the dropdown
-• [ ] Autosave system creates backup files correctly
+â€¢ [ ] Game executable name matches exactly (GoW.exe)
+â€¢ [ ] Memory addresses are correct for your game version
+â€¢ [ ] Route file is properly formatted (tab-separated, not spaces)
+â€¢ [ ] Collectible types in route file match the switch statement
+â€¢ [ ] Settings directory is set correctly
+â€¢ [ ] ConnectionWindow shows your game in the dropdown
+â€¢ [ ] Autosave system creates backup files correctly
 
 ---
 
@@ -555,24 +555,24 @@ The codebase has been reorganized for better maintainability:
 
 [Checklist] 12. Complete Implementation Checklist
 
-• [ ] Create GoW2018GameStats.cs with proper memory reading
-• [ ] Add all pointer offsets for collectibles/stats
-• [ ] Update GameConnectionManager.DetectRunningGame()
-• [ ] Update GameConnectionManager.InitializeGameStats()
-• [ ] Update GameConnectionManager.ConnectToGameAsync()
-• [ ] Update SettingsManager.GetGameDirectory()
-• [ ] Update SettingsManager.SaveDirectory()
-• [ ] Update SettingsManager.GetGamesWithDirectoriesSet()
-• [ ] Add game to ConnectionWindow dropdown
-• [ ] Add game to GameDirectoryForm dropdown
-• [ ] Add Gow2018Directory setting property
-• [ ] Create route TSV file with proper format
-• [ ] Update RouteManager.CheckCompletion() if needed
-• [ ] Update RouteHelpers.BuildStatsText() if desired
-• [ ] Test the complete workflow with enhanced features
-• [ ] Verify cycling autosave system works
-• [ ] Test connection window functionality
-• [ ] Verify settings backup system works
+â€¢ [ ] Create GoW2018GameStats.cs with proper memory reading
+â€¢ [ ] Add all pointer offsets for collectibles/stats
+â€¢ [ ] Update GameConnectionManager.DetectRunningGame()
+â€¢ [ ] Update GameConnectionManager.InitializeGameStats()
+â€¢ [ ] Update GameConnectionManager.ConnectToGameAsync()
+â€¢ [ ] Update SettingsManager.GetGameDirectory()
+â€¢ [ ] Update SettingsManager.SaveDirectory()
+â€¢ [ ] Update SettingsManager.GetGamesWithDirectoriesSet()
+â€¢ [ ] Add game to ConnectionWindow dropdown
+â€¢ [ ] Add game to GameDirectoryForm dropdown
+â€¢ [ ] Add Gow2018Directory setting property
+â€¢ [ ] Create route TSV file with proper format
+â€¢ [ ] Update RouteManager.CheckCompletion() if needed
+â€¢ [ ] Update RouteHelpers.BuildStatsText() if desired
+â€¢ [ ] Test the complete workflow with enhanced features
+â€¢ [ ] Verify cycling autosave system works
+â€¢ [ ] Test connection window functionality
+â€¢ [ ] Verify settings backup system works
 
 ---
 
@@ -595,10 +595,10 @@ Nornir Chest #1	Chest	1	Midgard - River Pass
 
 Important Notes
 
-• Use tabs (not spaces) to separate columns
-• The "Type" column must exactly match your switch statement cases
-• Numbers should be sequential for each type of collectible
-• Coordinates are optional but helpful for players
+â€¢ Use tabs (not spaces) to separate columns
+â€¢ The "Type" column must exactly match your switch statement cases
+â€¢ Numbers should be sequential for each type of collectible
+â€¢ Coordinates are optional but helpful for players
 
 ---
 
@@ -607,59 +607,59 @@ Important Notes
 The enhanced architecture now supports:
 
 **Memory Optimization:**
-• ReadWithCache() for efficient memory access
-• Automatic cache invalidation
-• Performance monitoring and adaptive updates
+â€¢ ReadWithCache() for efficient memory access
+â€¢ Automatic cache invalidation
+â€¢ Performance monitoring and adaptive updates
 
 **Enhanced Backup System:**
-• Cycling progress backups (1-10) with automatic rotation
-• Settings backup to AppData with restore functionality
-• Automatic backup creation on changes
+â€¢ Cycling progress backups (1-10) with automatic rotation
+â€¢ Settings backup to AppData with restore functionality
+â€¢ Automatic backup creation on changes
 
 **Improved UI:**
-• Multiple layout modes (Normal, Compact, Mini, Overlay)
-• Enhanced filtering and search capabilities
-• Better connection management with dedicated window
-• Right-click context menus for common actions
+â€¢ Multiple layout modes (Normal, Compact, Mini, Overlay)
+â€¢ Enhanced filtering and search capabilities
+â€¢ Better connection management with dedicated window
+â€¢ Right-click context menus for common actions
 
 **Advanced Route Features:**
-• Enhanced prerequisite system
-• Better completion tracking
-• Improved file searching with fallback locations
-• Support for game state transitions (loading, menu, gameplay)
+â€¢ Enhanced prerequisite system
+â€¢ Better completion tracking
+â€¢ Improved file searching with fallback locations
+â€¢ Support for game state transitions (loading, menu, gameplay)
 
 ---
 
 [Troubleshooting] 15. Troubleshooting Common Issues
 
 **Game Not Detected**
-• Verify the exact process name using Task Manager
-• Check ConnectionWindow dropdown includes your game
-• Ensure DetectRunningGame() includes your process mapping
+â€¢ Verify the exact process name using Task Manager
+â€¢ Check ConnectionWindow dropdown includes your game
+â€¢ Ensure DetectRunningGame() includes your process mapping
 
 **Stats Not Updating**
-• Confirm memory addresses are correct for your game version
-• Check if ReadWithCache() calls are properly implemented
-• Verify GameStatsBase inheritance is correct
-• Use Debug.WriteLine() to log stats retrieval
+â€¢ Confirm memory addresses are correct for your game version
+â€¢ Check if ReadWithCache() calls are properly implemented
+â€¢ Verify GameStatsBase inheritance is correct
+â€¢ Use Debug.WriteLine() to log stats retrieval
 
 **Route File Not Loading**
-• Check file format (TSV with tabs, not spaces)
-• Verify file is in the correct Routes/ folder
-• Ensure RouteManager.CheckCompletion() includes your collectible types
-• Test with the enhanced file searching system
+â€¢ Check file format (TSV with tabs, not spaces)
+â€¢ Verify file is in the correct Routes/ folder
+â€¢ Ensure RouteManager.CheckCompletion() includes your collectible types
+â€¢ Test with the enhanced file searching system
 
 **Connection Issues**
-• Use the new ConnectionWindow instead of old dropdown system
-• Check Settings > Game Directory is set correctly
-• Verify GameConnectionManager updates are complete
-• Run Route Tracker as administrator if needed
+â€¢ Use the new ConnectionWindow instead of old dropdown system
+â€¢ Check Settings > Game Directory is set correctly
+â€¢ Verify GameConnectionManager updates are complete
+â€¢ Run Route Tracker as administrator if needed
 
 **UI Issues**
-• Ensure all helper classes are updated
-• Check that SettingsMenuManager includes your game
-• Verify ConnectionWindow shows your game option
-• Test different layout modes work correctly
+â€¢ Ensure all helper classes are updated
+â€¢ Check that SettingsMenuManager includes your game
+â€¢ Verify ConnectionWindow shows your game option
+â€¢ Test different layout modes work correctly
 
 ---
 
