@@ -1,4 +1,4 @@
-\# How to Add a New Game to Route Tracker (Updated Guide)
+# How to Add a New Game to Route Tracker (Updated Guide)
 
 This guide walks you through adding a new game—using God of War 2018 as an example—to Route Tracker.
 
@@ -6,9 +6,9 @@ It covers everything: memory pointers, code changes, UI, settings, and route fil
 
 No prior experience required!
 
-\---
+---
 
-\[Target\] 1. Gather What You Need
+[Target] 1. Gather What You Need
 
 Before you start, make sure you have:
 
@@ -18,17 +18,17 @@ Before you start, make sure you have:
 
 • Route file data listing all the items/collectibles you want to track (see step 7 for details)
 
-\[Tip\] Use memory scanning tools like Cheat Engine to find memory addresses for collectibles.
+[Tip] Use memory scanning tools like Cheat Engine to find memory addresses for collectibles.
 
-\---
+---
 
-\[Tool\] 2. Create the Game Stats Class
+[Tool] 2. Create the Game Stats Class
 
-File: Route Tracker\\GoW2018GameStats.cs
+File: Route TrackerGoW2018GameStats.cs
 
-This class reads the game's memory and provides stats to the rest of the program. It inherits from the enhanced \`GameStatsBase\` class which now includes automatic caching, adaptive timers, and improved memory management.
+This class reads the game's memory and provides stats to the rest of the program. It inherits from the enhanced `GameStatsBase` class which now includes automatic caching, adaptive timers, and improved memory management.
 
-\`\`\`csharp
+```csharp
 
 using System;
 
@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 using System.Diagnostics;
 
-namespace Route\_Tracker
+namespace Route_Tracker
 
 {
 
@@ -46,11 +46,11 @@ public unsafe class GoW2018GameStats : GameStatsBase
 
 // Example: memory offsets for collectibles (replace with real values)
 
-private readonly int\[\] ravenOffsets = { 0x123, 0x456, 0x789 };
+private readonly int[] ravenOffsets = { 0x123, 0x456, 0x789 };
 
-private readonly int\[\] chestOffsets = { 0xABC, 0xDEF, 0x101 };
+private readonly int[] chestOffsets = { 0xABC, 0xDEF, 0x101 };
 
-private readonly int\[\] artifactOffsets = { 0x222, 0x333, 0x444 };
+private readonly int[] artifactOffsets = { 0x222, 0x333, 0x444 };
 
 // Pre-calculated base address for collectibles
 
@@ -88,13 +88,13 @@ return new Dictionary
 
 {
 
-\["Ravens"\] = ravens,
+["Ravens"] = ravens,
 
-\["Chests"\] = chests,
+["Chests"] = chests,
 
-\["Artifacts"\] = artifacts,
+["Artifacts"] = artifacts,
 
-\["Game"\] = "God of War 2018",
+["Game"] = "God of War 2018",
 
 // Add more stats as needed
 
@@ -118,11 +118,11 @@ return (false, false);
 
 }
 
-\`\`\`\`
+````
 
 What's happening here?
 
-• You define memory pointers for each collectible/stat as int\[\] arrays
+• You define memory pointers for each collectible/stat as int[] arrays
 
 • GetStatsAsDictionary() uses the enhanced ReadWithCache method for better performance
 
@@ -130,17 +130,17 @@ What's happening here?
 
 • The base class now handles automatic updates, caching, and performance optimization
 
-\---
+---
 
-\[Link\] 3. Update GameConnectionManager
+[Link] 3. Update GameConnectionManager
 
-File: Route Tracker\\GameConnectionManager.cs
+File: Route TrackerGameConnectionManager.cs
 
 The connection manager has been enhanced but the core integration points remain the same.
 
 3.1 Update the DetectRunningGame() method
 
-\`\`\`csharp
+```csharp
 
 public string DetectRunningGame()
 
@@ -204,11 +204,11 @@ return string.Empty; // No matching game found
 
 }
 
-\`\`\`
+```
 
 3.2 Update the InitializeGameStats() method
 
-\`\`\`csharp
+```csharp
 
 public void InitializeGameStats(string gameName)
 
@@ -228,7 +228,7 @@ gameStats = gameName switch
 
 "God of War 2018" => new GoW2018GameStats(processHandle, baseAddress),
 
-\_ => throw new NotSupportedException($"Game {gameName} is not supported")
+_ => throw new NotSupportedException($"Game {gameName} is not supported")
 
 };
 
@@ -240,11 +240,11 @@ gameStats.StartUpdating();
 
 }
 
-\`\`\`
+```
 
 3.3 Update the ConnectToGameAsync() method
 
-\`\`\`csharp
+```csharp
 
 public async Task ConnectToGameAsync(string gameName, bool autoStart = false)
 
@@ -302,23 +302,23 @@ return false;
 
 }
 
-\`\`\`
+```
 
 Why these changes?
 
 This tells the program which executable to look for, how to start the game, and which stats class to use when connecting.
 
-\---
+---
 
-\[Settings\] 4. Update SettingsManager
+[Settings] 4. Update SettingsManager
 
-File: Route Tracker\\SettingsManager.cs
+File: Route TrackerSettingsManager.cs
 
 The settings system has been enhanced with backup functionality, but the core game directory methods remain the same.
 
 4.1 Update GetGameDirectory() method
 
-\`\`\`chsarp
+```chsarp
 
 public string GetGameDirectory(string game)
 
@@ -336,11 +336,11 @@ return string.Empty;
 
 }
 
-\`\`\`
+```
 
 4.2 Update SaveDirectory() method
 
-\`\`\`chsarp
+```chsarp
 
 public void SaveDirectory(string selectedGame, string directory)
 
@@ -370,11 +370,11 @@ BackupSettings();
 
 }
 
-\`\`\`
+```
 
 4.3 Update GetGamesWithDirectoriesSet() method
 
-\`\`\`chsarp
+```chsarp
 
 public List GetGamesWithDirectoriesSet()
 
@@ -382,7 +382,7 @@ public List GetGamesWithDirectoriesSet()
 
 var games = new List();
 
-var supportedGames = new\[\] { "Assassin's Creed 4", "God of War 2018" };
+var supportedGames = new[] { "Assassin's Creed 4", "God of War 2018" };
 
 foreach (var game in supportedGames)
 
@@ -398,25 +398,25 @@ return games;
 
 }
 
-\`\`\`
+```
 
 Why these changes?
 
 The program needs to know where your game is installed to launch it and attach to its process. The enhanced settings manager now automatically backs up settings when changed.
 
-\---
+---
 
-\[UI\] 5. Update UI Elements
+[UI] 5. Update UI Elements
 
 The UI system has been reorganized into helper classes. You'll need to update multiple files:
 
 5.1 Update ConnectionWindow
 
-File: Route Tracker\\ConnectionWindow.cs
+File: Route TrackerConnectionWindow.cs
 
 This is the new dedicated connection window that replaced the old dropdown system.
 
-\`\`\`chsarp
+```chsarp
 
 private void InitializeCustomComponents()
 
@@ -466,7 +466,7 @@ DropDownStyle = ComboBoxStyle.DropDownList
 
 };
 
-gameDropdown.Items.AddRange(\["", "Assassin's Creed 4", "God of War 2018"\]); // Add your game here
+gameDropdown.Items.AddRange(["", "Assassin's Creed 4", "God of War 2018"]); // Add your game here
 
 gameDropdown.SelectedIndex = 0;
 
@@ -476,17 +476,17 @@ this.Controls.Add(gameDropdown);
 
 }
 
-\`\`\`
+```
 
 5.2 Update GameDirectoryForm
 
-File: Route Tracker\\GameDirectoryForm.cs
+File: Route TrackerGameDirectoryForm.cs
 
-Update the GameDropdown\_SelectedIndexChanged method and SaveDirectory method.
+Update the GameDropdown_SelectedIndexChanged method and SaveDirectory method.
 
-\`\`\`chsarp
+```chsarp
 
-private void GameDropdown\_SelectedIndexChanged(object? sender, EventArgs e)
+private void GameDropdown_SelectedIndexChanged(object? sender, EventArgs e)
 
 {
 
@@ -510,15 +510,15 @@ directoryTextBox.Text = Settings.Default.Gow2018Directory;
 
 }
 
-\`\`\`
+```
 
 5.3 Update GameDirectoryForm - SaveDirectory
 
-File: Route Tracker\\GameDirectoryForm.cs
+File: Route TrackerGameDirectoryForm.cs
 
 The settings menu is now managed in its own class. The auto-start dropdown automatically updates when you add games, so no changes are needed here unless you want to add game-specific settings.
 
-\`\`\`chsarp
+```chsarp
 
 private void SaveDirectory()
 
@@ -548,43 +548,43 @@ DirectoryChanged?.Invoke(this, EventArgs.Empty);
 
 }
 
-\`\`\`
+```
 
 Why these changes?
 
 The UI has been reorganized for better maintainability. The ConnectionWindow provides a cleaner connection experience, and settings are managed centrally.
 
-\---
+---
 
-\[SettingsProperty\] 6. Add Settings Property
+[SettingsProperty] 6. Add Settings Property
 
 In your application settings (Settings.settings or Settings.Designer.cs), add a new property for your game's directory.
 
-\`\`\`csharp
+```csharp
 
-\[global::System.Configuration.UserScopedSettingAttribute()\]
+[global::System.Configuration.UserScopedSettingAttribute()]
 
-\[global::System.Diagnostics.DebuggerNonUserCodeAttribute()\]
+[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 
-\[global::System.Configuration.DefaultSettingValueAttribute("")\]
+[global::System.Configuration.DefaultSettingValueAttribute("")]
 
 public string Gow2018Directory {
 
 get {
 
-return ((string)(this\["Gow2018Directory"\]));
+return ((string)(this["Gow2018Directory"]));
 
 }
 
 set {
 
-this\["Gow2018Directory"\] = value;
+this["Gow2018Directory"] = value;
 
 }
 
 }
 
-\`\`\`
+```
 
 Alternative: You can add this through Visual Studio's Settings editor:
 
@@ -596,9 +596,9 @@ Alternative: You can add this through Visual Studio's Settings editor:
 
 • Value: (empty)
 
-\---
+---
 
-\[RouteFile\] 7. Create a Route File
+[RouteFile] 7. Create a Route File
 
 Folder: Routes/
 
@@ -622,7 +622,7 @@ Each line is a tab-separated value (TSV) with these columns:
 
 Example File Content:
 
-\`\`\`tsv
+```tsv
 
 Raven #1Raven1Midgard - Wildwoods
 
@@ -634,7 +634,7 @@ Legendary Chest #1Chest2Midgard - Witch's Cave
 
 Raven #2Raven2Midgard - The River Pass
 
-\`\`\`\`
+````
 
 Column Definitions
 
@@ -648,21 +648,21 @@ Column Definitions
 
 The enhanced route system now supports:
 
-\- Automatic progress saving with cycling backups
+- Automatic progress saving with cycling backups
 
-\- Better prerequisite tracking
+- Better prerequisite tracking
 
-\- Enhanced filtering and search capabilities
+- Enhanced filtering and search capabilities
 
-\---
+---
 
-\[RouteManager\] 8. Update RouteManager (If Needed)
+[RouteManager] 8. Update RouteManager (If Needed)
 
-File: Route Tracker\\RouteManager.cs
+File: Route TrackerRouteManager.cs
 
 The RouteManager has been significantly enhanced but the core completion checking logic remains in the same place. If your new game has unique collectible types, update the CheckCompletion method.
 
-\`\`\`csharp
+```csharp
 
 private bool CheckCompletion(RouteEntry entry, GameStatsEventArgs stats)
 
@@ -698,41 +698,41 @@ return normalizedType switch
 
 // Add more types as needed
 
-\_ => false,
+_ => false,
 
 };
 
 }
 
-\`\`\`
+```
 
 Why this change?
 
 This function matches the route file's "Type" column to the correct stat in your code, enabling automatic completion detection. The enhanced RouteManager now includes:
 
-\- Cycling autosave system with numbered backups
+- Cycling autosave system with numbered backups
 
-\- Better file searching capabilities
+- Better file searching capabilities
 
-\- Enhanced completion tracking
+- Enhanced completion tracking
 
-\---
+---
 
-\[StatsDisplay\] 9. Update Stats Display (If Needed)
+[StatsDisplay] 9. Update Stats Display (If Needed)
 
-File: Route Tracker\\RouteHelpers.cs
+File: Route TrackerRouteHelpers.cs
 
 The stats display system has been reorganized into RouteHelpers. If you want your new game's stats to appear in the stats window, update the BuildStatsText method to include your game's specific statistics.
 
-\`\`\`csharp
+```csharp
 
 private static string BuildStatsText(Dictionary statsDict)
 
 {
 
-string baseStats = $"Completion Percentage: {statsDict.GetValueOrDefault("Completion Percentage", 0)}%\\n" +
+string baseStats = $"Completion Percentage: {statsDict.GetValueOrDefault("Completion Percentage", 0)}%n" +
 
-$"Completion Percentage Exact: {statsDict.GetValueOrDefault("Exact Percentage", 0):F2}%\\n";
+$"Completion Percentage Exact: {statsDict.GetValueOrDefault("Exact Percentage", 0):F2}%n";
 
 // Add AC4 stats if present
 
@@ -740,37 +740,37 @@ if (statsDict.ContainsKey("Viewpoints"))
 
 {
 
-baseStats += $"Viewpoints Completed: {statsDict.GetValueOrDefault("Viewpoints", 0)}\\n" +
+baseStats += $"Viewpoints Completed: {statsDict.GetValueOrDefault("Viewpoints", 0)}n" +
 
-$"Myan Stones Collected: {statsDict.GetValueOrDefault("Myan Stones", 0)}\\n" +
+$"Myan Stones Collected: {statsDict.GetValueOrDefault("Myan Stones", 0)}n" +
 
-$"Buried Treasure Collected: {statsDict.GetValueOrDefault("Buried Treasure", 0)}\\n" +
+$"Buried Treasure Collected: {statsDict.GetValueOrDefault("Buried Treasure", 0)}n" +
 
-$"AnimusFragments Collected: {statsDict.GetValueOrDefault("Animus Fragments", 0)}\\n" +
+$"AnimusFragments Collected: {statsDict.GetValueOrDefault("Animus Fragments", 0)}n" +
 
-$"AssassinContracts Completed: {statsDict.GetValueOrDefault("Assassin Contracts", 0)}\\n" +
+$"AssassinContracts Completed: {statsDict.GetValueOrDefault("Assassin Contracts", 0)}n" +
 
-$"NavalContracts Completed: {statsDict.GetValueOrDefault("Naval Contracts", 0)}\\n" +
+$"NavalContracts Completed: {statsDict.GetValueOrDefault("Naval Contracts", 0)}n" +
 
-$"LetterBottles Collected: {statsDict.GetValueOrDefault("Letter Bottles", 0)}\\n" +
+$"LetterBottles Collected: {statsDict.GetValueOrDefault("Letter Bottles", 0)}n" +
 
-$"Manuscripts Collected: {statsDict.GetValueOrDefault("Manuscripts", 0)}\\n" +
+$"Manuscripts Collected: {statsDict.GetValueOrDefault("Manuscripts", 0)}n" +
 
-$"Music Sheets Collected: {statsDict.GetValueOrDefault("Music Sheets", 0)}\\n" +
+$"Music Sheets Collected: {statsDict.GetValueOrDefault("Music Sheets", 0)}n" +
 
-$"Forts Captured: {statsDict.GetValueOrDefault("Forts", 0)}\\n" +
+$"Forts Captured: {statsDict.GetValueOrDefault("Forts", 0)}n" +
 
-$"Taverns unlocked: {statsDict.GetValueOrDefault("Taverns", 0)}\\n" +
+$"Taverns unlocked: {statsDict.GetValueOrDefault("Taverns", 0)}n" +
 
-$"Total Chests Collected: {statsDict.GetValueOrDefault("Chests", 0)}\\n" +
+$"Total Chests Collected: {statsDict.GetValueOrDefault("Chests", 0)}n" +
 
-$"Story Missions Completed: {statsDict.GetValueOrDefault("Story Missions", 0)}\\n" +
+$"Story Missions Completed: {statsDict.GetValueOrDefault("Story Missions", 0)}n" +
 
-$"Templar Hunts Completed: {statsDict.GetValueOrDefault("Templar Hunts", 0)}\\n" +
+$"Templar Hunts Completed: {statsDict.GetValueOrDefault("Templar Hunts", 0)}n" +
 
-$"Legendary Ships Defeated: {statsDict.GetValueOrDefault("Legendary Ships", 0)}\\n" +
+$"Legendary Ships Defeated: {statsDict.GetValueOrDefault("Legendary Ships", 0)}n" +
 
-$"Treasure Maps Collected: {statsDict.GetValueOrDefault("Treasure Maps", 0)}\\n";
+$"Treasure Maps Collected: {statsDict.GetValueOrDefault("Treasure Maps", 0)}n";
 
 }
 
@@ -780,11 +780,11 @@ if (statsDict.ContainsKey("Ravens"))
 
 {
 
-baseStats += $"Ravens Collected: {statsDict.GetValueOrDefault("Ravens", 0)}\\n" +
+baseStats += $"Ravens Collected: {statsDict.GetValueOrDefault("Ravens", 0)}n" +
 
-$"Artifacts Found: {statsDict.GetValueOrDefault("Artifacts", 0)}\\n" +
+$"Artifacts Found: {statsDict.GetValueOrDefault("Artifacts", 0)}n" +
 
-$"Chests Opened: {statsDict.GetValueOrDefault("Chests", 0)}\\n";
+$"Chests Opened: {statsDict.GetValueOrDefault("Chests", 0)}n";
 
 }
 
@@ -792,25 +792,25 @@ return baseStats;
 
 }
 
-\`\`\`
+```
 
-\---
+---
 
-\[Testing\] 10. Testing Your Implementation
+[Testing] 10. Testing Your Implementation
 
 Step-by-Step Testing
 
-1\. Build and run the application
+1. Build and run the application
 
-2\. Open Settings > Game Directory
+2. Open Settings > Game Directory
 
-3\. Select "God of War 2018" and set its installation directory
+3. Select "God of War 2018" and set its installation directory
 
-4\. Start God of War 2018
+4. Start God of War 2018
 
-5\. In Route Tracker, click "Connect to Game" and use the new ConnectionWindow
+5. In Route Tracker, click "Connect to Game" and use the new ConnectionWindow
 
-6\. Verify that:
+6. Verify that:
 
 • Stats are updating in the Game Stats window
 
@@ -824,113 +824,113 @@ Step-by-Step Testing
 
 Debugging Checklist
 
-\[ \] Game executable name matches exactly (GoW.exe)
+[ ] Game executable name matches exactly (GoW.exe)
 
-\[ \] Memory addresses are correct for your game version
+[ ] Memory addresses are correct for your game version
 
-\[ \] Route file is properly formatted (tab-separated, not spaces)
+[ ] Route file is properly formatted (tab-separated, not spaces)
 
-\[ \] Collectible types in route file match the switch statement
+[ ] Collectible types in route file match the switch statement
 
-\[ \] Settings directory is set correctly
+[ ] Settings directory is set correctly
 
-\[ \] ConnectionWindow shows your game in the dropdown
+[ ] ConnectionWindow shows your game in the dropdown
 
-\[ \] Autosave system creates backup files correctly
+[ ] Autosave system creates backup files correctly
 
-\---
+---
 
-\[Architecture\] 11. Understanding the New Architecture
+[Architecture] 11. Understanding the New Architecture
 
 The codebase has been reorganized for better maintainability:
 
-\*\*Helper Classes:\*\*
+**Helper Classes:**
 
-\- \*\*RouteHelpers.cs\*\*: Route data management, filtering, game connection, and window management
+- **RouteHelpers.cs**: Route data management, filtering, game connection, and window management
 
-\- \*\*MainFormHelpers.cs\*\*: UI creation, context menus, and hotkey processing
+- **MainFormHelpers.cs**: UI creation, context menus, and hotkey processing
 
-\- \*\*SettingsMenuManager.cs\*\*: Settings menu creation and management
+- **SettingsMenuManager.cs**: Settings menu creation and management
 
-\- \*\*LayoutManager.cs\*\*: UI layout management for different modes
+- **LayoutManager.cs**: UI layout management for different modes
 
-\*\*Enhanced Features:\*\*
+**Enhanced Features:**
 
-\- \*\*Memory Caching\*\*: GameStatsBase now includes automatic caching for better performance
+- **Memory Caching**: GameStatsBase now includes automatic caching for better performance
 
-\- \*\*Adaptive Timers\*\*: Update frequency adjusts based on player activity
+- **Adaptive Timers**: Update frequency adjusts based on player activity
 
-\- \*\*Cycling Backups\*\*: Progress saves with numbered backups (1-10) that cycle
+- **Cycling Backups**: Progress saves with numbered backups (1-10) that cycle
 
-\- \*\*Settings Backup\*\*: Automatic settings backup to AppData with restore functionality
+- **Settings Backup**: Automatic settings backup to AppData with restore functionality
 
-\- \*\*Enhanced UI\*\*: Multiple layout modes, better connection window, improved filtering
+- **Enhanced UI**: Multiple layout modes, better connection window, improved filtering
 
-\*\*Key Files to Update:\*\*
+**Key Files to Update:**
 
-1\. \*\*GameStatsBase\*\*: Your game stats class (inherits enhanced features)
+1. **GameStatsBase**: Your game stats class (inherits enhanced features)
 
-2\. \*\*GameConnectionManager\*\*: Game detection and connection logic
+2. **GameConnectionManager**: Game detection and connection logic
 
-3\. \*\*SettingsManager\*\*: Game directory management
+3. **SettingsManager**: Game directory management
 
-4\. \*\*ConnectionWindow\*\*: Game selection and connection UI
+4. **ConnectionWindow**: Game selection and connection UI
 
-5\. \*\*GameDirectoryForm\*\*: Directory selection UI
+5. **GameDirectoryForm**: Directory selection UI
 
-6\. \*\*RouteManager\*\*: Route completion logic (if needed)
+6. **RouteManager**: Route completion logic (if needed)
 
-7\. \*\*RouteHelpers\*\*: Stats display (if desired)
+7. **RouteHelpers**: Stats display (if desired)
 
-\---
+---
 
-\[Checklist\] 12. Complete Implementation Checklist
+[Checklist] 12. Complete Implementation Checklist
 
-\[ \] Create GoW2018GameStats.cs with proper memory reading
+[ ] Create GoW2018GameStats.cs with proper memory reading
 
-\[ \] Add all pointer offsets for collectibles/stats
+[ ] Add all pointer offsets for collectibles/stats
 
-\[ \] Update GameConnectionManager.DetectRunningGame()
+[ ] Update GameConnectionManager.DetectRunningGame()
 
-\[ \] Update GameConnectionManager.InitializeGameStats()
+[ ] Update GameConnectionManager.InitializeGameStats()
 
-\[ \] Update GameConnectionManager.ConnectToGameAsync()
+[ ] Update GameConnectionManager.ConnectToGameAsync()
 
-\[ \] Update SettingsManager.GetGameDirectory()
+[ ] Update SettingsManager.GetGameDirectory()
 
-\[ \] Update SettingsManager.SaveDirectory()
+[ ] Update SettingsManager.SaveDirectory()
 
-\[ \] Update SettingsManager.GetGamesWithDirectoriesSet()
+[ ] Update SettingsManager.GetGamesWithDirectoriesSet()
 
-\[ \] Add game to ConnectionWindow dropdown
+[ ] Add game to ConnectionWindow dropdown
 
-\[ \] Add game to GameDirectoryForm dropdown
+[ ] Add game to GameDirectoryForm dropdown
 
-\[ \] Add Gow2018Directory setting property
+[ ] Add Gow2018Directory setting property
 
-\[ \] Create route TSV file with proper format
+[ ] Create route TSV file with proper format
 
-\[ \] Update RouteManager.CheckCompletion() if needed
+[ ] Update RouteManager.CheckCompletion() if needed
 
-\[ \] Update RouteHelpers.BuildStatsText() if desired
+[ ] Update RouteHelpers.BuildStatsText() if desired
 
-\[ \] Test the complete workflow with enhanced features
+[ ] Test the complete workflow with enhanced features
 
-\[ \] Verify cycling autosave system works
+[ ] Verify cycling autosave system works
 
-\[ \] Test connection window functionality
+[ ] Test connection window functionality
 
-\[ \] Verify settings backup system works
+[ ] Verify settings backup system works
 
-\---
+---
 
-\[RouteFileFormat\] 13. Route File Format Reference
+[RouteFileFormat] 13. Route File Format Reference
 
 AC4 vs GoW Example Comparison
 
 Assassin's Creed 4:
 
-\`\`\`tsv
+```tsv
 
 Havana Viewpoint 1Viewpoint1
 
@@ -938,17 +938,17 @@ Havana Havana Chest 1
 
 Chest1Havana
 
-\`\`\`
+```
 
 God of War 2018:
 
-\`\`\`tsv
+```tsv
 
 Raven #1Raven1Midgard - Wildwoods
 
 Nornir Chest #1Chest1Midgard - River Pass
 
-\`\`\`
+```
 
 Important Notes
 
@@ -960,13 +960,13 @@ Important Notes
 
 • Coordinates are optional but helpful for players
 
-\---
+---
 
-\[Advanced\] 14. Advanced Features (Optional)
+[Advanced] 14. Advanced Features (Optional)
 
 The enhanced architecture now supports:
 
-\*\*Memory Optimization:\*\*
+**Memory Optimization:**
 
 • ReadWithCache() for efficient memory access
 
@@ -974,7 +974,7 @@ The enhanced architecture now supports:
 
 • Performance monitoring and adaptive updates
 
-\*\*Enhanced Backup System:\*\*
+**Enhanced Backup System:**
 
 • Cycling progress backups (1-10) with automatic rotation
 
@@ -982,7 +982,7 @@ The enhanced architecture now supports:
 
 • Automatic backup creation on changes
 
-\*\*Improved UI:\*\*
+**Improved UI:**
 
 • Multiple layout modes (Normal, Compact, Mini, Overlay)
 
@@ -992,7 +992,7 @@ The enhanced architecture now supports:
 
 • Right-click context menus for common actions
 
-\*\*Advanced Route Features:\*\*
+**Advanced Route Features:**
 
 • Enhanced prerequisite system
 
@@ -1002,11 +1002,11 @@ The enhanced architecture now supports:
 
 • Support for game state transitions (loading, menu, gameplay)
 
-\---
+---
 
-\[Troubleshooting\] 15. Troubleshooting Common Issues
+[Troubleshooting] 15. Troubleshooting Common Issues
 
-\*\*Game Not Detected\*\*
+**Game Not Detected**
 
 • Verify the exact process name using Task Manager
 
@@ -1014,7 +1014,7 @@ The enhanced architecture now supports:
 
 • Ensure DetectRunningGame() includes your process mapping
 
-\*\*Stats Not Updating\*\*
+**Stats Not Updating**
 
 • Confirm memory addresses are correct for your game version
 
@@ -1024,7 +1024,7 @@ The enhanced architecture now supports:
 
 • Use Debug.WriteLine() to log stats retrieval
 
-\*\*Route File Not Loading\*\*
+**Route File Not Loading**
 
 • Check file format (TSV with tabs, not spaces)
 
@@ -1034,7 +1034,7 @@ The enhanced architecture now supports:
 
 • Test with the enhanced file searching system
 
-\*\*Connection Issues\*\*
+**Connection Issues**
 
 • Use the new ConnectionWindow instead of old dropdown system
 
@@ -1044,7 +1044,7 @@ The enhanced architecture now supports:
 
 • Run Route Tracker as administrator if needed
 
-\*\*UI Issues\*\*
+**UI Issues**
 
 • Ensure all helper classes are updated
 
@@ -1054,24 +1054,24 @@ The enhanced architecture now supports:
 
 • Test different layout modes work correctly
 
-\---
+---
 
-\[Congrats\] 16. Congratulations!
+[Congrats] 16. Congratulations!
 
 You've successfully added God of War 2018 to Route Tracker using the enhanced architecture. The same process can be applied to add any other game with the appropriate memory addresses and route data.
 
-\*\*New Benefits:\*\*
+**New Benefits:**
 
-\- Automatic memory caching for better performance
+- Automatic memory caching for better performance
 
-\- Cycling backup system protects your progress
+- Cycling backup system protects your progress
 
-\- Enhanced UI with multiple layout modes
+- Enhanced UI with multiple layout modes
 
-\- Better connection management
+- Better connection management
 
-\- Automatic settings backup and restore
+- Automatic settings backup and restore
 
-\- Improved filtering and search capabilities
+- Improved filtering and search capabilities
 
 For questions or issues, check the existing code comments or create an issue on the project's GitHub repository.
