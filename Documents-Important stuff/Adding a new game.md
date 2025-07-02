@@ -554,24 +554,24 @@ The codebase has been reorganized for better maintainability:
 ---
 
 [Checklist] 12. Complete Implementation Checklist
-[ ] Create GoW2018GameStats.cs with proper memory reading
-[ ] Add all pointer offsets for collectibles/stats
-[ ] Update GameConnectionManager.DetectRunningGame()
-[ ] Update GameConnectionManager.InitializeGameStats()
-[ ] Update GameConnectionManager.ConnectToGameAsync()
-[ ] Update SettingsManager.GetGameDirectory()
-[ ] Update SettingsManager.SaveDirectory()
-[ ] Update SettingsManager.GetGamesWithDirectoriesSet()
-[ ] Add game to ConnectionWindow dropdown
-[ ] Add game to GameDirectoryForm dropdown
-[ ] Add Gow2018Directory setting property
-[ ] Create route TSV file with proper format
-[ ] Update RouteManager.CheckCompletion() if needed
-[ ] Update RouteHelpers.BuildStatsText() if desired
-[ ] Test the complete workflow with enhanced features
-[ ] Verify cycling autosave system works
-[ ] Test connection window functionality
-[ ] Verify settings backup system works
+- [ ] Create GoW2018GameStats.cs with proper memory reading
+- [ ] Add all pointer offsets for collectibles/stats
+- [ ] Update GameConnectionManager.DetectRunningGame()
+- [ ] Update GameConnectionManager.InitializeGameStats()
+- [ ] Update GameConnectionManager.ConnectToGameAsync()
+- [ ] Update SettingsManager.GetGameDirectory()
+- [ ] Update SettingsManager.SaveDirectory()
+- [ ] Update SettingsManager.GetGamesWithDirectoriesSet()
+- [ ] Add game to ConnectionWindow dropdown
+- [ ] Add game to GameDirectoryForm dropdown
+- [ ] Add Gow2018Directory setting property
+- [ ] Create route TSV file with proper format
+- [ ] Update RouteManager.CheckCompletion() if needed
+- [ ] Update RouteHelpers.BuildStatsText() if desired
+- [ ] Test the complete workflow with enhanced features
+- [ ] Verify cycling autosave system works
+- [ ] Test connection window functionality
+- [ ] Verify settings backup system works
 
 ---
 
