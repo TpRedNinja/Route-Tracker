@@ -556,22 +556,39 @@ The codebase has been reorganized for better maintainability:
 [Checklist] 12. Complete Implementation Checklist
 
 [ ] Create GoW2018GameStats.cs with proper memory reading
+
 [ ] Add all pointer offsets for collectibles/stats
+
 [ ] Update GameConnectionManager.DetectRunningGame()
+
 [ ] Update GameConnectionManager.InitializeGameStats()
+
 [ ] Update GameConnectionManager.ConnectToGameAsync()
+
 [ ] Update SettingsManager.GetGameDirectory()
+
 [ ] Update SettingsManager.SaveDirectory()
+
 [ ] Update SettingsManager.GetGamesWithDirectoriesSet()
+
 [ ] Add game to ConnectionWindow dropdown
+
 [ ] Add game to GameDirectoryForm dropdown
+
 [ ] Add Gow2018Directory setting property
+
 [ ] Create route TSV file with proper format
+
 [ ] Update RouteManager.CheckCompletion() if needed
+
 [ ] Update RouteHelpers.BuildStatsText() if desired
+
 [ ] Test the complete workflow with enhanced features
+
 [ ] Verify cycling autosave system works
+
 [ ] Test connection window functionality
+
 [ ] Verify settings backup system works
 
 ---
@@ -607,25 +624,39 @@ Important Notes
 The enhanced architecture now supports:
 
 **Memory Optimization:**
+
 • ReadWithCache() for efficient memory access
+
 • Automatic cache invalidation
+
 • Performance monitoring and adaptive updates
 
 **Enhanced Backup System:**
+
 • Cycling progress backups (1-10) with automatic rotation
+
 • Settings backup to AppData with restore functionality
+
 • Automatic backup creation on changes
 
 **Improved UI:**
+
 • Multiple layout modes (Normal, Compact, Mini, Overlay)
+
 • Enhanced filtering and search capabilities
+
 • Better connection management with dedicated window
+
 • Right-click context menus for common actions
 
 **Advanced Route Features:**
+
 • Enhanced prerequisite system
+
 • Better completion tracking
+
 • Improved file searching with fallback locations
+
 • Support for game state transitions (loading, menu, gameplay)
 
 ---
@@ -633,29 +664,45 @@ The enhanced architecture now supports:
 [Troubleshooting] 15. Troubleshooting Common Issues
 
 **Game Not Detected**
+
 • Verify the exact process name using Task Manager
+
 • Check ConnectionWindow dropdown includes your game
+
 • Ensure DetectRunningGame() includes your process mapping
 
 **Stats Not Updating**
+
 • Confirm memory addresses are correct for your game version
+
 • Check if ReadWithCache() calls are properly implemented
+
 • Verify GameStatsBase inheritance is correct
+
 • Use Debug.WriteLine() to log stats retrieval
 
 **Route File Not Loading**
+
 • Check file format (TSV with tabs, not spaces)
+
 • Verify file is in the correct Routes/ folder
+
 • Ensure RouteManager.CheckCompletion() includes your collectible types
+
 • Test with the enhanced file searching system
 
 **Connection Issues**
+
 • Use the new ConnectionWindow instead of old dropdown system
+
 • Check Settings > Game Directory is set correctly
+
 • Verify GameConnectionManager updates are complete
+
 • Run Route Tracker as administrator if needed
 
 **UI Issues**
+
 • Ensure all helper classes are updated
 
 • Check that SettingsMenuManager includes your game
