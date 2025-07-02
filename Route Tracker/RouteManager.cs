@@ -28,6 +28,8 @@ namespace Route_Tracker
         private readonly GameConnectionManager gameConnectionManager;
         private List<RouteEntry> routeEntries = [];
 
+        private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
         // last know folder path for Routes folder to avoid repeated searches
         private static string? lastFoundRoutesFolder;
 
@@ -616,12 +618,13 @@ namespace Route_Tracker
         #endregion
 
         #region Progress Persistence
+        // Replace the existing AutoSaveProgress method with this enhanced version:
         // ==========FORMAL COMMENT=========
-        // Automatically saves current progress to a predefined autosave file
-        // Creates consistent file name in same folder as route file for easy tracking
+        // Automatically saves current progress with cycling backup system
+        // Creates numbered backup files and cycles through them for redundancy
         // ==========MY NOTES==============
-        // Silently saves progress whenever route entries change
-        // Used for preserving progress between game sessions and crashes
+        // Enhanced autosave that creates multiple backup files
+        // Gives users automatic protection with rotating save files
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1869:",
         Justification = "Performance optimizations are minimal")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079:",
@@ -649,16 +652,14 @@ namespace Route_Tracker
                 if (!Directory.Exists(saveDir))
                     Directory.CreateDirectory(saveDir);
 
-                // Use a fixed name for the autosave
-                string routeName = Path.GetFileNameWithoutExtension(routeFilePath);
-                string autosaveFile = Path.Combine(saveDir, $"{routeName}_AutoSave.json");
+                // Determine game abbreviation and route type
+                string gameAbbreviation = GetGameAbbreviation();
+                string routeType = GetRouteType();
 
-                // Save the data - completely overwrite the file
-                System.Text.Json.JsonSerializerOptions options = new() { WriteIndented = true };
-                string json = System.Text.Json.JsonSerializer.Serialize(entryStatus, options);
-                File.WriteAllText(autosaveFile, json);
+                // Create the cycling autosave with numbered backups
+                CreateCyclingAutoSave(saveDir, gameAbbreviation, routeType, entryStatus);
 
-                Debug.WriteLine($"Auto-saved progress to {autosaveFile}");
+                Debug.WriteLine($"Auto-saved progress with cycling backup system");
             }
             catch (Exception ex)
             {
@@ -667,11 +668,156 @@ namespace Route_Tracker
         }
 
         // ==========FORMAL COMMENT=========
-        // Loads autosaved route completion status if available
-        // Silently loads from predefined autosave location without user interaction
+        // Creates cycling autosave files with numbered backups
+        // Maintains main autosave and up to 10 numbered backup files
         // ==========MY NOTES==============
-        // Automatically loads saved progress when re-entering gameplay
-        // Preserves completion status between sessions
+        // The core of the cycling backup system
+        // Rotates through numbered backups (1-10) and cycles back to 1
+        private void CreateCyclingAutoSave(string saveDir, string gameAbbreviation, string routeType, Dictionary<string, (bool IsCompleted, bool IsSkipped)> entryStatus)
+        {
+            // Create file names
+            string baseFileName = $"{gameAbbreviation}AutoSave{routeType}.json";
+            string mainAutosaveFile = Path.Combine(saveDir, baseFileName);
+
+            string json = System.Text.Json.JsonSerializer.Serialize(entryStatus, JsonOptions);
+
+
+            // If main autosave exists, we need to cycle it into numbered backups
+            if (File.Exists(mainAutosaveFile))
+            {
+                // Find the next backup number to use (1-10, cycling)
+                int nextBackupNumber = GetNextBackupNumber(saveDir, gameAbbreviation, routeType);
+
+                // Move current main autosave to numbered backup
+                string backupFileName = $"{gameAbbreviation}AutoSave{routeType}{nextBackupNumber}.json";
+                string backupFilePath = Path.Combine(saveDir, backupFileName);
+
+                try
+                {
+                    File.Copy(mainAutosaveFile, backupFilePath, overwrite: true);
+                    Debug.WriteLine($"Backed up previous autosave to {backupFileName}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Warning: Could not create backup {backupFileName}: {ex.Message}");
+                }
+            }
+
+            // Save new main autosave
+            File.WriteAllText(mainAutosaveFile, json);
+            Debug.WriteLine($"Created new autosave: {baseFileName}");
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Determines the next backup number in the cycle (1-10)
+        // Cycles back to 1 after reaching 10 for continuous rotation
+        // ==========MY NOTES==============
+        // Figures out which numbered backup to create next
+        // Cycles through 1-10 and starts over, giving us rolling backups
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        private int GetNextBackupNumber(string saveDir, string gameAbbreviation, string routeType)
+        {
+            // Find the highest existing backup number
+            int highestBackup = 0;
+            string searchPattern = $"{gameAbbreviation}AutoSave{routeType}*.json";
+
+            try
+            {
+                var backupFiles = Directory.GetFiles(saveDir, searchPattern);
+                foreach (string file in backupFiles)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file);
+                    string expectedPrefix = $"{gameAbbreviation}AutoSave{routeType}";
+
+                    if (fileName.StartsWith(expectedPrefix) && fileName != expectedPrefix)
+                    {
+                        string numberPart = fileName[expectedPrefix.Length..];
+                        if (int.TryParse(numberPart, out int backupNumber) && backupNumber > 0 && backupNumber <= 10)
+                        {
+                            highestBackup = Math.Max(highestBackup, backupNumber);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Warning: Error checking backup files: {ex.Message}");
+            }
+
+            // Return next number in cycle (1-10)
+            return highestBackup >= 10 ? 1 : highestBackup + 1;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Determines game abbreviation based on route file or game connection
+        // Returns standard abbreviations like AC4, GoW, TR13, etc.
+        // ==========MY NOTES==============
+        // Creates short game names for the autosave files
+        // Uses common abbreviations that gamers would recognize
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1847",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        private string GetGameAbbreviation()
+        {
+            string routeFileName = Path.GetFileNameWithoutExtension(routeFilePath).ToLower();
+
+            // Check route file name for game indicators
+            if (routeFileName.Contains("ac4") || (routeFileName.Contains("assassin") && routeFileName.Contains("creed") && routeFileName.Contains("4")))
+                return "AC4";
+            if (routeFileName.Contains("gow") || (routeFileName.Contains("god") && routeFileName.Contains("war")))
+                return "GoW";
+            if (routeFileName.Contains("tr13") || (routeFileName.Contains("tomb") && routeFileName.Contains("raider")))
+                return "TR13";
+
+            // Try to get from game connection if available
+            if (gameConnectionManager?.GameStats != null)
+            {
+                var statsType = gameConnectionManager.GameStats.GetType().Name;
+                if (statsType.Contains("AC4"))
+                    return "AC4";
+                if (statsType.Contains("GoW"))
+                    return "GoW";
+            }
+
+            // Default fallback - use first 3-4 characters of route name
+            string safeName = new([.. routeFileName.Take(4).Where(char.IsLetterOrDigit)]);
+            return string.IsNullOrEmpty(safeName) ? "Game" : safeName.ToUpper();
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Determines if this is a user-created route or official route
+        // Returns "User" for custom routes, empty string for official routes
+        // ==========MY NOTES==============
+        // Distinguishes between official game routes and user-made custom routes
+        // Adds "User" to filename for custom routes so they don't conflict
+        private string GetRouteType()
+        {
+            string routeFileName = Path.GetFileNameWithoutExtension(routeFilePath).ToLower();
+
+            // Check for indicators of user-created routes
+            if (routeFileName.Contains("user") ||
+                routeFileName.Contains("custom") ||
+                routeFileName.Contains("personal") ||
+                routeFileName.Contains("test") ||
+                (!routeFileName.Contains("100") && !routeFileName.Contains("main")))
+            {
+                return "User";
+            }
+
+            return ""; // Official route
+        }
+
+        // Replace the existing LoadAutoSave method with this enhanced version:
+        // ==========FORMAL COMMENT=========
+        // Loads autosaved route completion status from cycling backup system
+        // Attempts to load from main autosave, falls back to most recent backup
+        // ==========MY NOTES==============
+        // Enhanced autosave loading that can find backups if main file is corrupted
+        // Tries the main autosave first, then looks for numbered backups
         private bool LoadAutoSave(DataGridView routeGrid)
         {
             if (routeEntries == null || routeEntries.Count == 0 || routeGrid == null)
@@ -679,28 +825,97 @@ namespace Route_Tracker
 
             try
             {
-                // Determine autosave file path
                 string saveDir = Path.Combine(
                     Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
                     "SavedProgress");
 
-                string routeName = Path.GetFileNameWithoutExtension(routeFilePath);
-                string autosaveFile = Path.Combine(saveDir, $"{routeName}_AutoSave.json");
-
-                // Check if file exists
-                if (!File.Exists(autosaveFile))
+                if (!Directory.Exists(saveDir))
                     return false;
 
-                // Load and apply saved data
-                string json = File.ReadAllText(autosaveFile);
+                // Get file naming info
+                string gameAbbreviation = GetGameAbbreviation();
+                string routeType = GetRouteType();
+                string baseFileName = $"{gameAbbreviation}AutoSave{routeType}.json";
+                string mainAutosaveFile = Path.Combine(saveDir, baseFileName);
+
+                // Try to load main autosave first
+                if (File.Exists(mainAutosaveFile))
+                {
+                    if (TryLoadAutosaveFile(mainAutosaveFile, routeGrid))
+                    {
+                        Debug.WriteLine($"Loaded autosave from {baseFileName}");
+                        return true;
+                    }
+                }
+
+                // If main autosave failed, try numbered backups (newest first)
+                return TryLoadFromBackups(saveDir, gameAbbreviation, routeType, routeGrid);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading autosave: {ex.Message}");
+                return false;
+            }
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Attempts to load autosave from numbered backup files
+        // Tries backups in reverse chronological order (newest first)
+        // ==========MY NOTES==============
+        // Fallback system that looks for working backup files
+        // Starts with the most recent backup and works backwards
+        private bool TryLoadFromBackups(string saveDir, string gameAbbreviation, string routeType, DataGridView routeGrid)
+        {
+            try
+            {
+                // Find all backup files for this game/route
+                string searchPattern = $"{gameAbbreviation}AutoSave{routeType}*.json";
+                var backupFiles = Directory.GetFiles(saveDir, searchPattern)
+                    .Where(f =>
+                    {
+                        string fileName = Path.GetFileNameWithoutExtension(f);
+                        string expectedPrefix = $"{gameAbbreviation}AutoSave{routeType}";
+                        return fileName.StartsWith(expectedPrefix) && fileName != expectedPrefix;
+                    })
+                    .OrderByDescending(f => File.GetLastWriteTime(f))
+                    .ToList();
+
+                foreach (string backupFile in backupFiles)
+                {
+                    if (TryLoadAutosaveFile(backupFile, routeGrid))
+                    {
+                        Debug.WriteLine($"Loaded autosave from backup: {Path.GetFileName(backupFile)}");
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading from backups: {ex.Message}");
+                return false;
+            }
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Attempts to load and apply autosave data from a specific file
+        // Handles both new tuple format and legacy format for compatibility
+        // ==========MY NOTES==============
+        // The actual file loading logic that works with any autosave file
+        // Handles different save formats for backwards compatibility
+        private bool TryLoadAutosaveFile(string filePath, DataGridView routeGrid)
+        {
+            try
+            {
+                string json = File.ReadAllText(filePath);
 
                 try
                 {
-                    // First, try to deserialize as the new tuple format
+                    // Try new tuple format first
                     var entryStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, (bool IsCompleted, bool IsSkipped)>>(json);
 
-                    // Apply status to entries
-                    foreach (var entry in routeEntries)
+                    foreach (var entry in routeEntries!)
                     {
                         string key = $"{entry.Id}_{entry.Name}_{entry.Type}_{entry.Condition}";
                         if (entryStatus != null && entryStatus.TryGetValue(key, out var status))
@@ -712,11 +927,10 @@ namespace Route_Tracker
                 }
                 catch
                 {
-                    // Fallback: try the old format (for backwards compatibility)
+                    // Fallback to legacy format
                     var completionStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, bool>>(json);
 
-                    // Apply completion status only
-                    foreach (var entry in routeEntries)
+                    foreach (var entry in routeEntries!)
                     {
                         string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
                         if (completionStatus != null && completionStatus.TryGetValue(key, out bool isCompleted))
@@ -732,7 +946,6 @@ namespace Route_Tracker
 
                 foreach (var entry in routeEntries)
                 {
-                    // Skip entries marked as skipped
                     if (entry.IsSkipped)
                         continue;
 
@@ -746,7 +959,6 @@ namespace Route_Tracker
                 {
                     SortRouteGridByCompletion(routeGrid);
                     ScrollToFirstIncomplete(routeGrid);
-                    Debug.WriteLine($"Loaded autosave from {autosaveFile}");
                     return true;
                 }
 
@@ -754,7 +966,7 @@ namespace Route_Tracker
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading autosave: {ex.Message}");
+                Debug.WriteLine($"Error loading autosave file {filePath}: {ex.Message}");
                 return false;
             }
         }
