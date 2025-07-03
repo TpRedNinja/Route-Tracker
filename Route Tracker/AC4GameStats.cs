@@ -351,14 +351,14 @@ namespace Route_Tracker
         // Used to track progress through the route
         private void DetectModernDayMissions(int character)
         {
-            if (character == 1 && character != oldcharacter)
+            if (character == 1 && oldcharacter == 0)
             {
                 oldcharacter = character;
             }
             else if(character == 0 && oldcharacter == 1)
             {
                 oldcharacter = character;
-                modernDayMissions++;
+                modernDayMissions ++;
             }
         }
 
@@ -502,7 +502,7 @@ namespace Route_Tracker
         // Returns a tuple with all four counter values at once.
         public (int StoryMissions, int TemplarHunts, int LegendaryShips, int TreasureMaps) GetSpecialActivityCounts()
         {
-            return (completedStoryMissions + modernDayMissions, totalTemplarHunts, legendaryShips, treasuremaps);
+            return (completedStoryMissions, totalTemplarHunts, legendaryShips, treasuremaps);
         }
 
         public override (bool IsLoading, bool IsMainMenu) GetGameStatus()

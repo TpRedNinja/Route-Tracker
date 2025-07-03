@@ -538,6 +538,7 @@ namespace Route_Tracker
                 "Legendary Ships" or "legendary ships" => stats.GetValue<int>("Legendary Ships", 0) >= entry.Condition,
                 "Templar Hunts" or "templar hunts" => stats.GetValue<int>("Templar Hunts", 0) >= entry.Condition,
                 "Treasure Map" or "treasure map" => stats.GetValue<int>("Treasure Maps", 0) >= entry.Condition,
+                "Modern Day" or "modern day" => stats.GetValue<int>("Modern Day Missions", 0) >= entry.Condition,
                 // Special case for upgrades
                 "Upgrades" or "upgrades" => gameConnectionManager?.GameStats is AC4GameStats upgradeStats &&
                     entry.Condition > 0 && entry.Condition <= upgradeStats.GetPurchasedUpgrades().Length &&
