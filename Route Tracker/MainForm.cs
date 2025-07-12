@@ -86,6 +86,7 @@ namespace Route_Tracker
         public MainForm()
         {
             InitializeComponent();
+            this.KeyPreview = true;
 
             // Initialize managers FIRST
             gameConnectionManager = new GameConnectionManager();
@@ -306,6 +307,14 @@ namespace Route_Tracker
             AppTheme.ApplyToButton(showCompletionButton);
             AppTheme.ApplyToButton(clearFiltersButton);
 
+            var toolTip = new ToolTip();
+            toolTip.SetToolTip(connectButton, "Connect to the selected game. If not running, you can auto-start it in the settings panel.");
+            toolTip.SetToolTip(showStatsButton, "View the values of certain in game values like percentage, total viewpoints done, etc etc...");
+            toolTip.SetToolTip(showCompletionButton, "View your progress and completion statistics for the current route");
+            toolTip.SetToolTip(searchTextBox, "Type to search route entries by name, type, or coordinates");
+            toolTip.SetToolTip(typeFilterComboBox, "Filter route entries by type.");
+            toolTip.SetToolTip(clearFiltersButton, "Clear all filters and show all route entries.");
+
             return topBar;
         }
 
@@ -333,6 +342,9 @@ namespace Route_Tracker
             };
 
             labelPanel.Controls.Add(completionLabel);
+            var tooltip = new ToolTip();
+            tooltip.SetToolTip(completionLabel, "Shows the current completion percentage based on completed route entries.");
+
             return labelPanel;
         }
 
@@ -384,8 +396,14 @@ namespace Route_Tracker
         #region Hotkey Management
         // ==========MY NOTES==============
         // Catches key presses and runs hotkey actions if hotkeys are enabled
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            Debug.WriteLine($"ProcessCmdKey: {keyData}");
+
             var shortcuts = settingsManager.GetShortcuts();
 
             if (keyData == shortcuts.Load)
@@ -401,6 +419,11 @@ namespace Route_Tracker
             if (keyData == shortcuts.LoadProgress)
             {
                 MainFormHelpers.LoadProgress(this);
+                return true;
+            }
+            if (keyData == shortcuts.ResetProgress)
+            {
+                MainFormHelpers.ResetProgress(this, routeManager);
                 return true;
             }
             if (keyData == shortcuts.Refresh)
@@ -419,9 +442,115 @@ namespace Route_Tracker
                 RouteHelpers.ClearFilters(this);
                 return true;
             }
+            if (keyData == shortcuts.Connect)
+            {
+                using var connectionWindow = new ConnectionWindow(gameConnectionManager, settingsManager);
+                connectionWindow.ShowDialog(this);
+                return true;
+            }
+            if (keyData == shortcuts.GameStats)
+            {
+                RouteHelpers.ShowStatsWindow(this, gameConnectionManager);
+                return true;
+            }
+            if (keyData == shortcuts.RouteStats)
+            {
+                RouteHelpers.ShowCompletionStatsWindow(this, routeManager);
+                return true;
+            }
+            if (keyData == shortcuts.LayoutUp)
+            {
+                CycleLayout(true);
+                return true;
+            }
+            if (keyData == shortcuts.LayoutDown)
+            {
+                CycleLayout(false);
+                return true;
+            }
+            if (keyData == shortcuts.BackupFolder)
+            {
+                settingsManager.OpenBackupFolder();
+                return true;
+            }
+            if (keyData == shortcuts.BackupNow)
+            {
+                settingsManager.BackupSettings();
+                MessageBox.Show("Settings backed up successfully!", "Backup Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return true;
+            }
+            if (keyData == shortcuts.Restore)
+            {
+                var (hasBackup, backupDate, backupVersion) = settingsManager.GetBackupInfo();
+                if (hasBackup)
+                {
+                    var result = MessageBox.Show($"Restore settings from backup?\n\nBackup Date: {backupDate:yyyy-MM-dd HH:mm}\nVersion: {backupVersion}", "Restore Settings", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (result == DialogResult.Yes && settingsManager.RestoreFromBackup())
+                    {
+                        MessageBox.Show("Settings restored successfully!", "Restore Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No backup found!", "No Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                return true;
+            }
+            if (keyData == shortcuts.SetFolder)
+            {
+                settingsManager.OpenSettingsFolder();
+                return true;
+            }
+            if (keyData == shortcuts.AutoTog)
+            {
+                if (enableAutoStartMenuItem != null)
+                {
+                    enableAutoStartMenuItem.Checked = !enableAutoStartMenuItem.Checked;
+                    settingsManager.SaveSettings(Settings.Default.GameDirectory, enableAutoStartMenuItem.Checked ? Settings.Default.AutoStart : "");
+                }
+                return true;
+            }
+            if (keyData == shortcuts.TopTog)
+            {
+                this.TopMost = !this.TopMost;
+                settingsManager.SaveAlwaysOnTop(this.TopMost);
+                return true;
+            }
+            if (keyData == shortcuts.AdvTog)
+            {
+                var (CompleteHotkey, SkipHotkey, UndoHotkey, GlobalHotkeys, AdvancedHotkeys) = settingsManager.GetAllHotkeySettings();
+                settingsManager.SaveHotkeySettings(UndoHotkey, GlobalHotkeys, !AdvancedHotkeys);
+                return true;
+            }
+            if (keyData == shortcuts.GlobalTog)
+            {
+                var (CompleteHotkey, SkipHotkey, UndoHotkey, GlobalHotkeys, AdvancedHotkeys) = settingsManager.GetAllHotkeySettings();
+                settingsManager.SaveHotkeySettings(UndoHotkey, !GlobalHotkeys, AdvancedHotkeys);
+                UpdateGlobalHotkeys();
+                return true;
+            }
 
             bool handled = MainFormHelpers.ProcessCmdKey(this, settingsManager, routeManager, ref msg, keyData);
             return handled || base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void CycleLayout(bool forward)
+        {
+            var modes = Enum.GetValues<LayoutSettingsForm.LayoutMode>();
+            int currentIndex = Array.IndexOf(modes, currentLayoutMode);
+
+            if (forward)
+            {
+                currentIndex = (currentIndex + 1) % modes.Length;
+            }
+            else
+            {
+                currentIndex = (currentIndex - 1 + modes.Length) % modes.Length;
+            }
+
+            currentLayoutMode = modes[currentIndex];
+            settingsManager.SaveLayoutMode(currentLayoutMode);
+            LayoutManager.ApplyLayoutMode(this, currentLayoutMode);
         }
 
         // ==========MY NOTES==============
@@ -523,8 +652,6 @@ namespace Route_Tracker
             await SettingsLifecycleManager.HandleApplicationStartup(this, settingsManager, gameConnectionManager);
         }
 
-        // ==========MY NOTES==============
-        // Handles app shutdown - cleans up resources properly
         // ==========MY NOTES==============
         // Handles app shutdown - cleans up resources properly
         private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)

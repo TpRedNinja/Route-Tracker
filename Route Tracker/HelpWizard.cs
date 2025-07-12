@@ -31,7 +31,7 @@ namespace Route_Tracker
         {
             this.parentForm = parentForm;
             this.Text = "Help";
-            this.Size = new Size(500, 300);
+            this.Size = new Size(500, 500);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -39,21 +39,31 @@ namespace Route_Tracker
             this.BackColor = AppTheme.BackgroundColor;
             this.ForeColor = AppTheme.TextColor;
 
+            // Scrollable panel for help content
+            var scrollPanel = new Panel
+            {
+                Location = new Point(10, 10),
+                Size = new Size(480, 390),
+                AutoScroll = true,
+                BackColor = AppTheme.BackgroundColor
+            };
+
             infoLabel = new Label
             {
-                AutoSize = false,
-                Location = new Point(20, 20),
-                Size = new Size(440, 180),
+                AutoSize = true,
+                MaximumSize = new Size(460, 0),
                 ForeColor = AppTheme.TextColor,
                 BackColor = AppTheme.BackgroundColor,
                 Font = new Font(FontFamily.GenericSansSerif, 11),
+                Location = new Point(0, 0)
             };
+            scrollPanel.Controls.Add(infoLabel);
 
             prevButton = new Button
             {
                 Text = "Previous",
                 Size = new Size(90, 30),
-                Location = new Point(120, 220)
+                Location = new Point(60, 420)
             };
             prevButton.Click += (s, e) => { step--; UpdateStep(); };
 
@@ -61,7 +71,7 @@ namespace Route_Tracker
             {
                 Text = "Next",
                 Size = new Size(90, 30),
-                Location = new Point(220, 220)
+                Location = new Point(200, 420)
             };
             nextButton.Click += (s, e) => { step++; UpdateStep(); };
 
@@ -69,7 +79,7 @@ namespace Route_Tracker
             {
                 Text = "Close",
                 Size = new Size(90, 30),
-                Location = new Point(320, 220)
+                Location = new Point(340, 420)
             };
             closeButton.Click += (s, e) => this.Close();
 
@@ -77,7 +87,7 @@ namespace Route_Tracker
             AppTheme.ApplyToButton(nextButton);
             AppTheme.ApplyToButton(closeButton);
 
-            this.Controls.Add(infoLabel);
+            this.Controls.Add(scrollPanel);
             this.Controls.Add(prevButton);
             this.Controls.Add(nextButton);
             this.Controls.Add(closeButton);
@@ -86,15 +96,25 @@ namespace Route_Tracker
             UpdateStep();
         }
 
-        private void LoadHelpPages()
+        // Helper to auto-adjust font size if needed
+        private void AdjustFontToFit(string text)
         {
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "HelpPages.json");
-            if (File.Exists(path))
+            int minFont = 8;
+            int maxFont = 11;
+            Font font = new(FontFamily.GenericSansSerif, maxFont);
+            infoLabel.Font = font;
+            infoLabel.Text = text;
+            infoLabel.MaximumSize = new Size(460, 0);
+            infoLabel.AutoSize = true;
+
+            // If label is too tall for panel, shrink font
+            while (infoLabel.Height > 390 && font.Size > minFont)
             {
-                string json = File.ReadAllText(path);
-                var pages = JsonSerializer.Deserialize<List<HelpPage>>(json);
-                if (pages != null)
-                    helpPages.AddRange(pages);
+                font = new Font(FontFamily.GenericSansSerif, font.Size - 1);
+                infoLabel.Font = font;
+                infoLabel.Text = text;
+                infoLabel.MaximumSize = new Size(460, 0);
+                infoLabel.AutoSize = true;
             }
         }
 
@@ -102,7 +122,7 @@ namespace Route_Tracker
         {
             if (helpPages.Count == 0)
             {
-                infoLabel.Text = "No help content available.";
+                AdjustFontToFit("No help content available.");
                 prevButton.Enabled = false;
                 nextButton.Enabled = false;
                 return;
@@ -115,28 +135,51 @@ namespace Route_Tracker
             nextButton.Enabled = step < helpPages.Count - 1;
 
             var page = helpPages[step];
-            var shortcuts = parentForm.settingsManager?.GetShortcuts()
-                ?? (Load: Keys.None, Save: Keys.None, LoadProgress: Keys.None, Refresh: Keys.None, Help: Keys.None, FilterClear: Keys.None);
+
+            var shortcuts = parentForm.settingsManager?.GetShortcuts() ??
+                (Load: Keys.None, Save: Keys.None, LoadProgress: Keys.None, ResetProgress: Keys.None,
+                 Refresh: Keys.None, Help: Keys.None, FilterClear: Keys.None, Connect: Keys.None,
+                 GameStats: Keys.None, RouteStats: Keys.None, LayoutUp: Keys.None, LayoutDown: Keys.None,
+                 BackupFolder: Keys.None, BackupNow: Keys.None, Restore: Keys.None, SetFolder: Keys.None,
+                 AutoTog: Keys.None, TopTog: Keys.None, AdvTog: Keys.None, GlobalTog: Keys.None);
 
             var keysConverter = new KeysConverter();
-
-            // Debug: Show raw content and shortcut values
-            Debug.WriteLine($"DEBUG: Page Title: {page.Title}");
-            Debug.WriteLine($"DEBUG: Raw Content: {page.Content}");
-            Debug.WriteLine($"DEBUG: Shortcuts: Load={shortcuts.Load}, Save={shortcuts.Save}, LoadProgress={shortcuts.LoadProgress}, Refresh={shortcuts.Refresh}, Help={shortcuts.Help}, FilterClear={shortcuts.FilterClear}");
 
             string content = page.Content
                 .Replace("{Load}", keysConverter.ConvertToString(shortcuts.Load))
                 .Replace("{Save}", keysConverter.ConvertToString(shortcuts.Save))
                 .Replace("{LoadProgress}", keysConverter.ConvertToString(shortcuts.LoadProgress))
+                .Replace("{ResetProgress}", keysConverter.ConvertToString(shortcuts.ResetProgress))
                 .Replace("{Refresh}", keysConverter.ConvertToString(shortcuts.Refresh))
                 .Replace("{Help}", keysConverter.ConvertToString(shortcuts.Help))
-                .Replace("{FilterClear}", keysConverter.ConvertToString(shortcuts.FilterClear));
+                .Replace("{FilterClear}", keysConverter.ConvertToString(shortcuts.FilterClear))
+                .Replace("{Connect}", keysConverter.ConvertToString(shortcuts.Connect))
+                .Replace("{GameStats}", keysConverter.ConvertToString(shortcuts.GameStats))
+                .Replace("{RouteStats}", keysConverter.ConvertToString(shortcuts.RouteStats))
+                .Replace("{LayoutUp}", keysConverter.ConvertToString(shortcuts.LayoutUp))
+                .Replace("{LayoutDown}", keysConverter.ConvertToString(shortcuts.LayoutDown))
+                .Replace("{BackupFolder}", keysConverter.ConvertToString(shortcuts.BackupFolder))
+                .Replace("{BackupNow}", keysConverter.ConvertToString(shortcuts.BackupNow))
+                .Replace("{Restore}", keysConverter.ConvertToString(shortcuts.Restore))
+                .Replace("{SetFolder}", keysConverter.ConvertToString(shortcuts.SetFolder))
+                .Replace("{AutoTog}", keysConverter.ConvertToString(shortcuts.AutoTog))
+                .Replace("{TopTog}", keysConverter.ConvertToString(shortcuts.TopTog))
+                .Replace("{AdvTog}", keysConverter.ConvertToString(shortcuts.AdvTog))
+                .Replace("{GlobalTog}", keysConverter.ConvertToString(shortcuts.GlobalTog));
 
-            // Debug: Show replaced content
-            Debug.WriteLine($"DEBUG: Replaced Content: {content}");
+            AdjustFontToFit($"{page.Title}\n\n{content}");
+        }
 
-            infoLabel.Text = $"{page.Title}\n\n{content}";
+        private void LoadHelpPages()
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "HelpPages.json");
+            if (File.Exists(path))
+            {
+                string json = File.ReadAllText(path);
+                var pages = JsonSerializer.Deserialize<List<HelpPage>>(json);
+                if (pages != null)
+                    helpPages.AddRange(pages);
+            }
         }
     }
 }

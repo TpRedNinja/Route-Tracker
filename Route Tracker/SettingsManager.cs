@@ -51,7 +51,6 @@ namespace Route_Tracker
             public DateTime BackupTimestamp { get; set; } = DateTime.Now;
             public string AppVersion { get; set; } = string.Empty;
             public string LayoutMode { get; set; } = "Normal";
-            public bool TransparentBackground { get; set; } = false;
         }
 
         #region Backup/Restore Settings
@@ -81,8 +80,7 @@ namespace Route_Tracker
                     AlwaysOnTop = Settings.Default.AlwaysOnTop,
                     CheckForUpdateOnStartup = Settings.Default.CheckForUpdateOnStartup,
                     DevMode = Settings.Default.DevMode,
-                    LayoutMode = Settings.Default.LayoutMode,           // Add this
-                    TransparentBackground = Settings.Default.TransparentBackground, // Add this
+                    LayoutMode = Settings.Default.LayoutMode,
                     BackupTimestamp = DateTime.Now,
                     AppVersion = AppTheme.Version
                 };
@@ -129,8 +127,7 @@ namespace Route_Tracker
                 Settings.Default.AlwaysOnTop = backup.AlwaysOnTop;
                 Settings.Default.CheckForUpdateOnStartup = backup.CheckForUpdateOnStartup;
                 Settings.Default.DevMode = backup.DevMode;
-                Settings.Default.LayoutMode = backup.LayoutMode;               // Add this
-                Settings.Default.TransparentBackground = backup.TransparentBackground; // Add this
+                Settings.Default.LayoutMode = backup.LayoutMode;
 
                 Settings.Default.Save();
 
@@ -399,15 +396,29 @@ namespace Route_Tracker
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
-        public (Keys Load, Keys Save, Keys LoadProgress, Keys Refresh, Keys Help, Keys FilterClear) GetShortcuts()
+        public (Keys Load, Keys Save, Keys LoadProgress, Keys ResetProgress, Keys Refresh, Keys Help, Keys FilterClear, Keys Connect, Keys GameStats, Keys RouteStats, Keys LayoutUp, Keys LayoutDown, Keys BackupFolder, Keys BackupNow, Keys Restore, Keys SetFolder, Keys AutoTog, Keys TopTog, Keys AdvTog, Keys GlobalTog) GetShortcuts()
         {
             return (
                 (Keys)Settings.Default.ShortLoad,
                 (Keys)Settings.Default.ShortSave,
                 (Keys)Settings.Default.ShortLoadP,
+                (Keys)Settings.Default.ShortResetP,
                 (Keys)Settings.Default.ShortRefresh,
                 (Keys)Settings.Default.ShortHelp,
-                (Keys)Settings.Default.ShortFilterC
+                (Keys)Settings.Default.ShortFilterC,
+                (Keys)Settings.Default.ShortConnect,
+                (Keys)Settings.Default.ShortGameStats,
+                (Keys)Settings.Default.ShortRouteStats,
+                (Keys)Settings.Default.ShortLayoutUp,
+                (Keys)Settings.Default.ShortLayoutDown,
+                (Keys)Settings.Default.ShortBackFold,
+                (Keys)Settings.Default.ShortBackNow,
+                (Keys)Settings.Default.ShortRestore,
+                (Keys)Settings.Default.ShortSetFold,
+                (Keys)Settings.Default.AutoTog,
+                (Keys)Settings.Default.TopTog,
+                (Keys)Settings.Default.AdvTog,
+                (Keys)Settings.Default.GlobalTog
             );
         }
 
@@ -415,14 +426,32 @@ namespace Route_Tracker
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
-        public void SaveShortcuts(Keys load, Keys save, Keys loadProgress, Keys refresh, Keys help, Keys filterClear)
+        public void SaveShortcuts(Keys load, Keys save, Keys loadProgress, 
+            Keys resetProgress, Keys refresh, Keys help, Keys filterClear, Keys connect, 
+            Keys gameStats, Keys routeStats, Keys layoutUp, Keys layoutDown, 
+            Keys backupFolder, Keys backupNow, Keys restore, Keys setFolder, 
+            Keys autoTog, Keys topTog, Keys advTog, Keys globalTog)
         {
             Settings.Default.ShortLoad = (int)load;
             Settings.Default.ShortSave = (int)save;
             Settings.Default.ShortLoadP = (int)loadProgress;
+            Settings.Default.ShortResetP = (int)resetProgress;
             Settings.Default.ShortRefresh = (int)refresh;
             Settings.Default.ShortHelp = (int)help;
             Settings.Default.ShortFilterC = (int)filterClear;
+            Settings.Default.ShortConnect = (int)connect;
+            Settings.Default.ShortGameStats = (int)gameStats;
+            Settings.Default.ShortRouteStats = (int)routeStats;
+            Settings.Default.ShortLayoutUp = (int)layoutUp;
+            Settings.Default.ShortLayoutDown = (int)layoutDown;
+            Settings.Default.ShortBackFold = (int)backupFolder;
+            Settings.Default.ShortBackNow = (int)backupNow;
+            Settings.Default.ShortRestore = (int)restore;
+            Settings.Default.ShortSetFold = (int)setFolder;
+            Settings.Default.AutoTog = (int)autoTog;
+            Settings.Default.TopTog = (int)topTog;
+            Settings.Default.AdvTog = (int)advTog;
+            Settings.Default.GlobalTog = (int)globalTog;
             Settings.Default.Save();
             BackupSettings();
         }
@@ -475,6 +504,36 @@ namespace Route_Tracker
             return Enum.TryParse<LayoutSettingsForm.LayoutMode>(Settings.Default.LayoutMode, out var mode)
                 ? mode
                 : LayoutSettingsForm.LayoutMode.Normal;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        public void OpenSettingsFolder()
+        {
+            try
+            {
+                // Get the folder where the app's config files are stored
+                string settingsFolder = Path.GetDirectoryName(Application.UserAppDataPath) ??
+                                       Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RouteTracker");
+
+                if (Directory.Exists(settingsFolder))
+                {
+                    System.Diagnostics.Process.Start("explorer.exe", settingsFolder);
+                }
+                else
+                {
+                    // Fallback to app directory if user settings folder doesn't exist
+                    string appFolder = AppDomain.CurrentDomain.BaseDirectory;
+                    System.Diagnostics.Process.Start("explorer.exe", appFolder);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not open settings folder: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
         #endregion
     }

@@ -233,8 +233,19 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Resets progress with confirmation
-        private static void ResetProgress(MainForm mainForm, RouteManager routeManager)
+        public static void ResetProgress(MainForm mainForm, RouteManager? routeManager)
         {
+            if (routeManager == null)
+            {
+                routeManager = mainForm.CreateDefaultRouteManager();
+                if (routeManager.LoadEntries().Count == 0)
+                {
+                    MessageBox.Show("No route entries found. Make sure the route file exists.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
             var result = MessageBox.Show(
                 "Are you sure you want to reset your progress?\n\nThis will delete your autosave and cannot be undone.",
                 "Reset Progress",
@@ -244,6 +255,8 @@ namespace Route_Tracker
             if (result == DialogResult.Yes)
             {
                 routeManager.ResetProgress(mainForm.routeGrid);
+                MessageBox.Show("Progress has been reset.", "Reset Complete",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
         #endregion

@@ -2,7 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Route_Tracker.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <!-- hotkey settings -->
     <Setting Name="CompleteHotkey" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
@@ -21,15 +20,58 @@
     <Setting Name="HotkeysEnabled" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    
-    <!-- General Settings -->
+    <Setting Name="ShortLoad" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131151</Value>
+    </Setting>
+    <Setting Name="ShortSave" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131155</Value>
+    </Setting>
+    <Setting Name="ShortLoadP" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131148</Value>
+    </Setting>
+    <Setting Name="ShortResetP" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131154</Value>
+    </Setting>
+    <Setting Name="ShortRefresh" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">116</Value>
+    </Setting>
+    <Setting Name="ShortHelp" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">112</Value>
+    </Setting>
+    <Setting Name="ShortFilterC" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">27</Value>
+    </Setting>
+    <Setting Name="ShortConnect" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">65603</Value>
+    </Setting>
+    <Setting Name="ShortGameStats" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">65619</Value>
+    </Setting>
+    <Setting Name="ShortRouteStats" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">65618</Value>
+    </Setting>
+    <Setting Name="ShortLayoutUp" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">262221</Value>
+    </Setting>
+    <Setting Name="ShortLayoutDown" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">65613</Value>
+    </Setting>
+    <Setting Name="ShortBackFold" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131138</Value>
+    </Setting>
+    <Setting Name="ShortBackNow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">65602</Value>
+    </Setting>
+    <Setting Name="ShortRestore" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">196674</Value>
+    </Setting>
+    <Setting Name="ShortSetFold" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">196691</Value>
+    </Setting>
     <Setting Name="CheckForUpdateOnStartup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="DevMode" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="TransparentBackground" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AlwaysOnTop" Type="System.Boolean" Scope="User">
@@ -41,29 +83,6 @@
     <Setting Name="AutoStart" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    
-    
-    <!-- shortcut settings -->
-    <Setting Name="ShortLoad" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">131151</Value>
-    </Setting>
-    <Setting Name="ShortSave" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">131155</Value>
-    </Setting>
-    <Setting Name="ShortLoadP" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">131148</Value>
-    </Setting>
-    <Setting Name="ShortRefresh" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">116</Value>
-    </Setting>
-    <Setting Name="ShortHelp" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">112</Value>
-    </Setting>
-    <Setting Name="ShortFilterC" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">27</Value>
-    </Setting>
-
-    <!-- game directories settings -->
     <Setting Name="GameDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
@@ -72,6 +91,18 @@
     </Setting>
     <Setting Name="Gow2018Directory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AutoTog" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131137</Value>
+    </Setting>
+    <Setting Name="TopTog" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131156</Value>
+    </Setting>
+    <Setting Name="AdvTog" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6553</Value>
+    </Setting>
+    <Setting Name="GlobalTog" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131143</Value>
     </Setting>
   </Settings>
 </SettingsFile>

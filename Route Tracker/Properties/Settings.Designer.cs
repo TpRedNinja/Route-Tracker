@@ -25,66 +25,6 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string GameDirectory {
-            get {
-                return ((string)(this["GameDirectory"]));
-            }
-            set {
-                this["GameDirectory"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string AutoStart {
-            get {
-                return ((string)(this["AutoStart"]));
-            }
-            set {
-                this["AutoStart"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string AC4Directory {
-            get {
-                return ((string)(this["AC4Directory"]));
-            }
-            set {
-                this["AC4Directory"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string Gow2018Directory {
-            get {
-                return ((string)(this["Gow2018Directory"]));
-            }
-            set {
-                this["Gow2018Directory"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AlwaysOnTop {
-            get {
-                return ((bool)(this["AlwaysOnTop"]));
-            }
-            set {
-                this["AlwaysOnTop"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int CompleteHotkey {
             get {
@@ -104,66 +44,6 @@ namespace Route_Tracker.Properties {
             }
             set {
                 this["SkipHotkey"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool HotkeysEnabled {
-            get {
-                return ((bool)(this["HotkeysEnabled"]));
-            }
-            set {
-                this["HotkeysEnabled"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool CheckForUpdateOnStartup {
-            get {
-                return ((bool)(this["CheckForUpdateOnStartup"]));
-            }
-            set {
-                this["CheckForUpdateOnStartup"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool DevMode {
-            get {
-                return ((bool)(this["DevMode"]));
-            }
-            set {
-                this["DevMode"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string LayoutMode {
-            get {
-                return ((string)(this["LayoutMode"]));
-            }
-            set {
-                this["LayoutMode"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool TransparentBackground {
-            get {
-                return ((bool)(this["TransparentBackground"]));
-            }
-            set {
-                this["TransparentBackground"] = value;
             }
         }
         
@@ -205,6 +85,18 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HotkeysEnabled {
+            get {
+                return ((bool)(this["HotkeysEnabled"]));
+            }
+            set {
+                this["HotkeysEnabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("131151")]
         public int ShortLoad {
             get {
@@ -241,6 +133,18 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131154")]
+        public int ShortResetP {
+            get {
+                return ((int)(this["ShortResetP"]));
+            }
+            set {
+                this["ShortResetP"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("116")]
         public int ShortRefresh {
             get {
@@ -272,6 +176,258 @@ namespace Route_Tracker.Properties {
             }
             set {
                 this["ShortFilterC"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("65603")]
+        public int ShortConnect {
+            get {
+                return ((int)(this["ShortConnect"]));
+            }
+            set {
+                this["ShortConnect"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("65619")]
+        public int ShortGameStats {
+            get {
+                return ((int)(this["ShortGameStats"]));
+            }
+            set {
+                this["ShortGameStats"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("65618")]
+        public int ShortRouteStats {
+            get {
+                return ((int)(this["ShortRouteStats"]));
+            }
+            set {
+                this["ShortRouteStats"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("262221")]
+        public int ShortLayoutUp {
+            get {
+                return ((int)(this["ShortLayoutUp"]));
+            }
+            set {
+                this["ShortLayoutUp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("65613")]
+        public int ShortLayoutDown {
+            get {
+                return ((int)(this["ShortLayoutDown"]));
+            }
+            set {
+                this["ShortLayoutDown"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131138")]
+        public int ShortBackFold {
+            get {
+                return ((int)(this["ShortBackFold"]));
+            }
+            set {
+                this["ShortBackFold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("65602")]
+        public int ShortBackNow {
+            get {
+                return ((int)(this["ShortBackNow"]));
+            }
+            set {
+                this["ShortBackNow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("196674")]
+        public int ShortRestore {
+            get {
+                return ((int)(this["ShortRestore"]));
+            }
+            set {
+                this["ShortRestore"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("196691")]
+        public int ShortSetFold {
+            get {
+                return ((int)(this["ShortSetFold"]));
+            }
+            set {
+                this["ShortSetFold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CheckForUpdateOnStartup {
+            get {
+                return ((bool)(this["CheckForUpdateOnStartup"]));
+            }
+            set {
+                this["CheckForUpdateOnStartup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DevMode {
+            get {
+                return ((bool)(this["DevMode"]));
+            }
+            set {
+                this["DevMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AlwaysOnTop {
+            get {
+                return ((bool)(this["AlwaysOnTop"]));
+            }
+            set {
+                this["AlwaysOnTop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LayoutMode {
+            get {
+                return ((string)(this["LayoutMode"]));
+            }
+            set {
+                this["LayoutMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AutoStart {
+            get {
+                return ((string)(this["AutoStart"]));
+            }
+            set {
+                this["AutoStart"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GameDirectory {
+            get {
+                return ((string)(this["GameDirectory"]));
+            }
+            set {
+                this["GameDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AC4Directory {
+            get {
+                return ((string)(this["AC4Directory"]));
+            }
+            set {
+                this["AC4Directory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Gow2018Directory {
+            get {
+                return ((string)(this["Gow2018Directory"]));
+            }
+            set {
+                this["Gow2018Directory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131137")]
+        public int AutoTog {
+            get {
+                return ((int)(this["AutoTog"]));
+            }
+            set {
+                this["AutoTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131156")]
+        public int TopTog {
+            get {
+                return ((int)(this["TopTog"]));
+            }
+            set {
+                this["TopTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6553")]
+        public int AdvTog {
+            get {
+                return ((int)(this["AdvTog"]));
+            }
+            set {
+                this["AdvTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131143")]
+        public int GlobalTog {
+            get {
+                return ((int)(this["GlobalTog"]));
+            }
+            set {
+                this["GlobalTog"] = value;
             }
         }
     }

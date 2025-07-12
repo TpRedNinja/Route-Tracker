@@ -5,13 +5,6 @@ using System.Runtime.InteropServices;
 
 namespace Route_Tracker
 {
-    // ==========FORMAL COMMENT=========
-    // Form for configuring hotkeys to manually complete or skip route entries
-    // Allows users to assign custom keys for route entry management
-    // Supports global hotkeys and advanced hotkey behaviors
-    // ==========MY NOTES==============
-    // Enhanced hotkey settings with global hotkeys and advanced mode
-    // Now includes undo functionality and selection-based actions
     public partial class HotkeysSettingsForm : Form
     {
         private readonly KeysConverter keysConverter = new();
@@ -23,9 +16,23 @@ namespace Route_Tracker
         private Keys shortLoad;
         private Keys shortSave;
         private Keys shortLoadP;
+        private Keys shortResetP;
         private Keys shortRefresh;
         private Keys shortHelp;
         private Keys shortFilterC;
+        private Keys shortConnect;
+        private Keys shortGameStats;
+        private Keys shortRouteStats;
+        private Keys shortLayoutUp;
+        private Keys shortLayoutDown;
+        private Keys shortBackFold;
+        private Keys shortBackNow;
+        private Keys shortRestore;
+        private Keys shortSetFold;
+        private Keys shortAutoTog;
+        private Keys shortTopTog;
+        private Keys shortAdvTog;
+        private Keys shortGlobalTog;
         public readonly SettingsManager? settingsManager;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "SYSLIB1054",
@@ -34,7 +41,7 @@ namespace Route_Tracker
         Justification = "because i said so")]
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
-        
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "SYSLIB1054",
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
@@ -54,186 +61,454 @@ namespace Route_Tracker
             LoadHotkeys();
         }
 
-        // ==========FORMAL COMMENT=========
-        // Initializes form components with enhanced styling and new options
-        // Creates all controls including new undo hotkey and setting checkboxes
-        // ==========MY NOTES==============
-        // Enhanced form with all the new controls for global and advanced hotkeys
         private void InitializeComponent()
         {
             this.Text = "Configure Hotkeys";
-            this.Size = new Size(450, 600);
+            this.Size = new Size(400, 500);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.CenterParent;
             this.BackColor = AppTheme.BackgroundColor;
             this.ForeColor = AppTheme.TextColor;
+            this.AutoScroll = true;
 
-            // Hotkey labels and textboxes
+            var font = new Font(AppTheme.DefaultFont.FontFamily, 7.5f);
+
+            int y = 20;
+            int spacing = 25;
+
             Label lblComplete = new()
             {
-                Text = "Complete Entry Hotkey:",
+                Text = "Complete Entry:",
                 AutoSize = true,
-                Location = new Point(20, 30)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtCompleteHotkey = new()
             {
                 Name = "txtCompleteHotkey",
-                Size = new Size(200, 25),
-                Location = new Point(200, 30),
-                ReadOnly = true
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                ReadOnly = true,
+                Font = font
             };
             txtCompleteHotkey.KeyDown += TextBoxes_KeysDown;
 
+            y += spacing;
             Label lblSkip = new()
             {
-                Text = "Skip Entry Hotkey:",
+                Text = "Skip Entry:",
                 AutoSize = true,
-                Location = new Point(20, 70)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtSkipHotkey = new()
             {
                 Name = "txtSkipHotkey",
-                Size = new Size(200, 25),
-                Location = new Point(200, 70),
-                ReadOnly = true
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                ReadOnly = true,
+                Font = font
             };
             txtSkipHotkey.KeyDown += TextBoxes_KeysDown;
 
+            y += spacing;
             Label lblUndo = new()
             {
-                Text = "Undo Entry Hotkey:",
+                Text = "Undo Entry:",
                 AutoSize = true,
-                Location = new Point(20, 110)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtUndoHotkey = new()
             {
                 Name = "txtUndoHotkey",
-                Size = new Size(200, 25),
-                Location = new Point(200, 110),
-                ReadOnly = true
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                ReadOnly = true,
+                Font = font
             };
             txtUndoHotkey.KeyDown += TextBoxes_KeysDown;
 
-            // Shortcut labels and textboxes
+            y += spacing;
             Label lblShortLoad = new()
             {
-                Text = "Shortcut: Load Route",
+                Text = "Load Route:",
                 AutoSize = true,
-                Location = new Point(20, 150)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtShortLoad = new()
             {
                 Name = "txtShortLoad",
-                Size = new Size(200, 25),
-                Location = new Point(200, 150)
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
             };
             txtShortLoad.KeyDown += TextBoxes_KeysDown;
 
+            y += spacing;
             Label lblShortSave = new()
             {
-                Text = "Shortcut: Save Progress",
+                Text = "Save Progress:",
                 AutoSize = true,
-                Location = new Point(20, 190)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtShortSave = new()
             {
                 Name = "txtShortSave",
-                Size = new Size(200, 25),
-                Location = new Point(200, 190)
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
             };
             txtShortSave.KeyDown += TextBoxes_KeysDown;
 
+            y += spacing;
             Label lblShortLoadP = new()
             {
-                Text = "Shortcut: Load Progress",
+                Text = "Load Progress:",
                 AutoSize = true,
-                Location = new Point(20, 230)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtShortLoadP = new()
             {
                 Name = "txtShortLoadP",
-                Size = new Size(200, 25),
-                Location = new Point(200, 230)
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
             };
             txtShortLoadP.KeyDown += TextBoxes_KeysDown;
 
+            y += spacing;
+            Label lblShortResetP = new()
+            {
+                Text = "Reset Progress:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortResetP = new()
+            {
+                Name = "txtShortResetP",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortResetP.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
             Label lblShortRefresh = new()
             {
-                Text = "Shortcut: Refresh",
+                Text = "Refresh:",
                 AutoSize = true,
-                Location = new Point(20, 270)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtShortRefresh = new()
             {
                 Name = "txtShortRefresh",
-                Size = new Size(200, 25),
-                Location = new Point(200, 270)
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
             };
             txtShortRefresh.KeyDown += TextBoxes_KeysDown;
 
+            y += spacing;
             Label lblShortHelp = new()
             {
-                Text = "Shortcut: Help",
+                Text = "Help:",
                 AutoSize = true,
-                Location = new Point(20, 310)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtShortHelp = new()
             {
                 Name = "txtShortHelp",
-                Size = new Size(200, 25),
-                Location = new Point(200, 310)
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
             };
             txtShortHelp.KeyDown += TextBoxes_KeysDown;
 
+            y += spacing;
             Label lblShortFilterC = new()
             {
-                Text = "Shortcut: Clear Filters",
+                Text = "Clear Filters:",
                 AutoSize = true,
-                Location = new Point(20, 350)
+                Location = new Point(20, y),
+                Font = font
             };
             TextBox txtShortFilterC = new()
             {
                 Name = "txtShortFilterC",
-                Size = new Size(200, 25),
-                Location = new Point(200, 350)
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
             };
             txtShortFilterC.KeyDown += TextBoxes_KeysDown;
 
-            // Info label
+            y += spacing;
+            Label lblShortConnect = new()
+            {
+                Text = "Connect to Game:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortConnect = new()
+            {
+                Name = "txtShortConnect",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortConnect.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortGameStats = new()
+            {
+                Text = "Game Stats:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortGameStats = new()
+            {
+                Name = "txtShortGameStats",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortGameStats.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortRouteStats = new()
+            {
+                Text = "Route Stats:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortRouteStats = new()
+            {
+                Name = "txtShortRouteStats",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortRouteStats.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortLayoutUp = new()
+            {
+                Text = "Layout Next:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortLayoutUp = new()
+            {
+                Name = "txtShortLayoutUp",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortLayoutUp.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortLayoutDown = new()
+            {
+                Text = "Layout Previous:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortLayoutDown = new()
+            {
+                Name = "txtShortLayoutDown",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortLayoutDown.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortBackFold = new()
+            {
+                Text = "Open Backup Folder:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortBackFold = new()
+            {
+                Name = "txtShortBackFold",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortBackFold.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortBackNow = new()
+            {
+                Text = "Backup Now:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortBackNow = new()
+            {
+                Name = "txtShortBackNow",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortBackNow.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortRestore = new()
+            {
+                Text = "Restore Settings:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortRestore = new()
+            {
+                Name = "txtShortRestore",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortRestore.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortSetFold = new()
+            {
+                Text = "Open settings folder:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortSetFold = new()
+            {
+                Name = "txtShortSetFold",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortSetFold.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortAutoTog = new()
+            {
+                Text = "Toggle Auto-Start Game:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortAutoTog = new()
+            {
+                Name = "txtShortAutoTog",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortAutoTog.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortTopTog = new()
+            {
+                Text = "Toggle Always On Top:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortTopTog = new()
+            {
+                Name = "txtShortTopTog",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortTopTog.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortAdvTog = new()
+            {
+                Text = "Toggle Advanced Hotkeys:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortAdvTog = new()
+            {
+                Name = "txtShortAdvTog",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortAdvTog.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing;
+            Label lblShortGlobalTog = new()
+            {
+                Text = "Toggle Global Hotkeys:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortGlobalTog = new()
+            {
+                Name = "txtShortGlobalTog",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortGlobalTog.KeyDown += TextBoxes_KeysDown;
+
+            y += spacing + 8;
             Label lblInfo = new()
             {
-                Text = "Click in textbox and press desired key",
+                Text = "Click in textbox and press desired key combination",
                 AutoSize = true,
-                Location = new Point(20, 390),
-                Width = 400
+                Location = new Point(20, y),
+                Width = 350,
+                Font = font,
+                ForeColor = Color.Gray
             };
 
-            // Checkboxes (moved below all textboxes)
+            y += spacing;
             CheckBox chkGlobalHotkeys = new()
             {
                 Name = "chkGlobalHotkeys",
                 Text = "Global Hotkeys",
                 AutoSize = true,
-                Location = new Point(20, 430)
+                Location = new Point(20, y),
+                Font = font
             };
             CheckBox chkAdvancedHotkeys = new()
             {
                 Name = "chkAdvancedHotkeys",
                 Text = "Advanced Hotkeys",
                 AutoSize = true,
-                Location = new Point(20, 460)
+                Location = new Point(140, y),
+                Font = font
             };
             ToolTip toolTip = new();
             toolTip.SetToolTip(chkAdvancedHotkeys, "Allows hotkey actions to apply to any selected entry, not just the first incomplete entry.");
 
-            // Buttons (moved below checkboxes)
+            y += spacing;
             Button btnSave = new()
             {
                 Text = "Save",
-                Size = new Size(100, 30),
-                Location = new Point(150, 510)
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
             };
             btnSave.Click += BtnSave_Click;
             AppTheme.ApplyToButton(btnSave);
@@ -241,51 +516,56 @@ namespace Route_Tracker
             Button btnCancel = new()
             {
                 Text = "Cancel",
-                Size = new Size(100, 30),
-                Location = new Point(270, 510)
+                AutoSize = true,
+                Location = new Point(140, y),
+                Font = font
             };
             btnCancel.Click += BtnCancel_Click;
             AppTheme.ApplyToButton(btnCancel);
 
             Button btnReset = new()
             {
-                Text = "Reset to Default",
-                Size = new Size(120, 30),
-                Location = new Point(20, 510)
+                Text = "Reset to default",
+                AutoSize = true,
+                Location = new Point(260, y),
+                Font = font
             };
             btnReset.Click += BtnReset_Click;
             AppTheme.ApplyToButton(btnReset);
 
-            // Add all controls
-            this.Controls.AddRange(
-            [
+            this.Controls.AddRange([
                 lblComplete, txtCompleteHotkey,
                 lblSkip, txtSkipHotkey,
                 lblUndo, txtUndoHotkey,
                 lblShortLoad, txtShortLoad,
                 lblShortSave, txtShortSave,
                 lblShortLoadP, txtShortLoadP,
+                lblShortResetP, txtShortResetP,
                 lblShortRefresh, txtShortRefresh,
                 lblShortHelp, txtShortHelp,
                 lblShortFilterC, txtShortFilterC,
-                lblInfo,
-                chkGlobalHotkeys, chkAdvancedHotkeys,
+                lblShortConnect, txtShortConnect,
+                lblShortGameStats, txtShortGameStats,
+                lblShortRouteStats, txtShortRouteStats,
+                lblShortLayoutUp, txtShortLayoutUp,
+                lblShortLayoutDown, txtShortLayoutDown,
+                lblShortBackFold, txtShortBackFold,
+                lblShortBackNow, txtShortBackNow,
+                lblShortRestore, txtShortRestore,
+                lblShortSetFold, txtShortSetFold,
+                lblShortAutoTog, txtShortAutoTog,
+                lblShortTopTog, txtShortTopTog,
+                lblShortAdvTog, txtShortAdvTog,
+                lblShortGlobalTog, txtShortGlobalTog,
+                lblInfo, chkGlobalHotkeys, chkAdvancedHotkeys,
                 btnSave, btnCancel, btnReset
             ]);
 
-            // Add this at the end of InitializeComponent()
             this.BackColor = AppTheme.BackgroundColor;
             this.ForeColor = AppTheme.TextColor;
             AppTheme.ApplyTo(this);
-            AppTheme.ApplyToButton(btnSave);
-            AppTheme.ApplyToButton(btnCancel);
-            AppTheme.ApplyToButton(btnReset);
         }
 
-        // ==========FORMAL COMMENT=========
-        // Loads current hotkey settings including new undo and option settings
-        // ==========MY NOTES==============
-        // Enhanced loading that includes all the new settings
         private void LoadHotkeys()
         {
             // hotkey stuff
@@ -314,16 +594,47 @@ namespace Route_Tracker
             shortLoad = (Keys)Settings.Default.ShortLoad;
             shortSave = (Keys)Settings.Default.ShortSave;
             shortLoadP = (Keys)Settings.Default.ShortLoadP;
+            shortResetP = (Keys)Settings.Default.ShortResetP;
             shortRefresh = (Keys)Settings.Default.ShortRefresh;
             shortHelp = (Keys)Settings.Default.ShortHelp;
             shortFilterC = (Keys)Settings.Default.ShortFilterC;
+            shortConnect = (Keys)Settings.Default.ShortConnect;
+            shortGameStats = (Keys)Settings.Default.ShortGameStats;
+            shortRouteStats = (Keys)Settings.Default.ShortRouteStats;
+            shortLayoutUp = (Keys)Settings.Default.ShortLayoutUp;
+            shortLayoutDown = (Keys)Settings.Default.ShortLayoutDown;
+            shortBackFold = (Keys)Settings.Default.ShortBackFold;
+            shortBackNow = (Keys)Settings.Default.ShortBackNow;
+            shortRestore = (Keys)Settings.Default.ShortRestore;
+            shortSetFold = (Keys)Settings.Default.ShortSetFold;
 
             if (this.Controls["txtShortLoad"] is TextBox txtLoad) txtLoad.Text = keysConverter.ConvertToString(shortLoad);
             if (this.Controls["txtShortSave"] is TextBox txtSave) txtSave.Text = keysConverter.ConvertToString(shortSave);
             if (this.Controls["txtShortLoadP"] is TextBox txtLoadP) txtLoadP.Text = keysConverter.ConvertToString(shortLoadP);
+            if (this.Controls["txtShortResetP"] is TextBox txtResetP) txtResetP.Text = keysConverter.ConvertToString(shortResetP);
             if (this.Controls["txtShortRefresh"] is TextBox txtRefresh) txtRefresh.Text = keysConverter.ConvertToString(shortRefresh);
             if (this.Controls["txtShortHelp"] is TextBox txtHelp) txtHelp.Text = keysConverter.ConvertToString(shortHelp);
             if (this.Controls["txtShortFilterC"] is TextBox txtFilterC) txtFilterC.Text = keysConverter.ConvertToString(shortFilterC);
+            if (this.Controls["txtShortConnect"] is TextBox txtConnect) txtConnect.Text = keysConverter.ConvertToString(shortConnect);
+            if (this.Controls["txtShortGameStats"] is TextBox txtGameStats) txtGameStats.Text = keysConverter.ConvertToString(shortGameStats);
+            if (this.Controls["txtShortRouteStats"] is TextBox txtRouteStats) txtRouteStats.Text = keysConverter.ConvertToString(shortRouteStats);
+            if (this.Controls["txtShortLayoutUp"] is TextBox txtLayoutUp) txtLayoutUp.Text = keysConverter.ConvertToString(shortLayoutUp);
+            if (this.Controls["txtShortLayoutDown"] is TextBox txtLayoutDown) txtLayoutDown.Text = keysConverter.ConvertToString(shortLayoutDown);
+            if (this.Controls["txtShortBackFold"] is TextBox txtBackFold) txtBackFold.Text = keysConverter.ConvertToString(shortBackFold);
+            if (this.Controls["txtShortBackNow"] is TextBox txtBackNow) txtBackNow.Text = keysConverter.ConvertToString(shortBackNow);
+            if (this.Controls["txtShortRestore"] is TextBox txtRestore) txtRestore.Text = keysConverter.ConvertToString(shortRestore);
+            if (this.Controls["txtShortSetFold"] is TextBox txtSetFold) txtSetFold.Text = keysConverter.ConvertToString(shortSetFold);
+
+            //toggle shortcuts
+            shortAutoTog = (Keys)Settings.Default.AutoTog;
+            shortTopTog = (Keys)Settings.Default.TopTog;
+            shortAdvTog = (Keys)Settings.Default.AdvTog;
+            shortGlobalTog = (Keys)Settings.Default.GlobalTog;
+
+            if (this.Controls["txtShortAutoTog"] is TextBox txtAutoTog) txtAutoTog.Text = keysConverter.ConvertToString(shortAutoTog);
+            if (this.Controls["txtShortTopTog"] is TextBox txtTopTog) txtTopTog.Text = keysConverter.ConvertToString(shortTopTog);
+            if (this.Controls["txtShortAdvTog"] is TextBox txtAdvTog) txtAdvTog.Text = keysConverter.ConvertToString(shortAdvTog);
+            if (this.Controls["txtShortGlobalTog"] is TextBox txtGlobalTog) txtGlobalTog.Text = keysConverter.ConvertToString(shortGlobalTog);
 
         }
 
@@ -354,6 +665,9 @@ namespace Route_Tracker
                 case "txtShortLoadP":
                     shortLoadP = value;
                     break;
+                case "txtShortResetP":
+                    shortResetP = value;
+                    break;
                 case "txtShortRefresh":
                     shortRefresh = value;
                     break;
@@ -363,6 +677,45 @@ namespace Route_Tracker
                 case "txtShortFilterC":
                     shortFilterC = value;
                     break;
+                case "txtShortConnect":
+                    shortConnect = value;
+                    break;
+                case "txtShortGameStats":
+                    shortGameStats = value;
+                    break;
+                case "txtShortRouteStats":
+                    shortRouteStats = value;
+                    break;
+                case "txtShortLayoutUp":
+                    shortLayoutUp = value;
+                    break;
+                case "txtShortLayoutDown":
+                    shortLayoutDown = value;
+                    break;
+                case "txtShortBackFold":
+                    shortBackFold = value;
+                    break;
+                case "txtShortBackNow":
+                    shortBackNow = value;
+                    break;
+                case "txtShortRestore":
+                    shortRestore = value;
+                    break;
+                case "txtShortSetFold":
+                    shortSetFold = value;
+                    break;
+                case "txtShortAutoTog":
+                    shortAutoTog = value;
+                    break;
+                case "txtShortTopTog":
+                    shortTopTog = value;
+                    break;
+                case "txtShortAdvTog":
+                    shortAdvTog = value;
+                    break;
+                case "txtShortGlobalTog":
+                    shortGlobalTog = value;
+                    break;
             }
 
             txtBox.Text = keysConverter.ConvertToString(value);
@@ -370,20 +723,14 @@ namespace Route_Tracker
             e.SuppressKeyPress = true;
         }
 
-        // ==========FORMAL COMMENT=========
-        // Saves all hotkey settings including new undo and option settings
-        // ==========MY NOTES==============
-        // Enhanced saving that includes all the new settings
         private void BtnSave_Click(object? sender, EventArgs e)
         {
-            // Get checkbox states
             if (this.Controls["chkGlobalHotkeys"] is CheckBox chkGlobal)
                 globalHotkeys = chkGlobal.Checked;
 
             if (this.Controls["chkAdvancedHotkeys"] is CheckBox chkAdvanced)
                 advancedHotkeys = chkAdvanced.Checked;
 
-            // Save all settings
             Settings.Default.CompleteHotkey = (int)completeHotkey;
             Settings.Default.SkipHotkey = (int)skipHotkey;
             Settings.Default.UndoHotkey = (int)undoHotkey;
@@ -392,9 +739,23 @@ namespace Route_Tracker
             Settings.Default.ShortLoad = (int)shortLoad;
             Settings.Default.ShortSave = (int)shortSave;
             Settings.Default.ShortLoadP = (int)shortLoadP;
+            Settings.Default.ShortResetP = (int)shortResetP;
             Settings.Default.ShortRefresh = (int)shortRefresh;
             Settings.Default.ShortHelp = (int)shortHelp;
             Settings.Default.ShortFilterC = (int)shortFilterC;
+            Settings.Default.ShortConnect = (int)shortConnect;
+            Settings.Default.ShortGameStats = (int)shortGameStats;
+            Settings.Default.ShortRouteStats = (int)shortRouteStats;
+            Settings.Default.ShortLayoutUp = (int)shortLayoutUp;
+            Settings.Default.ShortLayoutDown = (int)shortLayoutDown;
+            Settings.Default.ShortBackFold = (int)shortBackFold;
+            Settings.Default.ShortBackNow = (int)shortBackNow;
+            Settings.Default.ShortRestore = (int)shortRestore;
+            Settings.Default.ShortSetFold = (int)shortSetFold;
+            Settings.Default.AutoTog = (int)shortAutoTog;
+            Settings.Default.TopTog = (int)shortTopTog;
+            Settings.Default.AdvTog = (int)shortAdvTog;
+            Settings.Default.GlobalTog = (int)shortGlobalTog;
             Settings.Default.Save();
 
             if (this.Owner is MainForm mainForm)
@@ -422,15 +783,33 @@ namespace Route_Tracker
             shortLoad = Keys.Control | Keys.O;
             shortSave = Keys.Control | Keys.S;
             shortLoadP = Keys.Control | Keys.L;
+            shortResetP = Keys.Control | Keys.R;
             shortRefresh = Keys.F5;
             shortHelp = Keys.F1;
             shortFilterC = Keys.Escape;
+            shortConnect = Keys.Shift | Keys.C;
+            shortGameStats = Keys.Shift | Keys.S;
+            shortRouteStats = Keys.Shift | Keys.R;
+            shortLayoutUp = Keys.Alt | Keys.M;
+            shortLayoutDown = Keys.Shift | Keys.M;
+            shortBackFold = Keys.Control | Keys.B;
+            shortBackNow = Keys.Shift | Keys.B;
+            shortRestore = Keys.Control | Keys.Shift | Keys.B;
+            shortSetFold = Keys.Control | Keys.Shift | Keys.S;
+            shortAutoTog = Keys.Control | Keys.A;
+            shortTopTog = Keys.Control | Keys.T;
+            shortAdvTog = Keys.Shift | Keys.A;
+            shortGlobalTog = Keys.Control | Keys.G;
 
             if (settingsManager != null)
             {
                 settingsManager.SaveHotkeys(Keys.None, Keys.None);
                 settingsManager.SaveHotkeySettings(Keys.None, false, false);
-                settingsManager.SaveShortcuts(shortLoad, shortSave, shortLoadP, shortRefresh, shortHelp, shortFilterC);
+                settingsManager.SaveShortcuts(shortLoad, shortSave, shortLoadP, 
+                    shortResetP, shortRefresh, shortHelp, shortFilterC, shortConnect, 
+                    shortGameStats, shortRouteStats, shortLayoutUp, shortLayoutDown, 
+                    shortBackFold, shortBackNow, shortRestore, shortSetFold, 
+                    shortAutoTog, shortTopTog, shortAdvTog, shortGlobalTog);
             }
             else
             {
@@ -442,9 +821,23 @@ namespace Route_Tracker
                 Settings.Default.ShortLoad = (int)shortLoad;
                 Settings.Default.ShortSave = (int)shortSave;
                 Settings.Default.ShortLoadP = (int)shortLoadP;
+                Settings.Default.ShortResetP = (int)shortResetP;
                 Settings.Default.ShortRefresh = (int)shortRefresh;
                 Settings.Default.ShortHelp = (int)shortHelp;
                 Settings.Default.ShortFilterC = (int)shortFilterC;
+                Settings.Default.ShortConnect = (int)shortConnect;
+                Settings.Default.ShortGameStats = (int)shortGameStats;
+                Settings.Default.ShortRouteStats = (int)shortRouteStats;
+                Settings.Default.ShortLayoutUp = (int)shortLayoutUp;
+                Settings.Default.ShortLayoutDown = (int)shortLayoutDown;
+                Settings.Default.ShortBackFold = (int)shortBackFold;
+                Settings.Default.ShortBackNow = (int)shortBackNow;
+                Settings.Default.ShortRestore = (int)shortRestore;
+                Settings.Default.ShortSetFold = (int)shortSetFold;
+                Settings.Default.AutoTog = (int)shortAutoTog;
+                Settings.Default.TopTog = (int)shortTopTog;
+                Settings.Default.AdvTog = (int)shortAdvTog;
+                Settings.Default.GlobalTog = (int)shortGlobalTog;
                 Settings.Default.Save();
             }
 

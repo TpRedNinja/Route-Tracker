@@ -74,6 +74,7 @@ namespace Route_Tracker
             };
             connectButton.Click += ConnectButton_Click;
             this.Controls.Add(connectButton);
+
         }
 
         private void AutoDetectButton_Click(object? sender, EventArgs e)
