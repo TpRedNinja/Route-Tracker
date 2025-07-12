@@ -1,0 +1,14 @@
+[
+    {
+        "title": "How to Configure Hotkeys (Shortcuts)",
+        "content": "Click in any textbox and press the desired key combination.\nHotkeys (top) are for completing, skipping, and undoing route entries.\nShortcuts (bottom) are for quick actions like loading, saving, refreshing, help, clearing filters, connecting, stats, layout, backup, restore, settings folder, and toggles.\n\nAll available hotkeys and shortcuts are listed in the next section."
+    },
+    {
+        "title": "Current Shortcuts (Menu Actions)",
+        "content": "Complete Entry: (set in Hotkeys section)\nSkip Entry: (set in Hotkeys section)\nUndo Entry: (set in Hotkeys section)\nLoad Route: {Load}\nSave Progress: {Save}\nLoad Progress: {LoadProgress}\nReset Progress: {ResetProgress}\nRefresh: {Refresh}\nHelp: {Help}\nClear Filters: {FilterClear}\nConnect to Game: {Connect}\nShow Game Stats: {GameStats}\nShow Route Stats: {RouteStats}\nSwitch Layout Mode (Next): {LayoutUp}\nSwitch Layout Mode (Previous): {LayoutDown}\nOpen Backup Folder: {BackupFolder}\nBackup Settings Now: {BackupNow}\nRestore Settings from Backup: {Restore}\nOpen Settings Folder: {SetFolder}\nToggle Auto-Start Game: {AutoTog}\nToggle Always On Top: {TopTog}\nToggle Advanced Hotkeys: {AdvTog}\nToggle Global Hotkeys: {GlobalTog}"
+    },
+    {
+        "title": "Current Hotkeys (Route Actions)",
+        "content": "Global Hotkeys: Enable to use hotkeys even when the app is not focused.\nAdvanced Hotkeys: Allows hotkey actions to apply to any selected entry, not just the first incomplete entry.\n\nConfigure hotkeys and shortcuts in the Hotkeys section above."
+    }
+]
