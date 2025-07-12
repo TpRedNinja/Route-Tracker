@@ -16,6 +16,46 @@ namespace Route_Tracker
     // The core class that powers the entire tracking functionality
     public abstract unsafe class GameStatsBase : IGameStats
     {
+        #region current. and old. things
+        private readonly Dictionary<string, (object Old, object Current)> _statHistory = [];
+
+        protected void RegisterStat(string name, object value)
+        {
+            if (_statHistory.TryGetValue(name, out var entry))
+                _statHistory[name] = (entry.Current, value);
+            else
+                _statHistory[name] = (value, value);
+        }
+
+        public dynamic Current => new StatAccessor(_statHistory, true);
+        public dynamic Old => new StatAccessor(_statHistory, false);
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290: Use primary constructure",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        Justification = "because i said so")]
+        private class StatAccessor : System.Dynamic.DynamicObject
+        {
+            private readonly Dictionary<string, (object Old, object Current)> _dict;
+            private readonly bool _isCurrent;
+            public StatAccessor(Dictionary<string, (object Old, object Current)> dict, bool isCurrent)
+            {
+                _dict = dict;
+                _isCurrent = isCurrent;
+            }
+            public override bool TryGetMember(System.Dynamic.GetMemberBinder binder, out object result)
+            {
+                if (_dict.TryGetValue(binder.Name, out var entry))
+                {
+                    result = _isCurrent ? entry.Current : entry.Old;
+                    return true;
+                }
+                result = null!;
+                return false;
+            }
+        }
+        #endregion
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0290: Use primary constructure",
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",

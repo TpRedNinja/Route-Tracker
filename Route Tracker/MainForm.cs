@@ -72,6 +72,10 @@ namespace Route_Tracker
         // UI update throttling
         private DateTime _lastUIUpdateTime = DateTime.MinValue;
         private readonly TimeSpan _minimumUIUpdateInterval = TimeSpan.FromMilliseconds(100);
+        
+        // global hotkey support
+        private bool globalHotkeysRegistered = false;
+
         #endregion
 
         #region Constructor and Initialization
@@ -362,6 +366,88 @@ namespace Route_Tracker
             bool handled = MainFormHelpers.ProcessCmdKey(this, settingsManager, routeManager, ref msg, keyData);
             return handled || base.ProcessCmdKey(ref msg, keyData);
         }
+
+        // ==========MY NOTES==============
+        // Handles global hotkey messages and window procedure overrides
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_HOTKEY = 0x0312;
+
+            if (m.Msg == WM_HOTKEY)
+            {
+                var (CompleteHotkey, SkipHotkey, UndoHotkey, GlobalHotkeys, AdvancedHotkeys) = settingsManager.GetAllHotkeySettings();
+                if (GlobalHotkeys)
+                {
+                    Keys keyPressed = (Keys)((m.LParam.ToInt32() >> 16) & 0xFFFF);
+                    MainFormHelpers.ProcessGlobalHotkey(this, settingsManager, routeManager, keyPressed);
+                }
+            }
+
+            base.WndProc(ref m);
+        }
+
+        // ==========MY NOTES==============
+        // Registers or unregisters global hotkeys based on settings
+        public void UpdateGlobalHotkeys()
+        {
+            var hotkeySettings = settingsManager.GetAllHotkeySettings();
+
+            if (hotkeySettings.GlobalHotkeys && !globalHotkeysRegistered)
+            {
+                RegisterGlobalHotkeys(hotkeySettings);
+                globalHotkeysRegistered = true;
+            }
+            else if (!hotkeySettings.GlobalHotkeys && globalHotkeysRegistered)
+            {
+                UnregisterGlobalHotkeys();
+                globalHotkeysRegistered = false;
+            }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "SYSLIB1054",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "SYSLIB1054",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        private void RegisterGlobalHotkeys((Keys CompleteHotkey, Keys SkipHotkey, Keys UndoHotkey, bool GlobalHotkeys, bool AdvancedHotkeys) settings)
+        {
+            const int HOTKEY_ID_COMPLETE = 1;
+            const int HOTKEY_ID_SKIP = 2;
+            const int HOTKEY_ID_UNDO = 3;
+
+            if (settings.CompleteHotkey != Keys.None)
+                RegisterHotKey(this.Handle, HOTKEY_ID_COMPLETE, 0, (int)settings.CompleteHotkey);
+
+            if (settings.SkipHotkey != Keys.None)
+                RegisterHotKey(this.Handle, HOTKEY_ID_SKIP, 0, (int)settings.SkipHotkey);
+
+            if (settings.UndoHotkey != Keys.None)
+                RegisterHotKey(this.Handle, HOTKEY_ID_UNDO, 0, (int)settings.UndoHotkey);
+        }
+
+        private void UnregisterGlobalHotkeys()
+        {
+            const int HOTKEY_ID_COMPLETE = 1;
+            const int HOTKEY_ID_SKIP = 2;
+            const int HOTKEY_ID_UNDO = 3;
+
+            UnregisterHotKey(this.Handle, HOTKEY_ID_COMPLETE);
+            UnregisterHotKey(this.Handle, HOTKEY_ID_SKIP);
+            UnregisterHotKey(this.Handle, HOTKEY_ID_UNDO);
+        }
         #endregion
 
         #region Application Lifecycle
@@ -376,8 +462,16 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Handles app shutdown - cleans up resources properly
+        // ==========MY NOTES==============
+        // Handles app shutdown - cleans up resources properly
         private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
         {
+            // Cleanup global hotkeys
+            if (globalHotkeysRegistered)
+            {
+                UnregisterGlobalHotkeys();
+            }
+
             RouteHelpers.CleanupGameStats(gameConnectionManager);
         }
         #endregion

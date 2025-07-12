@@ -368,6 +368,30 @@ namespace Route_Tracker
         {
             return Settings.Default.HotkeysEnabled;
         }
+
+        public void SaveHotkeySettings(Keys undoHotkey, bool globalHotkeys, bool advancedHotkeys)
+        {
+            Settings.Default.UndoHotkey = (int)undoHotkey;
+            Settings.Default.GlobalHotkeys = globalHotkeys;
+            Settings.Default.AdvancedHotkeys = advancedHotkeys;
+            Settings.Default.Save();
+            BackupSettings();
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        public (Keys CompleteHotkey, Keys SkipHotkey, Keys UndoHotkey, bool GlobalHotkeys, bool AdvancedHotkeys) GetAllHotkeySettings()
+        {
+            return (
+                (Keys)Settings.Default.CompleteHotkey,
+                (Keys)Settings.Default.SkipHotkey,
+                (Keys)Settings.Default.UndoHotkey,
+                Settings.Default.GlobalHotkeys,
+                Settings.Default.AdvancedHotkeys
+            );
+        }
         #endregion
 
         #region misc settings
@@ -390,6 +414,10 @@ namespace Route_Tracker
             BackupSettings();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
         public LayoutSettingsForm.LayoutMode GetLayoutMode()
         {
             return Enum.TryParse<LayoutSettingsForm.LayoutMode>(Settings.Default.LayoutMode, out var mode)
@@ -404,6 +432,10 @@ namespace Route_Tracker
             BackupSettings();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
         public LayoutSettingsForm.LayoutMode GetLayoutSettings()
         {
             return Enum.TryParse<LayoutSettingsForm.LayoutMode>(Settings.Default.LayoutMode, out var mode)

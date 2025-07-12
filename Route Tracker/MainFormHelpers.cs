@@ -250,7 +250,7 @@ namespace Route_Tracker
 
         #region Hotkey Processing (from HotkeyManager.cs)
         // ==========MY NOTES==============
-        // Catches key presses and runs hotkey actions if hotkeys are enabled
+        // Enhanced hotkey processing with global hotkeys and advanced mode support
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060",
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
@@ -260,16 +260,53 @@ namespace Route_Tracker
             if (!mainForm.IsHotkeysEnabled)
                 return false;
 
-            (Keys CompleteHotkey, Keys SkipHotkey) = settingsManager.GetHotkeys();
+            var hotkeySettings = settingsManager.GetAllHotkeySettings();
 
-            if (keyData == CompleteHotkey)
+            // Skip processing if global hotkeys are enabled (handled by WndProc)
+            if (hotkeySettings.GlobalHotkeys)
+                return false;
+
+            return ProcessHotkeyAction(mainForm, routeManager, keyData, hotkeySettings);
+        }
+
+        // ==========MY NOTES==============
+        // Processes hotkey actions based on current settings and mode
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        private static bool ProcessHotkeyAction(MainForm mainForm, RouteManager? routeManager, Keys keyData, (Keys CompleteHotkey, Keys SkipHotkey, Keys UndoHotkey, bool GlobalHotkeys, bool AdvancedHotkeys) settings)
+        {
+            if (routeManager == null) return false;
+
+            RouteEntry? targetEntry = null;
+
+            // Determine which entry to act on based on advanced hotkeys setting
+            if (settings.AdvancedHotkeys)
             {
-                CompleteSelectedEntry(mainForm, routeManager);
+                targetEntry = routeManager.GetSelectedEntry(mainForm.routeGrid);
+                if (targetEntry == null) return false; // No selection in advanced mode
+            }
+            else
+            {
+                targetEntry = routeManager.GetFirstIncompleteEntry(mainForm.routeGrid);
+                if (targetEntry == null) return false; // No incomplete entries in normal mode
+            }
+
+            // Process the specific hotkey
+            if (keyData == settings.CompleteHotkey)
+            {
+                ProcessCompleteAction(mainForm, routeManager, targetEntry, settings.AdvancedHotkeys);
                 return true;
             }
-            else if (keyData == SkipHotkey)
+            else if (keyData == settings.SkipHotkey)
             {
-                SkipSelectedEntry(mainForm, routeManager);
+                ProcessSkipAction(mainForm, routeManager, targetEntry, settings.AdvancedHotkeys);
+                return true;
+            }
+            else if (keyData == settings.UndoHotkey)
+            {
+                ProcessUndoAction(mainForm, routeManager, targetEntry, settings.AdvancedHotkeys);
                 return true;
             }
 
@@ -277,56 +314,85 @@ namespace Route_Tracker
         }
 
         // ==========MY NOTES==============
-        // Marks the selected route entry as done when you press the complete hotkey
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
+        // Processes complete action with mode-specific behavior
+        private static void ProcessCompleteAction(MainForm mainForm, RouteManager routeManager, RouteEntry targetEntry, bool advancedMode)
+        {
+            if (advancedMode)
+            {
+                // In advanced mode, can complete any entry (even if already completed)
+                routeManager.CompleteEntry(mainForm.routeGrid, targetEntry);
+            }
+            else
+            {
+                // In normal mode, only complete if not already completed
+                if (!targetEntry.IsCompleted)
+                {
+                    routeManager.CompleteEntry(mainForm.routeGrid, targetEntry);
+                }
+            }
+
+            UpdateCompletionStats(mainForm, routeManager);
+        }
+
+        // ==========MY NOTES==============
+        // Processes skip action with mode-specific behavior
+        private static void ProcessSkipAction(MainForm mainForm, RouteManager routeManager, RouteEntry targetEntry, bool advancedMode)
+        {
+            if (advancedMode)
+            {
+                // In advanced mode, can skip any entry (even if already skipped)
+                if (!targetEntry.IsSkipped)
+                {
+                    routeManager.SkipEntry(mainForm.routeGrid, targetEntry);
+                }
+            }
+            else
+            {
+                // In normal mode, only skip if not already completed or skipped
+                if (!targetEntry.IsCompleted && !targetEntry.IsSkipped)
+                {
+                    routeManager.SkipEntry(mainForm.routeGrid, targetEntry);
+                }
+            }
+
+            UpdateCompletionStats(mainForm, routeManager);
+        }
+
+        // ==========MY NOTES==============
+        // Processes undo action - works on any completed or skipped entry
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060",
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
-        private static void CompleteSelectedEntry(MainForm mainForm, RouteManager? routeManager)
+        private static void ProcessUndoAction(MainForm mainForm, RouteManager routeManager, RouteEntry targetEntry, bool advancedMode)
         {
-            if (mainForm.routeGrid.CurrentRow != null && mainForm.routeGrid.CurrentRow.Tag is RouteEntry selectedEntry)
+            // Undo works if the entry is completed or skipped
+            if (targetEntry.IsCompleted || targetEntry.IsSkipped)
             {
-                selectedEntry.IsCompleted = true;
-                mainForm.routeGrid.CurrentRow.Cells[1].Value = "X";
-
-                RouteManager.SortRouteGridByCompletion(mainForm.routeGrid);
-                RouteManager.ScrollToFirstIncomplete(mainForm.routeGrid);
-
-                routeManager?.AutoSaveProgress();
-
-                if (routeManager != null)
-                {
-                    var (percentage, completed, total) = routeManager.CalculateCompletionStats();
-                    mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
-
-                    RouteHelpers.UpdateCompletionStatsIfVisible(routeManager);
-                }
+                routeManager.UndoEntry(mainForm.routeGrid, targetEntry);
+                UpdateCompletionStats(mainForm, routeManager);
             }
         }
 
         // ==========MY NOTES==============
-        // Skips the selected route entry when you press the skip hotkey
+        // Updates completion statistics after hotkey actions
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
-        private static void SkipSelectedEntry(MainForm mainForm, RouteManager? routeManager)
+        private static void UpdateCompletionStats(MainForm mainForm, RouteManager routeManager)
         {
-            if (mainForm.routeGrid.CurrentRow != null && mainForm.routeGrid.CurrentRow.Tag is RouteEntry selectedEntry)
-            {
-                selectedEntry.IsSkipped = true;
-                mainForm.routeGrid.Rows.Remove(mainForm.routeGrid.CurrentRow);
+            var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+            mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
+            RouteHelpers.UpdateCompletionStatsIfVisible(routeManager);
+        }
 
-                routeManager?.AutoSaveProgress();
-
-                if (routeManager != null)
-                {
-                    var (percentage, completed, total) = routeManager.CalculateCompletionStats();
-                    mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
-
-                    RouteHelpers.UpdateCompletionStatsIfVisible(routeManager);
-                }
-            }
+        // ==========MY NOTES==============
+        // Public method for global hotkey processing
+        public static void ProcessGlobalHotkey(MainForm mainForm, SettingsManager settingsManager, RouteManager? routeManager, Keys keyPressed)
+        {
+            var hotkeySettings = settingsManager.GetAllHotkeySettings();
+            ProcessHotkeyAction(mainForm, routeManager, keyPressed, hotkeySettings);
         }
         #endregion
     }

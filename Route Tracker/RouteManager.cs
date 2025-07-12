@@ -66,13 +66,28 @@ namespace Route_Tracker
                 string filename = Path.GetFileName(routeFilePath);
                 routeEntries = routeLoader.LoadRoute(filename);
 
-                // Assign sequential IDs to entries
+                // Load ID map if it exists
+                string idMapPath = Path.ChangeExtension(routeFilePath, ".ids.json");
+                Dictionary<string, int>? idMap = null;
+                if (File.Exists(idMapPath))
+                {
+                    string json = File.ReadAllText(idMapPath);
+                    idMap = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(json);
+                }
+
+                // Assign IDs
                 for (int i = 0; i < routeEntries.Count; i++)
                 {
-                    routeEntries[i].Id = i + 1;
-                    // Set prerequisite to previous entry (null for first)
+                    string key = $"{routeEntries[i].Name}_{routeEntries[i].Type}_{routeEntries[i].Condition}";
+                    if (idMap != null && idMap.TryGetValue(key, out int savedId))
+                        routeEntries[i].Id = savedId;
+                    else
+                        routeEntries[i].Id = i + 1;
                     routeEntries[i].Prerequisite = i > 0 ? routeEntries[i - 1] : null;
                 }
+
+                // Save the ID map after assignment
+                SaveIdMap();
             }
             return routeEntries;
         }
@@ -369,6 +384,11 @@ namespace Route_Tracker
         // Returns true if anything changed so we can update the display
         public bool UpdateCompletionStatus(DataGridView routeGrid, GameStatsEventArgs stats)
         {
+            if (gameConnectionManager?.GameStats is AC4GameStats ac4Stats && ac4Stats.isWindmillFragment)
+            {
+                HandleWindmillFragmentLogic();
+            }
+
             bool anyChanges = false;
 
             // Only check for 100% completion in AC4
@@ -468,7 +488,7 @@ namespace Route_Tracker
                 }
             }
 
-            // If changes were made, sort and scroll
+            // If changes were made sort, scroll, and auto-save
             if (anyChanges)
             {
                 SortRouteGridByCompletion(routeGrid);
@@ -481,21 +501,20 @@ namespace Route_Tracker
             return anyChanges;
         }
 
-        // Add this to the RouteManager class to handle cleanup
+        // does cleanup?
         public void Dispose()
         {
             completionCheckTimer?.Dispose();
             completionCheckTimer = null;
         }
 
-        // ==========FORMAL COMMENT=========
-        // Determines if a specific route entry should be marked as completed
-        // Uses type-based matching to compare game stats against completion conditions
-        // Handles special cases like story missions and supports multiple entry types
         // ==========MY NOTES==============
         // Decides if a specific route entry is complete or not
         // Looks at the entry type (viewpoint, chest, etc.) and checks the right stat
-        // Handles special types like story missions differently from collectibles
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
         private bool CheckCompletion(RouteEntry entry, GameStatsEventArgs stats)
         {
             if (string.IsNullOrEmpty(entry.Type))
@@ -539,16 +558,100 @@ namespace Route_Tracker
                 "Templar Hunts" or "templar hunts" => stats.GetValue<int>("Templar Hunts", 0) >= entry.Condition,
                 "Treasure Map" or "treasure map" => stats.GetValue<int>("Treasure Maps", 0) >= entry.Condition,
                 "Modern Day" or "modern day" => stats.GetValue<int>("Modern Day Missions", 0) >= entry.Condition,
-                // Special case for upgrades
-                "Upgrades" or "upgrades" => gameConnectionManager?.GameStats is AC4GameStats upgradeStats &&
-                    entry.Condition > 0 && entry.Condition <= upgradeStats.GetPurchasedUpgrades().Length &&
-                    upgradeStats.GetPurchasedUpgrades()[entry.Condition - 1],
+                "Upgrades" or "upgrades" => stats.GetValue<int>("Hero Upgrades", 0) >= entry.Condition,
                 _ => false,
             };
         }
         #endregion
 
         #region UI Management
+
+        private void HandleWindmillFragmentLogic()
+        {
+            if (gameConnectionManager.GameStats is not AC4GameStats ac4Stats || !ac4Stats.isWindmillFragment)
+                return;
+
+            // Find relevant entries by display text
+            var frag1 = routeEntries.FirstOrDefault(e => e.DisplayText.Contains("Skip fragment on windmill Get Castaway -> Fragment 1 New Bone", StringComparison.OrdinalIgnoreCase));
+            var frag2 = routeEntries.FirstOrDefault(e => e.DisplayText.Contains("Fragment 2 New Bone", StringComparison.OrdinalIgnoreCase));
+            var frag3 = routeEntries.FirstOrDefault(e => e.DisplayText.Contains("Fast Travel to New Bone -> Fragment 3 New Bone", StringComparison.OrdinalIgnoreCase));
+            var chest1 = routeEntries.FirstOrDefault(e => e.DisplayText.Contains("Chest 1 New Bone", StringComparison.OrdinalIgnoreCase));
+
+            // Save original index of frag3 before any changes
+            int frag3OriginalIndex = frag3 != null ? routeEntries.IndexOf(frag3) : -1;
+
+            // Case 3: Windmill fragment detected late
+            if (frag1 != null && frag2 != null && chest1 != null &&
+                frag1.IsCompleted && frag2.IsCompleted && chest1.IsCompleted && frag3 != null)
+            {
+                frag2.IsCompleted = false;
+                frag3.IsCompleted = true;
+                if (!frag3.Name.Contains("(completed early)", StringComparison.OrdinalIgnoreCase))
+                    frag3.Name += " (completed early)";
+
+                // Set frag3's condition to frag2's original condition
+                int targetCondition = frag2.Condition;
+                frag3.Condition = targetCondition;
+
+                // Adjust all fragments from frag2 up to (but not including) frag3's original position
+                int frag2Index = routeEntries.IndexOf(frag2);
+                int start = Math.Min(frag2Index, frag3OriginalIndex);
+                int end = Math.Max(frag2Index, frag3OriginalIndex);
+
+                for (int i = start; i < end; i++)
+                {
+                    var entry = routeEntries[i];
+                    if (entry.Type.Equals(frag2.Type, StringComparison.OrdinalIgnoreCase) && entry != frag3)
+                    {
+                        entry.Condition += 1;
+                    }
+                }
+                UpdateEntryIdsAndConditions(frag2Index, frag3OriginalIndex);
+                SaveIdMap();
+                return;
+            }
+
+            // Case 1 & 2: Windmill fragment collected early/on time
+            if (frag1 != null && frag3 != null)
+            {
+                frag1.IsCompleted = false;
+                frag3.IsCompleted = true;
+                if (!frag3.Name.Contains("(completed early)", StringComparison.OrdinalIgnoreCase))
+                    frag3.Name += " (completed early)";
+
+                // Set frag3's condition to frag1's original condition
+                int targetCondition = frag1.Condition;
+                frag3.Condition = targetCondition;
+
+                // Adjust all fragments from frag1 up to (but not including) frag3's original position
+                int frag1Index = routeEntries.IndexOf(frag1);
+                int start = Math.Min(frag1Index, frag3OriginalIndex);
+                int end = Math.Max(frag1Index, frag3OriginalIndex);
+
+                for (int i = start; i < end; i++)
+                {
+                    var entry = routeEntries[i];
+                    if (entry.Type.Equals(frag1.Type, StringComparison.OrdinalIgnoreCase) && entry != frag3)
+                    {
+                        entry.Condition += 1;
+                    }
+                }
+                UpdateEntryIdsAndConditions(frag1Index, frag3OriginalIndex); // See next step for this helper
+                SaveIdMap();
+            }
+        }
+
+        private void UpdateEntryIdsAndConditions(int startIndex, int endIndex)
+        {
+            int min = Math.Min(startIndex, endIndex);
+            int max = Math.Max(startIndex, endIndex);
+            for (int i = min; i <= max; i++)
+            {
+                routeEntries[i].Id = i + 1;
+                routeEntries[i].Prerequisite = i > 0 ? routeEntries[i - 1] : null;
+            }
+        }
+
         // ==========FORMAL COMMENT=========
         // Sorts the route grid so completed entries are at the top (by Id), followed by incomplete entries (by Id).
         // Does not change the current scroll position or selection in the grid.
@@ -616,6 +719,136 @@ namespace Route_Tracker
                 routeGrid.FirstDisplayedScrollingRowIndex = 0;
             }
         }
+
+        // ==========FORMAL COMMENT=========
+        // Marks the specified route entry as completed
+        // Updates UI display and triggers autosave
+        // Used by both manual and hotkey completion actions
+        // ==========MY NOTES==============
+        // Public method for completing any entry - used by hotkeys and manual actions
+        // Handles UI updates and autosave automatically
+        public void CompleteEntry(DataGridView routeGrid, RouteEntry entry)
+        {
+            if (entry == null) return;
+
+            entry.IsCompleted = true;
+
+            // Update the grid display
+            foreach (DataGridViewRow row in routeGrid.Rows)
+            {
+                if (row.Tag == entry)
+                {
+                    row.Cells[1].Value = "X";
+                    break;
+                }
+            }
+
+            SortRouteGridByCompletion(routeGrid);
+            ScrollToFirstIncomplete(routeGrid);
+            AutoSaveProgress();
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Marks the specified route entry as skipped and removes it from display
+        // Updates UI and triggers autosave
+        // Used by both manual and hotkey skip actions
+        // ==========MY NOTES==============
+        // Public method for skipping any entry - used by hotkeys and manual actions
+        // Removes the entry from display and handles autosave
+        public void SkipEntry(DataGridView routeGrid, RouteEntry entry)
+        {
+            if (entry == null) return;
+
+            entry.IsSkipped = true;
+
+            // Remove from grid display
+            for (int i = routeGrid.Rows.Count - 1; i >= 0; i--)
+            {
+                if (routeGrid.Rows[i].Tag == entry)
+                {
+                    routeGrid.Rows.RemoveAt(i);
+                    break;
+                }
+            }
+
+            AutoSaveProgress();
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Undoes completion or skip status for the specified route entry
+        // Restores entry to incomplete state and updates display
+        // Works for entries completed manually or automatically
+        // ==========MY NOTES==============
+        // New undo feature that works on any completed or skipped entry
+        // Brings back skipped entries and marks completed ones as incomplete
+        public void UndoEntry(DataGridView routeGrid, RouteEntry entry)
+        {
+            if (entry == null) return;
+
+            bool wasSkipped = entry.IsSkipped;
+            entry.IsCompleted = false;
+            entry.IsSkipped = false;
+
+            if (wasSkipped)
+            {
+                // Re-add to grid if it was skipped
+                string completionMark = entry.IsCompleted ? "X" : "";
+                int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                routeGrid.Rows[rowIndex].Tag = entry;
+            }
+            else
+            {
+                // Update existing row
+                foreach (DataGridViewRow row in routeGrid.Rows)
+                {
+                    if (row.Tag == entry)
+                    {
+                        row.Cells[1].Value = "";
+                        break;
+                    }
+                }
+            }
+
+            SortRouteGridByCompletion(routeGrid);
+            ScrollToFirstIncomplete(routeGrid);
+            AutoSaveProgress();
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Gets the currently selected route entry from the DataGridView
+        // Returns null if no entry is selected or selection is invalid
+        // ==========MY NOTES==============
+        // Helper method to get the selected entry for advanced hotkey mode
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        public RouteEntry? GetSelectedEntry(DataGridView routeGrid)
+        {
+            if (routeGrid.CurrentRow?.Tag is RouteEntry selectedEntry)
+                return selectedEntry;
+            return null;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Gets the first incomplete route entry from the DataGridView
+        // Returns null if all entries are completed
+        // ==========MY NOTES==============
+        // Helper method to get the first incomplete entry for normal hotkey mode
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        public RouteEntry? GetFirstIncompleteEntry(DataGridView routeGrid)
+        {
+            foreach (DataGridViewRow row in routeGrid.Rows)
+            {
+                if (row.Tag is RouteEntry entry && !entry.IsCompleted)
+                    return entry;
+            }
+            return null;
+        }
+
         #endregion
 
         #region Progress Persistence
@@ -1148,7 +1381,7 @@ namespace Route_Tracker
             return routeFilePath;
         }
 
-        // And add this method to show and open the save location
+        // show and open the save location
         public void ShowSaveLocation(Form parentForm)
         {
             string saveDir = Path.Combine(
@@ -1207,6 +1440,17 @@ namespace Route_Tracker
             }
             SortRouteGridByCompletion(routeGrid);
             ScrollToFirstIncomplete(routeGrid);
+        }
+
+        private void SaveIdMap()
+        {
+            string idMapPath = Path.ChangeExtension(routeFilePath, ".ids.json");
+            var idMap = routeEntries.ToDictionary(
+                e => $"{e.Name}_{e.Type}_{e.Condition}",
+                e => e.Id
+            );
+            string json = System.Text.Json.JsonSerializer.Serialize(idMap, JsonOptions);
+            File.WriteAllText(idMapPath, json);
         }
         #endregion
 

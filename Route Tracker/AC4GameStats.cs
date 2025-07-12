@@ -73,14 +73,6 @@ namespace Route_Tracker
         private static readonly int [] SpecialTreasureMapOffsets = [0x33B8, 0x33CC, 0x33E0, 0x33F4]; // Special treasure map offset we dont count this one
         #endregion
 
-        #region Resource Tracking
-        // Offsets for tracking resources spent (used for upgrade detection)
-        private const int RESOURCES_FIRST_OFFSET = 0x104;
-        private readonly int[] moneySpentOffsets = [0xB0, 0xC, 0x58, 0x26C];
-        private readonly int[] woodSpentOffsets = [0xA0, 0x3C, 0x80, 0x10C];
-        private readonly int[] metalSpentOffsets = [0xB8, 0x4, 0x28, 0xAC];
-        #endregion
-
         #region Progress and Upgrade Tracking
         // Special activity counters (updated via memory or logic)
         private int completedStoryMissions = 0;
@@ -94,61 +86,14 @@ namespace Route_Tracker
         // Default is 0 (not in modern day). When entering modern day, value becomes 1. When returning to main game (1 -> 0),
         // this is used to increment the completed modern day mission count and update the state for the next transition.
         private int oldcharacter = 0;
-
-        // Upgrade tracking
-        private int lastMoneySpent = 0;
-        private int lastWoodSpent = 0;
-        private int lastMetalSpent = 0;
-        private int lastHeroUpgradeValue = 0;
         private int totalUpgrades = 0;
-        private readonly bool[] upgradePurchased = new bool[43]; // Each index = a specific upgrade
-        private int skinPurchaseCheckpoint = 0; // Used for animal skin upgrade detection
 
-        // Main ship upgrades (excluding hero and animal skin upgrades)
-        private static readonly (int Index, int Money, int Wood, int Metal, string Name)[] MainUpgradeRequirements =
-        [
-            (0, 500, 0, 0, "Swords 1"),
-            (3, 1000, 0, 0, "Hull 1"),
-            (4, 900, 0, 0, "Round Shot Strength 1"),
-            (5, 4000, 0, 0, "Round Shot Strength 2"),
-            (6, 800, 0, 0, "Mortar 1"),
-            (7, 900, 0, 0, "Heavy Shot 1"),
-            (8, 6000, 0, 0, "Heavy Shot 2"),
-            (9, 800, 0, 0, "Mortar Storage 1"),
-            (10, 2000, 0, 0, "Mortar Storage 2"),
-            (11, 0, 0, 70, "Cannons 1"),
-            (12, 12000, 0, 0, "Round Shot Strength 3"),
-            (13, 2500, 0, 0, "Chain Shot Strength 1"),
-            (14, 6000, 0, 0, "Chain Shot Strength 2"),
-            (15, 3000, 0, 0, "Fire Barrel Strength 1"),
-            (16, 500, 0, 0, "Heavy Shot Storage 1"),
-            (17, 1500, 0, 0, "Heavy Shot Storage 2"),
-            (18, 3500, 0, 200, "Mortar 2"),
-            (19, 700, 0, 0, "Swivel Strength 1"),
-            (20, 14000, 0, 0, "Officers Rapiers"),
-            (21, 9000, 0, 0, "Cannon-Barrel Pistols"),
-            (34, 4000, 200, 100, "Hull Armor 2"),
-            (35, 5000, 0, 0, "Diving Bell"),
-            (36, 5000, 0, 0, "Mortar Storage 3"),
-            (37, 500, 25, 0, "Ram Strength 1"),
-            (38, 5000, 250, 150, "Ram Strength 2"),
-            (39, 8000, 0, 300, "Mortar 3"),
-            (40, 2000, 0, 100, "Broadside Cannons 2"),
-            (41, 35000, 0, 0, "Round Shot Strength 4"),
-            (42, 25000, 0, 0, "Heavy Shot 3"),
-        ];
-
-        // Animal skin upgrades
-        private static readonly (int Index, int Cost, string Name)[] SkinUpgradeRequirements =
-        [
-            (21, 1400, "Rabbit Pelt"),
-            (22, 1700, "Hutia Pelt"),
-            (23, 2000, "Howler Monkey Skin"),
-            (24, 4000, "Crocodile Leather"),
-            (25, 6300, "Killer Whale Skin"),
-            (26, 7000, "Humpback Whale Skin"),
-        ];
-
+        // for windmill fragment check
+        public bool isWindmillFragment = false; // this is used to check if we have collected the windmill fragment
+        private DateTime lastViewpointUpdate = DateTime.MinValue;
+        private DateTime lastFragmentUpdate = DateTime.MinValue;
+        private DateTime lastBuriedUpdate = DateTime.MinValue;
+        private const int EXPECTED_FRAGMENT_COUNT = 87; // This is the expected fragment count for windmill check
         #endregion
 
         // ==========FORMAL COMMENT=========
@@ -188,40 +133,6 @@ namespace Route_Tracker
         {   
             string cacheKey = $"mission_{missionOffset}";
             return ReadWithCache<int>(cacheKey, missionBaseAddress, [missionOffset]);
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Helper method to read resource expenditure values
-        // Follows pointer paths to track spent resources
-        // ==========MY NOTES==============
-        // Similar to ReadCollectible but for resources spent
-        // Combines the shared first offset with resource-specific offsets
-        private int ReadResourceSpent(int[] uniqueOffsets)
-        {
-            string cacheKey = $"resource_{string.Join("_", uniqueOffsets)}";
-
-            // Try to get from cache
-            if (TryGetCachedValue(cacheKey, out int cachedValue))
-            {
-                return cachedValue;
-            }
-
-            // Combine the shared first offset with resource-specific offsets
-            int[] fullOffsets = new int[uniqueOffsets.Length + 1];
-            fullOffsets[0] = RESOURCES_FIRST_OFFSET;
-            Array.Copy(uniqueOffsets, 0, fullOffsets, 1, uniqueOffsets.Length);
-
-            try
-            {
-                // Read and cache
-                int result = Read<int>(resourcesBaseAddress, fullOffsets);
-                StoreInCache(cacheKey, result);
-                return result;
-            }
-            catch (Exception)
-            {
-                return 0; // Return 0 if reading fails
-            }
         }
 
         // ==========FORMAL COMMENT=========
@@ -313,12 +224,7 @@ namespace Route_Tracker
             int music = ReadCollectible(MusicThirdOffset);
             int taverns = CountCollectibles(TavernStartOffset, TavernEndOffset);
             int totalChests = CountCollectibles(ChestStartOffset, ChestEndOffset);
-            int heroupgrades = ReadCollectible(HeroUpgradeThirdOffset);
-
-            // Read resource spent values
-            int moneySpent = ReadResourceSpent(moneySpentOffsets);
-            int woodSpent = ReadResourceSpent(woodSpentOffsets);
-            int metalSpent = ReadResourceSpent(metalSpentOffsets);
+            totalUpgrades = ReadCollectible(HeroUpgradeThirdOffset);
 
             // legendary ship,templar hunt, storymissions, and treasuremaps counts
             legendaryShips = ReadWithCache<int>("legendaryships", (nint)baseAddress + 0x00A0E21C, legendaryShipPtrOffsets);
@@ -326,14 +232,33 @@ namespace Route_Tracker
             completedStoryMissions = CountMissions(MissionFirstOffset, MissionEndOffset);
             treasuremaps = CountCollectibles(TreasureMapsStartOffset, TreasureMapsEndOffset);
 
-            // Detect upgrades using the resource values
-            HandleUpgradeCases(heroupgrades, moneySpent, woodSpent, metalSpent);
+            // register stats and update last update times
+            RegisterStat("Buried", treasure);
+            RegisterStat("Fragments", fragments);
+            RegisterStat("Viewpoints", viewpoints);
+
+            // may move these to a separate method if i can
+            if (Current.Viewpoints > Old.Viewpoints)
+            {
+                lastViewpointUpdate = DateTime.Now;
+            }
+            else if (Current.Fragments > Old.Fragments)
+            {
+                lastFragmentUpdate = DateTime.Now;
+            }
+            else if (Current.Treasure > Old.Treasure)
+            {
+                lastBuriedUpdate = DateTime.Now;
+            }
 
             // Detect modern day missions
-            DetectModernDayMissions(character);
+            DetectModernDayMissions(character, loading);
 
             // DetectStatuses
             DetectStatuses(mainmenu, loading);
+
+            // call windmill fragment check
+            Windmillfragment();
 
             // Return all the stats (including the basic ones that we got from memory)
             return (percent, percentFloat, viewpoints, myan, treasure, fragments, assassin, naval,
@@ -349,121 +274,17 @@ namespace Route_Tracker
         // These methods figure out what the player is doing or has done
         // They watch for changes in memory values that indicate game activities
         // Used to track progress through the route
-        private void DetectModernDayMissions(int character)
+        private void DetectModernDayMissions(int character, bool loading)
         {
-            if (character == 1 && oldcharacter == 0)
+            if (character > 0 && oldcharacter != character && !loading)
             {
                 oldcharacter = character;
             }
-            else if(character == 0 && oldcharacter == 1)
+            else if(character == 0 && oldcharacter > 0 && !loading)
             {
+                modernDayMissions++;
                 oldcharacter = character;
-                modernDayMissions ++;
-            }
-        }
-
-        // Implement HandleUpgradeCases:
-        private void HandleUpgradeCases(int currentHeroUpgrade, int moneySpent, int woodSpent, int metalSpent)
-        {
-            // First call - establish baseline
-            if (lastMoneySpent == 0)
-            {
-                lastMoneySpent = moneySpent;
-                lastWoodSpent = woodSpent;
-                lastMetalSpent = metalSpent;
-                lastHeroUpgradeValue = currentHeroUpgrade;
-                return;
-            }
-
-            // Detect hero upgrades
-            if (currentHeroUpgrade > lastHeroUpgradeValue)
-            {
-                int newUpgrades = currentHeroUpgrade - lastHeroUpgradeValue;
-
-                // Mark upgrades based on hero upgrade number
-                // Using the upgrade list from upgrades.txt
-                for (int i = 0; i < newUpgrades && lastHeroUpgradeValue + i < 8; i++)
-                {
-                    int upgradeIndex = -1;
-
-                    // Map hero upgrade value to the correct upgrade in the list
-                    switch (lastHeroUpgradeValue + i + 1) // +1 because hero upgrades start at 1
-                    {
-                        case 1: upgradeIndex = 1; break;  // Pistol Holster 2/Health 1
-                        case 2: upgradeIndex = 2; break;  // Pistol Holster 2/Health 1 (second option)
-                        case 3: upgradeIndex = 28; break; // Pistol Holster 3
-                        case 4: upgradeIndex = 29; break; // Pistol Holster 4
-                        case 5: upgradeIndex = 30; break; // Smoke Bomb Pouch 1
-                        case 6: upgradeIndex = 31; break; // Smoke Bomb Pouch 2
-                        case 7: upgradeIndex = 32; break; // Dart Pouch 1
-                        case 8: upgradeIndex = 33; break; // Dart Pouch 2
-                    }
-
-                    if (upgradeIndex >= 0 && upgradeIndex < upgradePurchased.Length && !upgradePurchased[upgradeIndex])
-                    {
-                        upgradePurchased[upgradeIndex] = true;
-                        totalUpgrades++;
-                        Debug.WriteLine($"Hero upgrade detected: {upgradeIndex + 1}");
-                    }
-                }
-
-                lastHeroUpgradeValue = currentHeroUpgrade;
-            }
-
-            // Check for specific resource expenditure patterns
-            int moneyDelta = moneySpent - lastMoneySpent;
-            int woodDelta = woodSpent - lastWoodSpent;
-            int metalDelta = metalSpent - lastMetalSpent;
-
-            // Only process if there's been a change
-            if (moneyDelta > 0 || woodDelta > 0 || metalDelta > 0)
-            {
-                // Main upgrades (excluding hero and animal skin upgrades)
-                foreach (var req in MainUpgradeRequirements)
-                {
-                    if (req.Index > 0 && !upgradePurchased[req.Index - 1])
-                        continue;
-                    
-                    if (!upgradePurchased[req.Index]
-                        && moneyDelta >= req.Money
-                        && woodDelta >= req.Wood
-                        && metalDelta >= req.Metal)
-                    {
-                        upgradePurchased[req.Index] = true;
-                        totalUpgrades++;
-                        Debug.WriteLine($"Detected {req.Name} upgrade");
-                        // If only one upgrade should be detected per call, uncomment the next line:
-                        // break;
-                    }
-                }
-
-                // Animal skin upgrades (only after Cannon-Barrel Pistols)
-                if (skinPurchaseCheckpoint > 0)
-                {
-                    int skinMoneyDelta = moneySpent - skinPurchaseCheckpoint;
-                    foreach (var (index, cost, name) in SkinUpgradeRequirements)
-                    {
-                        if (skinMoneyDelta >= cost && !upgradePurchased[index])
-                        {
-                            upgradePurchased[index] = true;
-                            totalUpgrades++;
-                            Debug.WriteLine($"Detected {name} upgrade");
-                            skinPurchaseCheckpoint = moneySpent;
-                            break; // Only one skin upgrade per purchase
-                        }
-                    }
-                }
-
-                // Set the checkpoint for animal skin purchases after Cannon-Barrel Pistols
-                if (moneyDelta >= 9000 && !upgradePurchased[20])
-                {
-                    skinPurchaseCheckpoint = moneySpent;
-                }
-
-                // Update the last spent values
-                lastMoneySpent = moneySpent;
-                lastWoodSpent = woodSpent;
-                lastMetalSpent = metalSpent;
+                
             }
         }
 
@@ -489,6 +310,29 @@ namespace Route_Tracker
                 isMainMenu = false;
             }
         }
+
+        // function to check if we have collected the windmill fragment
+        private void Windmillfragment()
+        {
+            // case 1: We get viewpoint first then fragment within 10 seconds
+            if (Current.Fragments > Old.Fragments &&
+            (DateTime.Now - lastViewpointUpdate).TotalSeconds <= 10)
+            {
+                isWindmillFragment = true;
+            } else if (Current.Viewpoints > Old.Viewpoints &&
+            (DateTime.Now - lastFragmentUpdate).TotalSeconds <= 10)
+            // Case 2: Fragment then viewpoint within 10 seconds
+            {
+                isWindmillFragment = true;
+            } else if (Current.Buried == 1 && Current.Fragments > EXPECTED_FRAGMENT_COUNT)
+            // Case 3: First chest (New Bone) collected, but fragments is higher than expected
+            {
+                isWindmillFragment = true;
+            } else
+            {
+                isWindmillFragment = false;
+            }
+        }
         #endregion
 
         #region Public Stats Interface
@@ -508,29 +352,6 @@ namespace Route_Tracker
         public override (bool IsLoading, bool IsMainMenu) GetGameStatus()
         {
             return (isLoading, isMainMenu);
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Returns the total number of upgrades purchased
-        // Used by the route tracker to mark completed upgrades
-        // ==========MY NOTES==============
-        // Exposes how many total upgrades have been purchased
-        // UI uses this to check off items in the route
-        public int GetUpgradeCount()
-        {
-            Debug.WriteLine("Total Upgrades: " + totalUpgrades);
-            return totalUpgrades;
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Returns details about which specific upgrades have been purchased
-        // Provides upgrade-by-upgrade tracking for the route
-        // ==========MY NOTES==============
-        // More detailed than just a counter, shows exactly which upgrades are done
-        // Helps track progress through the specific upgrade path
-        public bool[] GetPurchasedUpgrades()
-        {
-            return upgradePurchased;
         }
 
         // ==========FORMAL COMMENT=========
@@ -572,7 +393,7 @@ namespace Route_Tracker
                 ["Treasure Maps"] = TreasureMaps,
 
                 // Other stats
-                ["Total Upgrades"] = GetUpgradeCount(),
+                ["Hero Upgrades"] = totalUpgrades,
                 ["Modern Day Missions"] = modernDayMissions,
 
                 // Game state
@@ -584,3 +405,59 @@ namespace Route_Tracker
         #endregion
     }
 }
+
+
+/*
+// at top of file define these
+public bool isWindmillFragment = false; // this is used to check if we have collected the windmill fragment
+private DateTime lastViewpointUpdate = DateTime.MinValue;
+private DateTime lastFragmentUpdate = DateTime.MinValue;
+private DateTime lastBuriedUpdate = DateTime.MinValue;
+private const int EXPECTED_FRAGMENT_COUNT = 87; // This is the expected fragment count for windmill check
+
+// in getstats() function/method add this
+{
+    // stats define as normal
+    // ... existing code ...
+    // new code for tracking old and new values of stuff
+    RegisterStat("Buried", buriedtreasure);
+    RegisterStat("Fragments", fragments);
+    RegisterStat("Viewpoints", viewpoints);
+
+    // may move these to a separate method if i can
+    if(Current.Viewpoints > Old.Viewpoints)
+    {
+        lastViewpointUpdate = DateTime.Now;
+    } else if(Current.Fragments > Old.Fragments)
+    {
+        lastFragmentUpdate = DateTime.Now;
+    }
+    else if(Current.Treasure > Old.Treasure)
+    {
+        lastBuriedUpdate = DateTime.Now;
+    }
+}
+
+// function to check if we have collected the windmill fragment
+private void windmillfragment()
+{
+    // case 1: We get viewpoint first then fragment within 10 seconds
+    if (Current.Fragments > Old.Fragments && 
+    (DateTime.Now - lastViewpointUpdate).TotalSeconds <= 10)
+    {
+        isWindmillCollected = true;
+    } else if (Current.Viewpoints > Old.Viewpoints &&
+    (DateTime.Now - lastFragmentUpdate).TotalSeconds <= 10) 
+    // Case 2: Fragment then viewpoint within 10 seconds
+    {
+        isWindmillCollected = true;
+    } else if (Current.Buried == 1 && Current.Fragments > EXPECTED_FRAGMENT_COUNT)
+    // Case 3: First chest (New Bone) collected, but fragments is higher than expected
+    {
+        isWindmillCollected = true;
+    } else
+    {
+        isWindmillCollected = false;
+    }
+}
+*/

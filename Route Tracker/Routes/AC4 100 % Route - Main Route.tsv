@@ -13,7 +13,6 @@ Treasure Map Cape Bonavista	Treasure Map	1	None	1
 Edward Kennway	Story	1	None	1
 Welcome to Abstergo Entertainment	Modern Day	1	None	1
 Fragment 1 Havana	Animus Fragment	3	None	1
-British Swords	Upgrades	1	None	1
 Manuscript 1 Havana	Manuscripts	1	None	1
 Viewpoint 1 Havana	Viewpoint	4	None	1
 Chest 1 Havana	Chest	6	None	1
@@ -68,8 +67,8 @@ Fragment 3 Uncharted	Animus Fragment	17	(458,903)	3
  Reload -> Chest 3 Uncharted	Chest	21	(550,816)	3
 Letter 1 Abaco Island	Letters	1	None	1
 Shoot Ocolot (skin) -> Treasure Map Abaco Island	Treasure Map	3	None	1
-Air assassinate Ocolot if near (skin) ->Health Upgrade 1	Upgrades	2	None	2
- Pistol Holster 1	Upgrades	3	None	3
+Air assassinate Ocolot if near (skin) ->Health Upgrade 1	Upgrades	1	None	1
+ Pistol Holster 1	Upgrades	2	None	2
 Fragment 1 Abaco Island	Animus Fragment	18	None	1
 Viewpoint Abaco Island	Viewpoint	9	None	1
 Chest 1 Abaco Island	Chest	22	None	1
@@ -79,19 +78,10 @@ boat return to ship -> This Tyro Captain	Story	8	None	8
 Start Now Hiring -> free crew at church -> Viewpoint 1 Nassua	Viewpoint	10	None	1
 Fragment 1 Nassua	Animus Fragment	21	None	1
 reload -> Now Hiring	Story	9	None	9
-Start Prizes and plunder -> Destroy scooner -> Discover AndIs -> reload -> Hull Armor 1	Upgrades	4	None	4
-Complete Prizes and Plunder	Story	10	None	10
-Exit Mission -> Buy Roundshot Strength 1	Upgrades	5	None	5
-Buy Roundshot Strength 2	Upgrades	6	None	6
-Buy Mortar 1	Upgrades	7	None	7
-Buy HeavyShot 1	Upgrades	8	None	8
-Buy HeavyShot 2	Upgrades	9	None	9
-Buy Mortar storage 1	Upgrades	10	None	10
-Buy Mortar storage 2	Upgrades	11	None	11
-Start Raise the BlackFlag -> Fragment 4 Uncharted	Animus Fragment	22	(495,675)	4
+Start Prizes and plunder -> Destroy scooner -> Discover AndIs -> reload -> Hull Armor 1 ->  Complete Prizes and Plunder	Story	10	None	10
+Exit Mission -> Buy Roundshot Strength 1 & 2, Mortar 1, HeavyShot 1 & 2, Mortar storage 1 & 2 ->  Start Raise the BlackFlag -> Fragment 4 Uncharted	Animus Fragment	22	(495,675)	4
 Chest 4 Uncharted	Chest	23	(442,669)	4
-Reload -> Do first ship boarding -> Reload 2nd ship boarding,  Get Broadside Canon upgrade 1 on jackdaw in captain corders	Upgrades	12	None	12
-Raise the BlackFlag  (Wait for Hunter ship then destroy it but reduce wanted level after boarding is done)	Story	11	None	11
+Raise the BlackFlag  Reload -> Do first ship boarding -> Reload 2nd ship boarding ->  Get Canon upgrade 1 in captain corders ->  spawn hunter ship by sailing away while looking at objective	Story	11	None	11
 Chest 5 Uncharted	Chest	24	(488,591)	5
 Quit Warp -> Salt Key Banter	Taverns	1	None	1
 Get Shady Buisness -> Chest 1 SaltKey	Chest	25	None	1
@@ -173,13 +163,7 @@ Fragment 2 Eleuthera	Animus Fragment	40	None	2
 Chest 2 Eleuthera	Chest	58	None	2
 Capture Eleuthera	Forts	1	None	1
  Brother In Arms  go to (843,798) well underneath the marker then mark. sail to them stop at 570 range BE PATIENT!	Legendary Ships	1	None	1
-Fast travel to Eleuthera -> Buy Roundshot  Strength 3	Upgrades	13	None	13
-Buy Chainshot Strength 1	Upgrades	14	None	14
-Buy Chainshot Strength 2	Upgrades	15	None	15
-Fire barrel strength 1	Upgrades	16	None	16
-Buy Heavy shot Storage 1	Upgrades	17	None	17
-Buy Heavy shot Storage 2, Refill Mortar Shot if needed	Upgrades	18	None	18
-Accept Spanish Plague-> Fragment 6 Uncharted	Animus Fragment	41	(723,739)	6
+Fast travel to Eleuthera -> Buy Roundshot  Strength 3, Chainshot 1 & 2, -> firebarrel 1,  heavyshot storage 1 & 2, refill on ammo -> Accept Spanish Plague -> Fragment 6 Uncharted	Animus Fragment	41	(723,739)	6
 Spanish Plague	Naval Contracts	1	None	1
 Fast Travel to Cape Bonavista -> Fast travel to Viewpoint 1 -> Chest 6 Cape Bonavista	Chest	59	None	6
 Letter 5 Cape Bonavista	Letters	5	None	5
@@ -245,9 +229,7 @@ Viewpoint Matanzas	Viewpoint	19	None	1
 Fragment 3 Matanzas	Animus Fragment	53	None	3
 Warehouse -> Buried Treasure Matanzas	Burired Treasure	3	None	3
 MyanStone Matanzas	Myan Stones	6	None	6
-Fast Travel to Punta Guarico -> Buy Mortar 2	Upgrades	19	None	19
-Buy Swivel Strength 1, Refill ammo if needed-> Cheat reload after leaving habormaster	Upgrades	20	None	20
-Fragment 7 Uncharted	Animus Fragment	54	(738,310)	7
+Fast Travel to Punta Guarico -> Buy Mortar 2 , Swivel 1, Refill ammo if needed ->  Cheat reload after leaving habormaster -> Fragment 7 Uncharted	Animus Fragment	54	(738,310)	7
 swim to ship a little quit warp  Destroy Defenses & Infiltrate fort -> Chest 1 Navassa	Chest	91	None	1
 Chest 2 Navassa	Chest	92	None	2
 Fragment 1 Navassa	Animus Fragment	55	None	1
@@ -283,20 +265,12 @@ Fast Travel to Tortuga -> Chest 7 Tortuga	Chest	102	None	7
 The Slave Master	Assassin Contracts	6	None	6
 Letter 9 Tortuga	Letters	9	None	9
 Fast travel to Navassa -> Chest 14 Uncharted	Chest	103	(699,155)	14
-go to kingston -> Start Traveling Salesman-> Buy officer's rapiers	Upgrades	21	None	21
-Buy Cannon-Barrel Pistols	Upgrades	22	None	22
-Buy  rabbit pelt 2x 	Upgrades	23	None	23
-Buy hutia pelt 2x	Upgrades	24	None	24
-Buy howler moneky skin 2x	Upgrades	25	None	25
-Buy crocodile leather 2x	Upgrades	26	None	26
-Buy killer whale skin 2x	Upgrades	27	None	27
-Buy humpback whale skin 2x	Upgrades	28	None	28
-Buy  Pistol Holster 3	Upgrades	29	None	29
-Buy Pistol Holster 4	Upgrades	30	None	30
-Buy smoke bomb pouch 1	Upgrades	31	None	31
-Buy smoke bomb pouch 2	Upgrades	32	None	32
-Buy dart pouch 1	Upgrades	33	None	33
-Buy dart pouch 2	Upgrades	34	None	34
+go to Kingston -> start traveling salesman -> buy officer's rapiers, cannon-barrel pistols, rabbit, huita, howler, corcodile, killer whale, humpback (all 2x) -> Craft Pistol Holster 3	Upgrades	3	None	3
+Craft Pistol Holster 4	Upgrades	4	None	4
+Craft smoke bomb pouch 1	Upgrades	5	None	5
+Craft smoke bomb pouch 2	Upgrades	6	None	6
+Craft dart pouch 1	Upgrades	7	None	7
+Craft dart pouch 2	Upgrades	8	None	8
 Viewpoint 1 Kingston	Viewpoint	22	None	1
 Shanty 1 Kingston	Shanty	9	None	1
 Chest 1 Kingston	Chest	104	None	1
@@ -350,10 +324,7 @@ Shanty 6 Kingston	Shanty	14	None	6
 The Commanders Ruse	Templar Hunts	4	None	4
 Chest 16 Kingston	Chest	119	None	16
 Fast travel to Nassua -> (during following sequence) Shanty 1 Nassua	Shanty	15	None	1
-Buy Hull Armor 2	Upgrades	35	None	35
-Buy Diving Bell	Upgrades	36	None	36
-Buy Mortar storage 3, Refill ammo, Cheat reload	Upgrades	37	None	37
-Chest 1 Nassua	Chest	120	None	1
+Buy Hull armor 2, Diving bell, Mortar storage 3, Refill ammo, Cheat reload -> Chest 1 Nassua	Chest	120	None	1
 Chest 2 Nassua	Chest	121	None	2
 Cheat warp -> Chest 3 Nassua	Chest	122	None	3
 Fast travel to just outsude Havana -> Fragment 9 Uncharted	Animus Fragment	72	(268,699)	9
@@ -466,9 +437,7 @@ Fragment 2 Gibra	Animus Fragment	103	None	2
 Chest 2 Gibra	Chest	174	None	2
 Capture Gibra	Forts	5	None	5
 Silk on the Waves	Naval Contracts	5	None	5
-Buy Ram Strength 1	Upgrades	38	None	38
-Buy Ram Strength 2, cheat reload	Upgrades	39	None	39
-Chest 25 Uncharted	Chest	175	(653,590)	25
+Buy Ram Strength 1 & 2, cheat reload -> Chest 25 Uncharted	Chest	175	(653,590)	25
 Fast travel to gibra -> Fragment 19 Uncharted	Animus Fragment	104	(613,534)	19
 Swim quit warp -> Chest 1 Jiguey	Chest	176	None	1
 Chest 2 Jiguey	Chest	177	None	2
@@ -587,9 +556,7 @@ Viewpoint 3 Isla Providencia	Viewpoint	41	None	3
 Complete Marooned	Story	31	None	31
 Fast travel to Conttoyor -> Start The Realities of War ->  Refill on ammo if needed -> Chest 31 Uncharted	Chest	223	(58,535)	31
 The Realities of War	Naval Contracts	7	None	7
-Fast travel to Conttoyor -> refill on ammo/repair ship if needed -> Mortar 3	Upgrades	40	None	40
-BroadSide Cannon 2	Upgrades	41	None	41
-Cheat reload to skip upgrade of jackdaw cutscene -> fast travel to tulum ->  return to ship -> Cheat reload -> Fragment 1 Chinchorro	Animus Fragment	129	None	1
+Fast travel to Conttoyor -> refill on ammo/repair ship if needed -> Buy Mortar 3, cannons 2 ->  Cheat reload to skip upgrade of jackdaw cutscene -> fast travel to tulum ->  return to ship -> Cheat reload -> Fragment 1 Chinchorro	Animus Fragment	129	None	1
 Fragment 2 Chinchorro	Animus Fragment	130	None	2
 Chest 1 Chinchorro	Chest	224	None	1
 Chest 2 Chinchorro	Chest	225	None	2
@@ -766,9 +733,7 @@ Fast travel Viewpoint Misteriosa -> The Dreaded Pirate	Assassin Contracts	27	Non
 Fast travel Viewpoint Misteriosa -> Chest 5 Misteriosa	Chest	300	None	5
 Chest 6 Misteriosa	Chest	301	None	6
 Myan Stone 2 Misteriosa	Myan Stones	13	None	13
-Fast travel to Kingston Viewpoint 1 -> Round Shot Strength 4	Upgrades	42	None	42
-Heavy Shot 3	Upgrades	43	None	43
-Buried Treasure Kingston	Burired Treasure	18	None	18
+Fast travel to Kingston Viewpoint 1 -> Buy Round Shot 4, Heavy Shot 3 -> Buried Treasure Kingston	Burired Treasure	18	None	18
 Fast travel to Punta Guarico -> Fragment 27 Uncharted	Animus Fragment	171	(816,307)	27
 Weathering The Storm	Naval Contracts	12	None	12
 Cheat reload -> Fragment 1 Petite Caverne	Animus Fragment	172	None	1

@@ -43,16 +43,27 @@ Before you start coding, collect this info for your game:
   This is the process name you see in Task Manager (e.g., `GoW.exe` for God of War 2018).
 
 - **Memory pointers/offsets:**  
-  These are the addresses and pointer chains you’ll use to read stats from the game.  
-  *(If you’ve made an autosplitter or used Cheat Engine, you already know how to get these.)*
-    - you will need something for loading screens, main menu detection. Since the tracker saves at those points in game via those two
+  These are the addresses and pointer chains you'll use to read stats from the game.  
+  *(If you've made an autosplitter or used Cheat Engine, you already know how to get these.)*
+  
+  **⚠️ CRITICAL REQUIREMENT:**
+  - **Loading screen detection:** You MUST find a memory address that tells you when the game is loading
+  - **Main menu detection:** You MUST find a memory address that tells you when the game is at the main menu
+  
+  **Why these are required:** The tracker automatically saves your progress when you enter loading screens or return to the main menu, and loads your progress when you return to gameplay. Without these, the auto-save/load system won't work properly.
 
 - **Route file data:**  
   A list of all the items/collectibles you want to track, one per line.  
-  *(You’ll create this as a `.tsv` file later in the guide.)*
+  *(You'll create this as a `.tsv` file later in the guide.)*
 
 💡 **Tip:**  
 Use Cheat Engine or your favorite memory scanner to find the addresses for each collectible/stat you want to track. Write down the pointer chains and offsets.
+
+**🔍 Finding Loading/Menu Detection:**
+Look for memory values that change predictably:
+- Loading screens: Often a boolean (0/1) or specific value that's true/non-zero during loading
+- Main menu: Usually a specific value or state ID when you're at the main menu
+- Test these by triggering loading screens and menu transitions while monitoring memory
 
 ---
 
@@ -140,6 +151,92 @@ namespace Route_Tracker
     }
 }
 ````
+
+---
+
+## Isloading & IsMainMenu bools
+- You need to find something in the games memory for detecting a loading screen and main menu.
+- This is usually a boolean value (0 or 1) that indicates if the game is loading or at the main menu.
+- You do not need to find a bool though. You just need logic to change these bools from true to false.
+- for example in god of war 2018 the loading screen isnt a simple boolean.
+- It goes from 0 to 256 or 257. The higher numbers being the loading screen. the 0 for not. 
+- My main menu detection for mainmenu is a simple boolean so that will be easy below u will find a example on how you can handle this.
+- So example code would be below:
+
+```csharp
+    // first off add your pointers for loading and main menu in the getStats function 
+    // or whatever function you use to define pointers
+    // send the pointers to the function like this
+    **in getstats function**
+    [name of function for passing the values to](name of loading variable, name of mainmenu bool)
+
+    // second before we even do any more coding we need to actually make the varibles we need
+    // so at the top of your class add these variables
+    private bool isLoading = false; // This will track if the game is loading
+    private bool isMainMenu = false; // This will track if the game is at the main menu
+
+    // we make these variable private since current implementation is like this and i dont feel like changing it
+    // but normally u make them public since these variables are used by every game in the tracker
+    // but since im too lazy to change the current implementation i will leave them private
+    // i mostly dont want to break anything in the current implementation
+    // anyways we make them private so we dont get any errors due to conflicts or something
+    **truthful explanation start**
+    // Copilot suggested making these private, so I followed that.
+    // I then made a function elsewhere to accept and handle them via overrides.
+    // Technically, they could be public and managed from a central place,
+    // but I don’t want to rework the whole system right now.
+    // If someone wants to improve it later, they’re welcome to.
+    **truthful explanation end**
+
+    // Now that we finish that next step is below.
+    // Once you passed them and defined your variables, make a function that accepts whatever the type of variables they are
+    // in this case i would need a function that accepts two items one a int and one a bool
+    // we need a int since my loading goes to a value greater than 1 which in code means true
+    // we need a bool since main menu only ever is 0 or 1 so its really simple so below is how we would do the function
+    private void DetectStatuses(int loading, bool mainmenu)
+    // i called it detect statuses since we are detecting multiply things 
+    // but u can make these seperate functions. One for loading and one for mainmenu up to you
+    {
+        if(mainmenu)
+        {
+            isMainMenu = true; // Set main menu status to true
+        } else
+        {
+            isMainMenu = false; // Set main menu status to false
+        }
+
+        if(loading == 256 || loading == 257) // Check if loading value indicates loading screen
+        {
+            isLoading = true; // Set loading status to true
+        }
+        else if(loading == 0) // Check if loading value indicates not loading
+        {
+            isLoading = false; // Set loading status to false
+        }
+    }
+
+    // now that we have populated the values we need to pass these functions but the function is priavte
+    // so we have 2 options make it public or make a new public function that accepts the values from this function
+    // i prefer a new public function since its easier for me but you can do what you want
+    public override (bool IsLoading, bool IsMainMenu) GetGameStatus()
+    {
+        return (isLoading, isMainMenu); // Return the current loading and main menu status
+    }
+
+    // now that we have the public override we need to pass it with all other values
+    // to do that we would pass it in our GetStatsAsDictionary function
+    // to do that all we need to do is this
+    ** in getstatsasdictionary function**
+    var (IsLoading, IsMainMenu) = GetGameStatus(); // Call the GetGameStatus function to get current statuses
+
+    // rest of code
+
+    // Game state
+    ["Is Loading"] = IsLoading,
+    ["Is Main Menu"] = IsMainMenu
+
+    // very simple to add everything.
+```
 
 ---
 

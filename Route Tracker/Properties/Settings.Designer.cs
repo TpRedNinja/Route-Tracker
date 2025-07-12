@@ -166,5 +166,41 @@ namespace Route_Tracker.Properties {
                 this["TransparentBackground"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int UndoHotkey {
+            get {
+                return ((int)(this["UndoHotkey"]));
+            }
+            set {
+                this["UndoHotkey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool GlobalHotkeys {
+            get {
+                return ((bool)(this["GlobalHotkeys"]));
+            }
+            set {
+                this["GlobalHotkeys"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AdvancedHotkeys {
+            get {
+                return ((bool)(this["AdvancedHotkeys"]));
+            }
+            set {
+                this["AdvancedHotkeys"] = value;
+            }
+        }
     }
 }
