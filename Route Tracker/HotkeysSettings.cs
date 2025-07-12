@@ -20,7 +20,13 @@ namespace Route_Tracker
         private Keys undoHotkey;
         private bool globalHotkeys;
         private bool advancedHotkeys;
-        private readonly SettingsManager? settingsManager;
+        private Keys shortLoad;
+        private Keys shortSave;
+        private Keys shortLoadP;
+        private Keys shortRefresh;
+        private Keys shortHelp;
+        private Keys shortFilterC;
+        public readonly SettingsManager? settingsManager;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "SYSLIB1054",
         Justification = "NO")]
@@ -56,20 +62,21 @@ namespace Route_Tracker
         private void InitializeComponent()
         {
             this.Text = "Configure Hotkeys";
-            this.Size = new Size(450, 400);
+            this.Size = new Size(450, 600);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.CenterParent;
+            this.BackColor = AppTheme.BackgroundColor;
+            this.ForeColor = AppTheme.TextColor;
 
-            // Complete hotkey
+            // Hotkey labels and textboxes
             Label lblComplete = new()
             {
                 Text = "Complete Entry Hotkey:",
                 AutoSize = true,
                 Location = new Point(20, 30)
             };
-
             TextBox txtCompleteHotkey = new()
             {
                 Name = "txtCompleteHotkey",
@@ -77,16 +84,14 @@ namespace Route_Tracker
                 Location = new Point(200, 30),
                 ReadOnly = true
             };
-            txtCompleteHotkey.KeyDown += TxtCompleteHotkey_KeyDown;
+            txtCompleteHotkey.KeyDown += TextBoxes_KeysDown;
 
-            // Skip hotkey
             Label lblSkip = new()
             {
                 Text = "Skip Entry Hotkey:",
                 AutoSize = true,
                 Location = new Point(20, 70)
             };
-
             TextBox txtSkipHotkey = new()
             {
                 Name = "txtSkipHotkey",
@@ -94,16 +99,14 @@ namespace Route_Tracker
                 Location = new Point(200, 70),
                 ReadOnly = true
             };
-            txtSkipHotkey.KeyDown += TxtSkipHotkey_KeyDown;
+            txtSkipHotkey.KeyDown += TextBoxes_KeysDown;
 
-            // Undo hotkey
             Label lblUndo = new()
             {
                 Text = "Undo Entry Hotkey:",
                 AutoSize = true,
                 Location = new Point(20, 110)
             };
-
             TextBox txtUndoHotkey = new()
             {
                 Name = "txtUndoHotkey",
@@ -111,72 +114,172 @@ namespace Route_Tracker
                 Location = new Point(200, 110),
                 ReadOnly = true
             };
-            txtUndoHotkey.KeyDown += TxtUndoHotkey_KeyDown;
+            txtUndoHotkey.KeyDown += TextBoxes_KeysDown;
 
-            // Global hotkeys checkbox
-            CheckBox chkGlobalHotkeys = new()
+            // Shortcut labels and textboxes
+            Label lblShortLoad = new()
             {
-                Name = "chkGlobalHotkeys",
-                Text = "Global Hotkeys",
+                Text = "Shortcut: Load Route",
                 AutoSize = true,
-                Location = new Point(20, 160)
+                Location = new Point(20, 150)
             };
-
-            // Advanced hotkeys checkbox with tooltip
-            CheckBox chkAdvancedHotkeys = new()
+            TextBox txtShortLoad = new()
             {
-                Name = "chkAdvancedHotkeys",
-                Text = "Advanced Hotkeys",
+                Name = "txtShortLoad",
+                Size = new Size(200, 25),
+                Location = new Point(200, 150)
+            };
+            txtShortLoad.KeyDown += TextBoxes_KeysDown;
+
+            Label lblShortSave = new()
+            {
+                Text = "Shortcut: Save Progress",
                 AutoSize = true,
                 Location = new Point(20, 190)
             };
+            TextBox txtShortSave = new()
+            {
+                Name = "txtShortSave",
+                Size = new Size(200, 25),
+                Location = new Point(200, 190)
+            };
+            txtShortSave.KeyDown += TextBoxes_KeysDown;
 
-            // Tooltip for advanced hotkeys
-            ToolTip toolTip = new();
-            toolTip.SetToolTip(chkAdvancedHotkeys, "Allows hotkey actions to apply to any selected entry, not just the first incomplete entry.");
+            Label lblShortLoadP = new()
+            {
+                Text = "Shortcut: Load Progress",
+                AutoSize = true,
+                Location = new Point(20, 230)
+            };
+            TextBox txtShortLoadP = new()
+            {
+                Name = "txtShortLoadP",
+                Size = new Size(200, 25),
+                Location = new Point(200, 230)
+            };
+            txtShortLoadP.KeyDown += TextBoxes_KeysDown;
+
+            Label lblShortRefresh = new()
+            {
+                Text = "Shortcut: Refresh",
+                AutoSize = true,
+                Location = new Point(20, 270)
+            };
+            TextBox txtShortRefresh = new()
+            {
+                Name = "txtShortRefresh",
+                Size = new Size(200, 25),
+                Location = new Point(200, 270)
+            };
+            txtShortRefresh.KeyDown += TextBoxes_KeysDown;
+
+            Label lblShortHelp = new()
+            {
+                Text = "Shortcut: Help",
+                AutoSize = true,
+                Location = new Point(20, 310)
+            };
+            TextBox txtShortHelp = new()
+            {
+                Name = "txtShortHelp",
+                Size = new Size(200, 25),
+                Location = new Point(200, 310)
+            };
+            txtShortHelp.KeyDown += TextBoxes_KeysDown;
+
+            Label lblShortFilterC = new()
+            {
+                Text = "Shortcut: Clear Filters",
+                AutoSize = true,
+                Location = new Point(20, 350)
+            };
+            TextBox txtShortFilterC = new()
+            {
+                Name = "txtShortFilterC",
+                Size = new Size(200, 25),
+                Location = new Point(200, 350)
+            };
+            txtShortFilterC.KeyDown += TextBoxes_KeysDown;
 
             // Info label
             Label lblInfo = new()
             {
                 Text = "Click in textbox and press desired key",
                 AutoSize = true,
-                Location = new Point(20, 230),
+                Location = new Point(20, 390),
                 Width = 400
             };
 
-            // Buttons
+            // Checkboxes (moved below all textboxes)
+            CheckBox chkGlobalHotkeys = new()
+            {
+                Name = "chkGlobalHotkeys",
+                Text = "Global Hotkeys",
+                AutoSize = true,
+                Location = new Point(20, 430)
+            };
+            CheckBox chkAdvancedHotkeys = new()
+            {
+                Name = "chkAdvancedHotkeys",
+                Text = "Advanced Hotkeys",
+                AutoSize = true,
+                Location = new Point(20, 460)
+            };
+            ToolTip toolTip = new();
+            toolTip.SetToolTip(chkAdvancedHotkeys, "Allows hotkey actions to apply to any selected entry, not just the first incomplete entry.");
+
+            // Buttons (moved below checkboxes)
             Button btnSave = new()
             {
                 Text = "Save",
                 Size = new Size(100, 30),
-                Location = new Point(150, 320)
+                Location = new Point(150, 510)
             };
             btnSave.Click += BtnSave_Click;
+            AppTheme.ApplyToButton(btnSave);
 
             Button btnCancel = new()
             {
                 Text = "Cancel",
                 Size = new Size(100, 30),
-                Location = new Point(270, 320)
+                Location = new Point(270, 510)
             };
             btnCancel.Click += BtnCancel_Click;
+            AppTheme.ApplyToButton(btnCancel);
 
             Button btnReset = new()
             {
                 Text = "Reset to Default",
                 Size = new Size(120, 30),
-                Location = new Point(20, 320)
+                Location = new Point(20, 510)
             };
             btnReset.Click += BtnReset_Click;
+            AppTheme.ApplyToButton(btnReset);
 
             // Add all controls
-            this.Controls.AddRange([
+            this.Controls.AddRange(
+            [
                 lblComplete, txtCompleteHotkey,
                 lblSkip, txtSkipHotkey,
                 lblUndo, txtUndoHotkey,
+                lblShortLoad, txtShortLoad,
+                lblShortSave, txtShortSave,
+                lblShortLoadP, txtShortLoadP,
+                lblShortRefresh, txtShortRefresh,
+                lblShortHelp, txtShortHelp,
+                lblShortFilterC, txtShortFilterC,
+                lblInfo,
                 chkGlobalHotkeys, chkAdvancedHotkeys,
-                lblInfo, btnSave, btnCancel, btnReset
+                btnSave, btnCancel, btnReset
             ]);
+
+            // Add this at the end of InitializeComponent()
+            this.BackColor = AppTheme.BackgroundColor;
+            this.ForeColor = AppTheme.TextColor;
+            AppTheme.ApplyTo(this);
+            AppTheme.ApplyToButton(btnSave);
+            AppTheme.ApplyToButton(btnCancel);
+            AppTheme.ApplyToButton(btnReset);
         }
 
         // ==========FORMAL COMMENT=========
@@ -185,6 +288,7 @@ namespace Route_Tracker
         // Enhanced loading that includes all the new settings
         private void LoadHotkeys()
         {
+            // hotkey stuff
             completeHotkey = (Keys)Settings.Default.CompleteHotkey;
             skipHotkey = (Keys)Settings.Default.SkipHotkey;
             undoHotkey = (Keys)Settings.Default.UndoHotkey;
@@ -205,31 +309,63 @@ namespace Route_Tracker
 
             if (this.Controls["chkAdvancedHotkeys"] is CheckBox chkAdvanced)
                 chkAdvanced.Checked = advancedHotkeys;
+
+            // shortcut stuff
+            shortLoad = (Keys)Settings.Default.ShortLoad;
+            shortSave = (Keys)Settings.Default.ShortSave;
+            shortLoadP = (Keys)Settings.Default.ShortLoadP;
+            shortRefresh = (Keys)Settings.Default.ShortRefresh;
+            shortHelp = (Keys)Settings.Default.ShortHelp;
+            shortFilterC = (Keys)Settings.Default.ShortFilterC;
+
+            if (this.Controls["txtShortLoad"] is TextBox txtLoad) txtLoad.Text = keysConverter.ConvertToString(shortLoad);
+            if (this.Controls["txtShortSave"] is TextBox txtSave) txtSave.Text = keysConverter.ConvertToString(shortSave);
+            if (this.Controls["txtShortLoadP"] is TextBox txtLoadP) txtLoadP.Text = keysConverter.ConvertToString(shortLoadP);
+            if (this.Controls["txtShortRefresh"] is TextBox txtRefresh) txtRefresh.Text = keysConverter.ConvertToString(shortRefresh);
+            if (this.Controls["txtShortHelp"] is TextBox txtHelp) txtHelp.Text = keysConverter.ConvertToString(shortHelp);
+            if (this.Controls["txtShortFilterC"] is TextBox txtFilterC) txtFilterC.Text = keysConverter.ConvertToString(shortFilterC);
+
         }
 
-        private void TxtCompleteHotkey_KeyDown(object? sender, KeyEventArgs e)
+        private void TextBoxes_KeysDown(object? sender, KeyEventArgs e)
         {
-            completeHotkey = e.KeyCode;
-            if (sender is TextBox txtBox)
-                txtBox.Text = keysConverter.ConvertToString(completeHotkey);
-            e.Handled = true;
-            e.SuppressKeyPress = true;
-        }
+            if (sender is not TextBox txtBox)
+                return;
 
-        private void TxtSkipHotkey_KeyDown(object? sender, KeyEventArgs e)
-        {
-            skipHotkey = e.KeyCode;
-            if (sender is TextBox txtBox)
-                txtBox.Text = keysConverter.ConvertToString(skipHotkey);
-            e.Handled = true;
-            e.SuppressKeyPress = true;
-        }
+            Keys value = e.KeyCode | e.Modifiers;
 
-        private void TxtUndoHotkey_KeyDown(object? sender, KeyEventArgs e)
-        {
-            undoHotkey = e.KeyCode;
-            if (sender is TextBox txtBox)
-                txtBox.Text = keysConverter.ConvertToString(undoHotkey);
+            switch (txtBox.Name)
+            {
+                case "txtCompleteHotkey":
+                    completeHotkey = value;
+                    break;
+                case "txtSkipHotkey":
+                    skipHotkey = value;
+                    break;
+                case "txtUndoHotkey":
+                    undoHotkey = value;
+                    break;
+                case "txtShortLoad":
+                    shortLoad = value;
+                    break;
+                case "txtShortSave":
+                    shortSave = value;
+                    break;
+                case "txtShortLoadP":
+                    shortLoadP = value;
+                    break;
+                case "txtShortRefresh":
+                    shortRefresh = value;
+                    break;
+                case "txtShortHelp":
+                    shortHelp = value;
+                    break;
+                case "txtShortFilterC":
+                    shortFilterC = value;
+                    break;
+            }
+
+            txtBox.Text = keysConverter.ConvertToString(value);
             e.Handled = true;
             e.SuppressKeyPress = true;
         }
@@ -253,7 +389,18 @@ namespace Route_Tracker
             Settings.Default.UndoHotkey = (int)undoHotkey;
             Settings.Default.GlobalHotkeys = globalHotkeys;
             Settings.Default.AdvancedHotkeys = advancedHotkeys;
+            Settings.Default.ShortLoad = (int)shortLoad;
+            Settings.Default.ShortSave = (int)shortSave;
+            Settings.Default.ShortLoadP = (int)shortLoadP;
+            Settings.Default.ShortRefresh = (int)shortRefresh;
+            Settings.Default.ShortHelp = (int)shortHelp;
+            Settings.Default.ShortFilterC = (int)shortFilterC;
             Settings.Default.Save();
+
+            if (this.Owner is MainForm mainForm)
+            {
+                mainForm.RefreshHelpShortcutLabel();
+            }
 
             DialogResult = DialogResult.OK;
             Close();
@@ -272,11 +419,18 @@ namespace Route_Tracker
             undoHotkey = Keys.None;
             globalHotkeys = false;
             advancedHotkeys = false;
+            shortLoad = Keys.Control | Keys.O;
+            shortSave = Keys.Control | Keys.S;
+            shortLoadP = Keys.Control | Keys.L;
+            shortRefresh = Keys.F5;
+            shortHelp = Keys.F1;
+            shortFilterC = Keys.Escape;
 
             if (settingsManager != null)
             {
                 settingsManager.SaveHotkeys(Keys.None, Keys.None);
                 settingsManager.SaveHotkeySettings(Keys.None, false, false);
+                settingsManager.SaveShortcuts(shortLoad, shortSave, shortLoadP, shortRefresh, shortHelp, shortFilterC);
             }
             else
             {
@@ -285,10 +439,22 @@ namespace Route_Tracker
                 Settings.Default.UndoHotkey = (int)Keys.None;
                 Settings.Default.GlobalHotkeys = false;
                 Settings.Default.AdvancedHotkeys = false;
+                Settings.Default.ShortLoad = (int)shortLoad;
+                Settings.Default.ShortSave = (int)shortSave;
+                Settings.Default.ShortLoadP = (int)shortLoadP;
+                Settings.Default.ShortRefresh = (int)shortRefresh;
+                Settings.Default.ShortHelp = (int)shortHelp;
+                Settings.Default.ShortFilterC = (int)shortFilterC;
                 Settings.Default.Save();
             }
 
             LoadHotkeys();
+
+            if (this.Owner is MainForm mainForm)
+            {
+                mainForm.RefreshHelpShortcutLabel();
+            }
+
             MessageBox.Show("Hotkeys have been reset to default.", "Reset Complete",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

@@ -394,6 +394,40 @@ namespace Route_Tracker
         }
         #endregion
 
+        #region shortcut settings
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        public (Keys Load, Keys Save, Keys LoadProgress, Keys Refresh, Keys Help, Keys FilterClear) GetShortcuts()
+        {
+            return (
+                (Keys)Settings.Default.ShortLoad,
+                (Keys)Settings.Default.ShortSave,
+                (Keys)Settings.Default.ShortLoadP,
+                (Keys)Settings.Default.ShortRefresh,
+                (Keys)Settings.Default.ShortHelp,
+                (Keys)Settings.Default.ShortFilterC
+            );
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        public void SaveShortcuts(Keys load, Keys save, Keys loadProgress, Keys refresh, Keys help, Keys filterClear)
+        {
+            Settings.Default.ShortLoad = (int)load;
+            Settings.Default.ShortSave = (int)save;
+            Settings.Default.ShortLoadP = (int)loadProgress;
+            Settings.Default.ShortRefresh = (int)refresh;
+            Settings.Default.ShortHelp = (int)help;
+            Settings.Default.ShortFilterC = (int)filterClear;
+            Settings.Default.Save();
+            BackupSettings();
+        }
+        #endregion
+
         #region misc settings
         public List<string> GetGamesWithDirectoriesSet()
         {

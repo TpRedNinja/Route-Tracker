@@ -54,6 +54,7 @@ namespace Route_Tracker
         public DataGridView routeGrid = null!;
         public Label completionLabel = null!;
         public TextBox gameDirectoryTextBox = null!;
+        private Label helpShortcutLabel = null!;
 
         // Menu and settings controls
         public ToolStripComboBox? autoStartGameComboBox;
@@ -287,6 +288,19 @@ namespace Route_Tracker
             clearFiltersButton.Click += (s, e) => RouteHelpers.ClearFilters(this);
             topBar.Controls.Add(clearFiltersButton);
 
+            // Help shortcut label
+            helpShortcutLabel = new Label
+            {
+                AutoSize = true,
+                ForeColor = AppTheme.TextColor,
+                BackColor = AppTheme.BackgroundColor,
+                Font = new Font(AppTheme.DefaultFont.FontFamily, AppTheme.DefaultFont.Size, FontStyle.Italic),
+                Margin = new Padding(10, 2, 5, 2),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            UpdateHelpShortcutLabel();
+            topBar.Controls.Add(helpShortcutLabel);
+
             AppTheme.ApplyToButton(connectButton);
             AppTheme.ApplyToButton(showStatsButton);
             AppTheme.ApplyToButton(showCompletionButton);
@@ -320,6 +334,15 @@ namespace Route_Tracker
 
             labelPanel.Controls.Add(completionLabel);
             return labelPanel;
+        }
+
+        // update help shortcut label based on current hotkey settings
+        private void UpdateHelpShortcutLabel()
+        {
+            var shortcuts = settingsManager.GetShortcuts();
+            var keysConverter = new KeysConverter();
+            string helpKey = keysConverter.ConvertToString(shortcuts.Help) ?? "None";
+            helpShortcutLabel.Text = $"Click ({helpKey}) for help";
         }
 
         // ==========MY NOTES==============
@@ -363,6 +386,40 @@ namespace Route_Tracker
         // Catches key presses and runs hotkey actions if hotkeys are enabled
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            var shortcuts = settingsManager.GetShortcuts();
+
+            if (keyData == shortcuts.Load)
+            {
+                MainFormHelpers.LoadRouteFile(this);
+                return true;
+            }
+            if (keyData == shortcuts.Save)
+            {
+                routeManager?.SaveProgress(this);
+                return true;
+            }
+            if (keyData == shortcuts.LoadProgress)
+            {
+                MainFormHelpers.LoadProgress(this);
+                return true;
+            }
+            if (keyData == shortcuts.Refresh)
+            {
+                LoadRouteDataPublicManager();
+                return true;
+            }
+            if (keyData == shortcuts.Help)
+            {
+                using var wizard = new HelpWizard(new HotkeysSettingsForm(settingsManager));
+                wizard.ShowDialog(this);
+                return true;
+            }
+            if (keyData == shortcuts.FilterClear)
+            {
+                RouteHelpers.ClearFilters(this);
+                return true;
+            }
+
             bool handled = MainFormHelpers.ProcessCmdKey(this, settingsManager, routeManager, ref msg, keyData);
             return handled || base.ProcessCmdKey(ref msg, keyData);
         }
@@ -406,6 +463,12 @@ namespace Route_Tracker
                 UnregisterGlobalHotkeys();
                 globalHotkeysRegistered = false;
             }
+        }
+
+        //so other files can use this function
+        public void RefreshHelpShortcutLabel()
+        {
+            UpdateHelpShortcutLabel();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "SYSLIB1054",

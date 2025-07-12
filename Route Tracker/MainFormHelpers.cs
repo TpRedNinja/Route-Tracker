@@ -171,7 +171,7 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Lets you pick a different route file to load from the right-click menu
-        private static void LoadRouteFile(MainForm mainForm)
+        public static void LoadRouteFile(MainForm mainForm)
         {
             try
             {
@@ -211,7 +211,7 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Loads progress from saved file
-        private static void LoadProgress(MainForm mainForm)
+        public static void LoadProgress(MainForm mainForm)
         {
             RouteManager? routeManager = mainForm.GetRouteManager();
 

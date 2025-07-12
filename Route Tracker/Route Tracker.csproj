@@ -21,6 +21,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="HelpPages.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="HelpPages.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ProcessMemory64" Version="4.0.1-beta.20221205023454" />
   </ItemGroup>
 

@@ -1,0 +1,14 @@
+[
+    {
+        "title": "How to Configure Hotkeys (Shortcuts)",
+        "content": "Click in any textbox and press the desired key combination.\nHotkeys (top) are for completing, skipping, and undoing route entries.\nShortcuts (bottom) are for quick actions like loading, saving, refreshing, help, and clearing filters.\n\nClick 'Next' for more details."
+    },
+    {
+        "title": "Current Shortcuts (Hotkeys)",
+        "content": "Load Route: {Load}\nSave Progress: {Save}\nLoad Progress: {LoadProgress}\nRefresh: {Refresh}\nHelp: {Help}\nClear Filters: {FilterClear}\n\nClick 'Next' for advanced options."
+    },
+    {
+        "title": "Advanced Options",
+        "content": "Global Hotkeys: Enable to use hotkeys even when the app is not focused.\nAdvanced Hotkeys: Allows hotkey actions to apply to any selected entry, not just the first incomplete entry.\n\nClick 'Close' to exit help."
+    }
+]

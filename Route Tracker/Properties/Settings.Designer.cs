@@ -202,5 +202,77 @@ namespace Route_Tracker.Properties {
                 this["AdvancedHotkeys"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131151")]
+        public int ShortLoad {
+            get {
+                return ((int)(this["ShortLoad"]));
+            }
+            set {
+                this["ShortLoad"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131155")]
+        public int ShortSave {
+            get {
+                return ((int)(this["ShortSave"]));
+            }
+            set {
+                this["ShortSave"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131148")]
+        public int ShortLoadP {
+            get {
+                return ((int)(this["ShortLoadP"]));
+            }
+            set {
+                this["ShortLoadP"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("116")]
+        public int ShortRefresh {
+            get {
+                return ((int)(this["ShortRefresh"]));
+            }
+            set {
+                this["ShortRefresh"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("112")]
+        public int ShortHelp {
+            get {
+                return ((int)(this["ShortHelp"]));
+            }
+            set {
+                this["ShortHelp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("27")]
+        public int ShortFilterC {
+            get {
+                return ((int)(this["ShortFilterC"]));
+            }
+            set {
+                this["ShortFilterC"] = value;
+            }
+        }
     }
 }
