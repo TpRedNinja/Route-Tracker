@@ -1,41 +1,30 @@
 ## ✅ Completed  
 These actions already have hotkey/shortcut support in your app.
 
-- Load Route File  (crtl + o)
-- Save Progress  (crtl + s)
-- Load Progress  (crtl + l)
-- Complete Entry (hotkey) 
-- Skip Entry  (hotkey)
-- Undo Entry  (hotkey)
-- Clear Filters (esc)
-- Show Help/Hotkey Wizard (F1)
-- refresh (F5)
-- Reset Progress (crtl + r)
-- Connect to Game (shift + c)
-- Show Game Stats Window (shift + s)
-- Show Route Stats Window (shift + r)
-- Switch Layout Mode *(Normal / Compact / Mini / Overlay)*  
-	- for up: crtl + m, 
-	- for down: shift + m
-- Open Backup Folder (crtl + b)
-- Backup Settings Now (shift + b)
-- Restore Settings from Backup (crtl + shift + b)
-- Open Settings Folder (crtl + shift + s)
-
----
-
-## 🟡 Need to program so they work
-These features exist, but you haven’t added hotkey/shortcut support yet.
-
-
-
----
-
-## idk how to do these
-- Auto-Start Game *(toggle)*  (how i do this one?)
-- Toggle Always On Top  (how i do this one?)
-- Toggle Advanced Hotkeys  (how i do this one?)
-- Toggle Global Hotkeys  (how i do this one?)
+- [x] Load Route File  (crtl + o)  
+- [x] Save Progress  (crtl + s)  
+- [x] Load Progress  (crtl + l)  
+- [x] Complete Entry (hotkey)  
+- [x] Skip Entry  (hotkey)  
+- [x] Undo Entry  (hotkey)  
+- [x] Clear Filters (esc)  
+- [x] Show Help/Hotkey Wizard (F1)  
+- [x] refresh (F5)  
+- [x] Reset Progress (crtl + r)  
+- [x] Connect to Game (shift + c)  
+- [x] Show Game Stats Window (shift + s)  
+- [x] Show Route Stats Window (shift + r)  
+- [x] Switch Layout Mode *(Normal / Compact / Mini / Overlay)*  
+	- [x] for up: crtl + m  
+	- [x] for down: shift + m  
+- [x] Open Backup Folder (crtl + b)  
+- [x] Backup Settings Now (shift + b)  
+- [x] Restore Settings from Backup (crtl + shift + b)  
+- [x] Open Settings Folder (crtl + shift + s)
+- [x] Auto-Start Game *(toggle)*  (crtl + a)
+- [x] Toggle Always On Top  (crtl + t)
+- [x] Toggle Advanced Hotkeys  (shift + a)
+- [x] Toggle Global Hotkeys  (crtl + g)
 
 ---
 
@@ -48,6 +37,7 @@ These require the feature to be implemented before you can add hotkey/shortcut s
 - Scroll to First Incomplete Entry *(goes with sort route grid)*  
 - Sort Route Grid *(toggle sort modes)*
 
+-----
 
 ## features to add
 # 📝 Future Features TODO List
@@ -103,3 +93,21 @@ Let the user customize their shortcuts. *(Done)*
 - [ ] Allow users to remove specific types or entries in general (e.g., upgrades, story, chests)  
   - [ ] Program won’t try to track them  
   - [ ] Remove all of a type with one button click
+
+---
+
+## 🛠️ UpdateManager Advanced Checklist
+
+- [x] Show modal progress window during update
+    - [x] Progress bar for downloading ZIP
+    - [x] Progress bar for extracting ZIP
+    - [x] Status label for current operation
+    - [x] Allow user to select download location
+    - [x] Allow user to select extraction location
+- [x] "Continue" button (disabled until extraction is complete)
+- [x] Checkbox "Launch new version after update" (disabled until extraction is complete)
+- [x] On completion:
+    - [x] If checkbox checked, close all app windows and launch new EXE
+    - [x] Optionally launch as admin (if needed)
+- [x] Error handling for download and extraction
+- [x] Show error messages if update fails

@@ -96,6 +96,28 @@ namespace Route_Tracker
             // Now initialize UI components that need settingsManager
             InitializeCustomComponents();
 
+            // load icon on start with fallback image
+            try
+            {
+                var iconPath = "ProjectIcon_Main.ico";
+                this.Icon = new Icon(iconPath);
+                Debug.WriteLine($"Icon loaded from: {iconPath}");
+            }
+            catch (Exception exMain)
+            {
+                Debug.WriteLine($"Failed to load main icon: {exMain.Message}");
+                try
+                {
+                    var altIconPath = "ProjectIcon_Alt.ico";
+                    this.Icon = new Icon(altIconPath);
+                    Debug.WriteLine($"Fallback icon loaded from: {altIconPath}");
+                }
+                catch (Exception exAlt)
+                {
+                    Debug.WriteLine($"Failed to load fallback icon: {exAlt.Message}");
+                }
+            }
+
             // Auto-detect on startup
             AutoDetectGameOnStartup();
 
