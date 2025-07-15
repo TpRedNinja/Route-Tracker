@@ -89,6 +89,11 @@ namespace Route_Tracker
             layoutMenuItem.Click += (s, e) => LayoutMenuItem_Click(mainForm, settingsManager);
             settingsMenuItem.DropDownItems.Add(layoutMenuItem);
 
+            // Sorting Options
+            ToolStripMenuItem sortingMenuItem = new("Sorting Options");
+            sortingMenuItem.Click += (s, e) => SortingMenuItem_Click(mainForm, settingsManager);
+            settingsMenuItem.DropDownItems.Add(sortingMenuItem);
+
             ToolStripMenuItem showSaveLocationMenuItem = new("Show Save Location");
             showSaveLocationMenuItem.Click += (s, e) => ShowSaveLocationMenuItem_Click(mainForm);
             settingsMenuItem.DropDownItems.Add(showSaveLocationMenuItem);
@@ -370,6 +375,30 @@ namespace Route_Tracker
             if (mainForm.enableAutoStartMenuItem != null)
             {
                 mainForm.enableAutoStartMenuItem.Enabled = mainForm.autoStartGameComboBox.Items.Count > 0;
+            }
+        }
+
+        [SupportedOSPlatform("windows6.1")]
+        private static void SortingMenuItem_Click(MainForm mainForm, SettingsManager settingsManager)
+        {
+            bool wasTopMost = mainForm.TopMost;
+            if (wasTopMost)
+                mainForm.TopMost = false;
+
+            try
+            {
+                using var sortingForm = new SortingOptionsForm(settingsManager);
+                if (sortingForm.ShowDialog(mainForm) == DialogResult.OK)
+                {
+                    // Apply the new sorting mode immediately
+                    var currentMode = settingsManager.GetSortingMode();
+                    SortingManager.ApplySorting(mainForm.routeGrid, currentMode);
+                }
+            }
+            finally
+            {
+                if (wasTopMost)
+                    mainForm.TopMost = true;
             }
         }
     }

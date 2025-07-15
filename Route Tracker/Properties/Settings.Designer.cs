@@ -241,6 +241,30 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("262212")]
+        public int SortingUp {
+            get {
+                return ((int)(this["SortingUp"]));
+            }
+            set {
+                this["SortingUp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("196676")]
+        public int SortingDown {
+            get {
+                return ((int)(this["SortingDown"]));
+            }
+            set {
+                this["SortingDown"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("131138")]
         public int ShortBackFold {
             get {
@@ -397,6 +421,18 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int SortingMode {
+            get {
+                return ((int)(this["SortingMode"]));
+            }
+            set {
+                this["SortingMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AutoStart {
             get {
@@ -440,6 +476,18 @@ namespace Route_Tracker.Properties {
             }
             set {
                 this["Gow2018Directory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131140")]
+        public int GameDirect {
+            get {
+                return ((int)(this["GameDirect"]));
+            }
+            set {
+                this["GameDirect"] = value;
             }
         }
     }

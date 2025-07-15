@@ -1,5 +1,5 @@
 # ✅ Completed features and hotkeys and stuff
-## These actions already have hotkey/shortcut support in your app.
+## These actions that have hotkey/shortcut support in your app.
 - [x] Load Route File  (crtl + o)  
 - [x] Save Progress  (crtl + s)  
 - [x] Load Progress  (crtl + l)  
@@ -21,8 +21,9 @@
 - [x] Toggle Always On Top  (crtl + t)
 - [x] Toggle Advanced Hotkeys  (shift + a)
 - [x] Toggle Global Hotkeys  (crtl + g)
+- [x] open import route from url window (crtl + u)
 - [x] Switch Layout Mode *(Normal / Compact / Mini / Overlay)*  
-	- for up: crtl + m  
+	- for up: alt + m  
 	- for down: shift + m  
 
 ---
@@ -148,6 +149,48 @@ Add a feature to my C# WinForms app (.NET 8) called "Import routes from URLs" wi
     - save last used sorting option
     - add to backup folder like with settings 
 
+#solution
+
+Add a feature to my C# WinForms app (.NET 8) called "New Sorting Options" with the following requirements:
+
+**Requirements:**
+- Add new sorting options for the route grid:
+  - Option to hide completed entries (but keep a list of completed in a file. Technically already have with save progress; just ensure it works).
+  - Option to put completed entries at the bottom (scroll to first uncompleted. Already have; just ensure it works).
+  - Save and restore the last used sorting option.
+  - Add sorting settings to the backup folder (just add it to settings; extend current implementation).
+- Access sorting options from the UI:
+  - Add a button in the settings panel (like the layout options) that opens a separate window for sorting options.
+  - Also allow access via customizable hotkeys to swap between all sorting modes in both up and down directions (defaults: up = Alt+D, down = Shift+D). These hotkeys must be configurable in the hotkeys window.
+- All sorting logic should be integrated with the route grid and update the display accordingly.
+- Error handling for edge cases (e.g., empty grid, all entries completed).
+- Code should be structured for easy future expansion (e.g., adding more sort modes).
+
+**Additional Requirement:**
+- Add a customizable hotkey (default: Ctrl+D) to open the game directory window. This hotkey must be configurable in the hotkeys window.
+
+**Hotkey Persistence:**
+- All new hotkeys (sorting up, sorting down, game directory) must be saved and loaded with the rest of the hotkeys/shortcuts, using the same persistence mechanism as existing hotkeys.
+
+**Instructions:**
+- Generate all code for this feature, including:
+  - New forms, classes, or methods as needed.
+  - Full function bodies for any replacements or modifications.
+  - All UI code for the sorting options window (code or designer, but show all relevant code), and the settings panel button to open it.
+  - Integrate with the settings menu and hotkey system, including hotkey customization, wiring, and persistence for all new hotkeys.
+  - **Explicitly generate all code for adding the hotkeys, including registration, configuration, event handling, and saving/loading with the rest of the hotkeys. Do not just reference existing logic—show the actual code needed.**
+  - Integrate sorting settings and the new hotkeys with the backup/restore system.
+  - Include all error handling.
+- For each code block, specify:
+  - File name and path (e.g., `Route Tracker\SortingOptionsForm.cs`).
+  - Where in the file to place the code (e.g., "add this method to MainForm.cs").
+  - If a new file, specify the type (form, class, etc.).
+- Do not use placeholders like "rest of code goes here." Show full code for any function or class you add or modify.
+- At the end, provide a step-by-step integration guide summarizing where to add each piece and how to wire up the feature.
+- Ensure the code is easy to expand for future sorting modes.
+
+Thank you!
+    
 ---
 
 ## *will add details about these later*

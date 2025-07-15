@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Text;
@@ -73,6 +74,10 @@ namespace Route_Tracker
             public int AdvTog { get; set; } = (int)(Keys.Shift | Keys.A);
             public int GlobalTog { get; set; } = (int)(Keys.Control | Keys.G);
             public int ShortImportRoute { get; set; } = (int)(Keys.Control | Keys.U);
+            public int SortingMode { get; set; } = 0;
+            public int SortingUp { get; set; } = 262212; // Alt+D
+            public int SortingDown { get; set; } = 196676; // Shift+D
+            public int GameDirect { get; set; } = 131140; // Ctrl+D
         }
 
         #region Backup/Restore Settings
@@ -86,10 +91,9 @@ namespace Route_Tracker
         {
             try
             {
-                // Ensure backup directory exists
-                Directory.CreateDirectory(BackupFolder);
+                if (!Directory.Exists(BackupFolder))
+                    Directory.CreateDirectory(BackupFolder);
 
-                // Create backup object with current settings
                 var backup = new SettingsBackup
                 {
                     GameDirectory = Settings.Default.GameDirectory,
@@ -103,6 +107,8 @@ namespace Route_Tracker
                     AlwaysOnTop = Settings.Default.AlwaysOnTop,
                     CheckForUpdateOnStartup = Settings.Default.CheckForUpdateOnStartup,
                     DevMode = Settings.Default.DevMode,
+                    BackupTimestamp = DateTime.Now,
+                    AppVersion = AppTheme.Version,
                     LayoutMode = Settings.Default.LayoutMode,
                     ShortLoad = Settings.Default.ShortLoad,
                     ShortSave = Settings.Default.ShortSave,
@@ -125,19 +131,18 @@ namespace Route_Tracker
                     AdvTog = Settings.Default.AdvTog,
                     GlobalTog = Settings.Default.GlobalTog,
                     ShortImportRoute = Settings.Default.ShortImportRoute,
-                    BackupTimestamp = DateTime.Now,
-                    AppVersion = AppTheme.Version
+                    SortingMode = Settings.Default.SortingMode,
+                    SortingUp = Settings.Default.SortingUp,
+                    SortingDown = Settings.Default.SortingDown,
+                    GameDirect = Settings.Default.GameDirect
                 };
 
-                // Use cached JsonSerializerOptions
-                string json = JsonSerializer.Serialize(backup, JsonOptions);
+                string json = System.Text.Json.JsonSerializer.Serialize(backup, JsonOptions);
                 File.WriteAllText(BackupFilePath, json);
-
-                System.Diagnostics.Debug.WriteLine($"Settings backed up to: {BackupFilePath}");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to backup settings: {ex.Message}");
+                Debug.WriteLine($"Error backing up settings: {ex.Message}");
             }
         }
 
@@ -155,12 +160,11 @@ namespace Route_Tracker
                     return false;
 
                 string json = File.ReadAllText(BackupFilePath);
-                var backup = JsonSerializer.Deserialize<SettingsBackup>(json);
+                var backup = System.Text.Json.JsonSerializer.Deserialize<SettingsBackup>(json);
 
                 if (backup == null)
                     return false;
 
-                // Restore all settings
                 Settings.Default.GameDirectory = backup.GameDirectory;
                 Settings.Default.AutoStart = backup.AutoStart;
                 Settings.Default.AC4Directory = backup.AC4Directory;
@@ -194,15 +198,17 @@ namespace Route_Tracker
                 Settings.Default.AdvTog = backup.AdvTog;
                 Settings.Default.GlobalTog = backup.GlobalTog;
                 Settings.Default.ShortImportRoute = backup.ShortImportRoute;
+                Settings.Default.SortingMode = backup.SortingMode;
+                Settings.Default.SortingUp = backup.SortingUp;
+                Settings.Default.SortingDown = backup.SortingDown;
+                Settings.Default.GameDirectory = backup.GameDirectory;
 
                 Settings.Default.Save();
-
-                System.Diagnostics.Debug.WriteLine($"Settings restored from backup dated: {backup.BackupTimestamp}");
                 return true;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to restore settings: {ex.Message}");
+                Debug.WriteLine($"Error restoring settings: {ex.Message}");
                 return false;
             }
         }
@@ -462,11 +468,12 @@ namespace Route_Tracker
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
-        public (Keys Load, Keys Save, Keys LoadProgress, Keys ResetProgress, 
+        public (Keys Load, Keys Save, Keys LoadProgress, Keys ResetProgress,
             Keys Refresh, Keys Help, Keys FilterClear, Keys Connect, Keys GameStats,
             Keys RouteStats, Keys LayoutUp, Keys LayoutDown, Keys BackupFolder,
             Keys BackupNow, Keys Restore, Keys SetFolder, Keys AutoTog, Keys TopTog,
-            Keys AdvTog, Keys GlobalTog, Keys ImportRoute) GetShortcuts()
+            Keys AdvTog, Keys GlobalTog, Keys ImportRoute, Keys SortingUp, Keys SortingDown,
+            Keys GameDirect) GetShortcuts()
         {
             return (
                 (Keys)Settings.Default.ShortLoad,
@@ -489,7 +496,10 @@ namespace Route_Tracker
                 (Keys)Settings.Default.TopTog,
                 (Keys)Settings.Default.AdvTog,
                 (Keys)Settings.Default.GlobalTog,
-                (Keys)Settings.Default.ShortImportRoute
+                (Keys)Settings.Default.ShortImportRoute,
+                (Keys)Settings.Default.SortingUp,
+                (Keys)Settings.Default.SortingDown,
+                (Keys)Settings.Default.GameDirect
             );
         }
 
@@ -498,10 +508,11 @@ namespace Route_Tracker
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
         public void SaveShortcuts(Keys load, Keys save, Keys loadProgress,
-    Keys resetProgress, Keys refresh, Keys help, Keys filterClear, Keys connect,
-    Keys gameStats, Keys routeStats, Keys layoutUp, Keys layoutDown,
-    Keys backupFolder, Keys backupNow, Keys restore, Keys setFolder,
-    Keys autoTog, Keys topTog, Keys advTog, Keys globalTog, Keys importRoute)
+            Keys resetProgress, Keys refresh, Keys help, Keys filterClear, Keys connect,
+            Keys gameStats, Keys routeStats, Keys layoutUp, Keys layoutDown,
+            Keys backupFolder, Keys backupNow, Keys restore, Keys setFolder,
+            Keys autoTog, Keys topTog, Keys advTog, Keys globalTog, Keys importRoute,
+            Keys sortingUp, Keys sortingDown, Keys gameDirect)
         {
             Settings.Default.ShortLoad = (int)load;
             Settings.Default.ShortSave = (int)save;
@@ -524,6 +535,9 @@ namespace Route_Tracker
             Settings.Default.AdvTog = (int)advTog;
             Settings.Default.GlobalTog = (int)globalTog;
             Settings.Default.ShortImportRoute = (int)importRoute;
+            Settings.Default.SortingUp = (int)sortingUp;
+            Settings.Default.SortingDown = (int)sortingDown;
+            Settings.Default.GameDirect = (int)gameDirect;
             Settings.Default.Save();
             BackupSettings();
         }
@@ -606,6 +620,22 @@ namespace Route_Tracker
                 MessageBox.Show($"Could not open settings folder: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        public void SaveSortingMode(SortingOptionsForm.SortingMode sortingMode)
+        {
+            Settings.Default.SortingMode = (int)sortingMode;
+            Settings.Default.Save();
+            BackupSettings();
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        public SortingOptionsForm.SortingMode GetSortingMode()
+        {
+            return (SortingOptionsForm.SortingMode)Settings.Default.SortingMode;
         }
         #endregion
     }

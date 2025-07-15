@@ -89,6 +89,10 @@ namespace Route_Tracker
                 // RESTORED: USE ALL VALUES FROM CALCULATION
                 var (percentage, completed, total) = routeManager.CalculateCompletionStats();
                 mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
+
+                // Apply current sorting mode
+                var currentMode = settingsManager.GetSortingMode();
+                SortingManager.ApplySorting(routeGrid, currentMode);
             }
             else
             {
@@ -113,7 +117,7 @@ namespace Route_Tracker
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
-        public static void UpdateRouteCompletionStatus(RouteManager? routeManager, DataGridView routeGrid, GameStatsEventArgs stats, Label completionLabel)
+        public static void UpdateRouteCompletionStatus(RouteManager? routeManager, DataGridView routeGrid, GameStatsEventArgs stats, Label completionLabel, SettingsManager settingsManager)
         {
             bool changed = routeManager?.UpdateCompletionStatus(routeGrid, stats) ?? false;
 
@@ -126,6 +130,11 @@ namespace Route_Tracker
 
                 UpdateCompletionStatsIfVisible(routeManager);
             }
+
+            // Apply current sorting mode instead of default sorting
+            var currentMode = settingsManager.GetSortingMode();
+            SortingManager.ApplySorting(routeGrid, currentMode);
+
         }
         #endregion
 

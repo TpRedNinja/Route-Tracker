@@ -137,34 +137,42 @@ namespace Route_Tracker
             var page = helpPages[step];
 
             var shortcuts = parentForm.settingsManager?.GetShortcuts()
-            ?? (Load: Keys.None, Save: Keys.None, LoadProgress: Keys.None, ResetProgress: Keys.None,
-            Refresh: Keys.None, Help: Keys.None, FilterClear: Keys.None, Connect: Keys.None,
-            GameStats: Keys.None, RouteStats: Keys.None, LayoutUp: Keys.None, LayoutDown: Keys.None,
-            BackupFolder: Keys.None, BackupNow: Keys.None, Restore: Keys.None, SetFolder: Keys.None,
-            AutoTog: Keys.None, TopTog: Keys.None, AdvTog: Keys.None, GlobalTog: Keys.None, ImportRoute: Keys.None);
+            ?? (Load: Keys.None, Save: Keys.None, LoadProgress: Keys.None, 
+            ResetProgress: Keys.None, Refresh: Keys.None, Help: Keys.None, 
+            FilterClear: Keys.None, Connect: Keys.None, GameStats: Keys.None, 
+            RouteStats: Keys.None, LayoutUp: Keys.None, LayoutDown: Keys.None,
+            BackupFolder: Keys.None, BackupNow: Keys.None, Restore: Keys.None, 
+            SetFolder: Keys.None, AutoTog: Keys.None, TopTog: Keys.None, 
+            AdvTog: Keys.None, GlobalTog: Keys.None, ImportRoute: Keys.None, 
+            SortingUp: Keys.None, SortingDown: Keys.None, GameDirect: Keys.None);
+
             var keysConverter = new KeysConverter();
 
             string content = page.Content
-                .Replace("{Load}", keysConverter.ConvertToString(shortcuts.Load))
-                .Replace("{Save}", keysConverter.ConvertToString(shortcuts.Save))
-                .Replace("{LoadProgress}", keysConverter.ConvertToString(shortcuts.LoadProgress))
-                .Replace("{ResetProgress}", keysConverter.ConvertToString(shortcuts.ResetProgress))
-                .Replace("{Refresh}", keysConverter.ConvertToString(shortcuts.Refresh))
-                .Replace("{Help}", keysConverter.ConvertToString(shortcuts.Help))
-                .Replace("{FilterClear}", keysConverter.ConvertToString(shortcuts.FilterClear))
-                .Replace("{Connect}", keysConverter.ConvertToString(shortcuts.Connect))
-                .Replace("{GameStats}", keysConverter.ConvertToString(shortcuts.GameStats))
-                .Replace("{RouteStats}", keysConverter.ConvertToString(shortcuts.RouteStats))
-                .Replace("{LayoutUp}", keysConverter.ConvertToString(shortcuts.LayoutUp))
-                .Replace("{LayoutDown}", keysConverter.ConvertToString(shortcuts.LayoutDown))
-                .Replace("{BackupFolder}", keysConverter.ConvertToString(shortcuts.BackupFolder))
-                .Replace("{BackupNow}", keysConverter.ConvertToString(shortcuts.BackupNow))
-                .Replace("{Restore}", keysConverter.ConvertToString(shortcuts.Restore))
-                .Replace("{SetFolder}", keysConverter.ConvertToString(shortcuts.SetFolder))
-                .Replace("{AutoTog}", keysConverter.ConvertToString(shortcuts.AutoTog))
-                .Replace("{TopTog}", keysConverter.ConvertToString(shortcuts.TopTog))
-                .Replace("{AdvTog}", keysConverter.ConvertToString(shortcuts.AdvTog))
-                .Replace("{GlobalTog}", keysConverter.ConvertToString(shortcuts.GlobalTog));
+    .Replace("{Load}", keysConverter.ConvertToString(shortcuts.Load))
+    .Replace("{Save}", keysConverter.ConvertToString(shortcuts.Save))
+    .Replace("{LoadProgress}", keysConverter.ConvertToString(shortcuts.LoadProgress))
+    .Replace("{ResetProgress}", keysConverter.ConvertToString(shortcuts.ResetProgress))
+    .Replace("{Refresh}", keysConverter.ConvertToString(shortcuts.Refresh))
+    .Replace("{Help}", keysConverter.ConvertToString(shortcuts.Help))
+    .Replace("{FilterClear}", keysConverter.ConvertToString(shortcuts.FilterClear))
+    .Replace("{Connect}", keysConverter.ConvertToString(shortcuts.Connect))
+    .Replace("{GameStats}", keysConverter.ConvertToString(shortcuts.GameStats))
+    .Replace("{RouteStats}", keysConverter.ConvertToString(shortcuts.RouteStats))
+    .Replace("{LayoutUp}", keysConverter.ConvertToString(shortcuts.LayoutUp))
+    .Replace("{LayoutDown}", keysConverter.ConvertToString(shortcuts.LayoutDown))
+    .Replace("{BackupFolder}", keysConverter.ConvertToString(shortcuts.BackupFolder))
+    .Replace("{BackupNow}", keysConverter.ConvertToString(shortcuts.BackupNow))
+    .Replace("{Restore}", keysConverter.ConvertToString(shortcuts.Restore))
+    .Replace("{SetFolder}", keysConverter.ConvertToString(shortcuts.SetFolder))
+    .Replace("{AutoTog}", keysConverter.ConvertToString(shortcuts.AutoTog))
+    .Replace("{TopTog}", keysConverter.ConvertToString(shortcuts.TopTog))
+    .Replace("{AdvTog}", keysConverter.ConvertToString(shortcuts.AdvTog))
+    .Replace("{GlobalTog}", keysConverter.ConvertToString(shortcuts.GlobalTog))
+    .Replace("{ImportRoute}", keysConverter.ConvertToString(shortcuts.ImportRoute))
+    .Replace("{SortingUp}", keysConverter.ConvertToString(shortcuts.SortingUp))
+    .Replace("{SortingDown}", keysConverter.ConvertToString(shortcuts.SortingDown))
+    .Replace("{GameDirect}", keysConverter.ConvertToString(shortcuts.GameDirect));
 
             AdjustFontToFit($"{page.Title}\n\n{content}");
         }

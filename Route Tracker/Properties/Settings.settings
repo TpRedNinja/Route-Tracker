@@ -56,6 +56,12 @@
     <Setting Name="ShortLayoutDown" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">65613</Value>
     </Setting>
+    <Setting Name="SortingUp" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">262212</Value>
+    </Setting>
+    <Setting Name="SortingDown" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">196676</Value>
+    </Setting>
     <Setting Name="ShortBackFold" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">131138</Value>
     </Setting>
@@ -95,6 +101,9 @@
     <Setting Name="LayoutMode" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="SortingMode" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
     <Setting Name="AutoStart" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
@@ -106,6 +115,9 @@
     </Setting>
     <Setting Name="Gow2018Directory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="GameDirect" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131140</Value>
     </Setting>
   </Settings>
 </SettingsFile>
