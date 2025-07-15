@@ -89,6 +89,11 @@ namespace Route_Tracker
             layoutMenuItem.Click += (s, e) => LayoutMenuItem_Click(mainForm, settingsManager);
             settingsMenuItem.DropDownItems.Add(layoutMenuItem);
 
+            // Sorting Options
+            ToolStripMenuItem sortingMenuItem = new("Sorting Options");
+            sortingMenuItem.Click += (s, e) => SortingMenuItem_Click(mainForm, settingsManager);
+            settingsMenuItem.DropDownItems.Add(sortingMenuItem);
+
             ToolStripMenuItem showSaveLocationMenuItem = new("Show Save Location");
             showSaveLocationMenuItem.Click += (s, e) => ShowSaveLocationMenuItem_Click(mainForm);
             settingsMenuItem.DropDownItems.Add(showSaveLocationMenuItem);
@@ -96,6 +101,7 @@ namespace Route_Tracker
             settingsMenuItem.DropDownItems.Add(new ToolStripSeparator());
 
             AddSettingsBackupMenu(settingsMenuItem, settingsManager);
+            AddRouteImportMenu(settingsMenuItem, mainForm);
 
             AppTheme.ApplyToMenuStrip(menuStrip);
         }
@@ -149,8 +155,52 @@ namespace Route_Tracker
             showBackupFolderMenuItem.Click += (s, e) => settingsManager.OpenBackupFolder();
             backupMenuItem.DropDownItems.Add(showBackupFolderMenuItem);
 
+            // Show Downloaded Routes Folder option
+            ToolStripMenuItem showDownloadedRoutesMenuItem = new("Show Downloaded Routes");
+            showDownloadedRoutesMenuItem.Click += (s, e) =>
+            {
+                var historyManager = new RouteHistoryManager();
+                string downloadFolder = historyManager.GetDownloadFolder();
+
+                try
+                {
+                    System.Diagnostics.Process.Start("explorer.exe", downloadFolder);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not open folder: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            };
+            backupMenuItem.DropDownItems.Add(showDownloadedRoutesMenuItem);
+
             settingsMenuItem.DropDownItems.Add(backupMenuItem);
         }
+
+        private static void AddRouteImportMenu(ToolStripMenuItem settingsMenuItem, MainForm mainForm)
+        {
+            ToolStripMenuItem importRouteMenuItem = new("Import Route from URL");
+            importRouteMenuItem.Click += (s, e) => ImportRouteMenuItem_Click(mainForm);
+            settingsMenuItem.DropDownItems.Add(importRouteMenuItem);
+        }
+
+        private static void ImportRouteMenuItem_Click(MainForm mainForm)
+        {
+            bool wasTopMost = mainForm.TopMost;
+            if (wasTopMost)
+                mainForm.TopMost = false;
+
+            try
+            {
+                ImportRouteForm.ShowImportDialog(mainForm);
+            }
+            finally
+            {
+                if (wasTopMost)
+                    mainForm.TopMost = true;
+            }
+        }
+
 
         // ==========MY NOTES==============
         // Event handlers for settings menu items
@@ -325,6 +375,30 @@ namespace Route_Tracker
             if (mainForm.enableAutoStartMenuItem != null)
             {
                 mainForm.enableAutoStartMenuItem.Enabled = mainForm.autoStartGameComboBox.Items.Count > 0;
+            }
+        }
+
+        [SupportedOSPlatform("windows6.1")]
+        private static void SortingMenuItem_Click(MainForm mainForm, SettingsManager settingsManager)
+        {
+            bool wasTopMost = mainForm.TopMost;
+            if (wasTopMost)
+                mainForm.TopMost = false;
+
+            try
+            {
+                using var sortingForm = new SortingOptionsForm(settingsManager);
+                if (sortingForm.ShowDialog(mainForm) == DialogResult.OK)
+                {
+                    // Apply the new sorting mode immediately
+                    var currentMode = settingsManager.GetSortingMode();
+                    SortingManager.ApplySorting(mainForm.routeGrid, currentMode);
+                }
+            }
+            finally
+            {
+                if (wasTopMost)
+                    mainForm.TopMost = true;
             }
         }
     }

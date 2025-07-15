@@ -241,6 +241,30 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("262212")]
+        public int SortingUp {
+            get {
+                return ((int)(this["SortingUp"]));
+            }
+            set {
+                this["SortingUp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("196676")]
+        public int SortingDown {
+            get {
+                return ((int)(this["SortingDown"]));
+            }
+            set {
+                this["SortingDown"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("131138")]
         public int ShortBackFold {
             get {
@@ -284,6 +308,66 @@ namespace Route_Tracker.Properties {
             }
             set {
                 this["ShortSetFold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131137")]
+        public int AutoTog {
+            get {
+                return ((int)(this["AutoTog"]));
+            }
+            set {
+                this["AutoTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131156")]
+        public int TopTog {
+            get {
+                return ((int)(this["TopTog"]));
+            }
+            set {
+                this["TopTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6553")]
+        public int AdvTog {
+            get {
+                return ((int)(this["AdvTog"]));
+            }
+            set {
+                this["AdvTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131143")]
+        public int GlobalTog {
+            get {
+                return ((int)(this["GlobalTog"]));
+            }
+            set {
+                this["GlobalTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131157")]
+        public int ShortImportRoute {
+            get {
+                return ((int)(this["ShortImportRoute"]));
+            }
+            set {
+                this["ShortImportRoute"] = value;
             }
         }
         
@@ -337,6 +421,18 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int SortingMode {
+            get {
+                return ((int)(this["SortingMode"]));
+            }
+            set {
+                this["SortingMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AutoStart {
             get {
@@ -385,49 +481,13 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("131137")]
-        public int AutoTog {
+        [global::System.Configuration.DefaultSettingValueAttribute("131140")]
+        public int GameDirect {
             get {
-                return ((int)(this["AutoTog"]));
+                return ((int)(this["GameDirect"]));
             }
             set {
-                this["AutoTog"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("131156")]
-        public int TopTog {
-            get {
-                return ((int)(this["TopTog"]));
-            }
-            set {
-                this["TopTog"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6553")]
-        public int AdvTog {
-            get {
-                return ((int)(this["AdvTog"]));
-            }
-            set {
-                this["AdvTog"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("131143")]
-        public int GlobalTog {
-            get {
-                return ((int)(this["GlobalTog"]));
-            }
-            set {
-                this["GlobalTog"] = value;
+                this["GameDirect"] = value;
             }
         }
     }

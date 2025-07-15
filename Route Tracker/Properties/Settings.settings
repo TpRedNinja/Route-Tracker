@@ -56,6 +56,12 @@
     <Setting Name="ShortLayoutDown" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">65613</Value>
     </Setting>
+    <Setting Name="SortingUp" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">262212</Value>
+    </Setting>
+    <Setting Name="SortingDown" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">196676</Value>
+    </Setting>
     <Setting Name="ShortBackFold" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">131138</Value>
     </Setting>
@@ -67,6 +73,21 @@
     </Setting>
     <Setting Name="ShortSetFold" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">196691</Value>
+    </Setting>
+    <Setting Name="AutoTog" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131137</Value>
+    </Setting>
+    <Setting Name="TopTog" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131156</Value>
+    </Setting>
+    <Setting Name="AdvTog" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6553</Value>
+    </Setting>
+    <Setting Name="GlobalTog" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131143</Value>
+    </Setting>
+    <Setting Name="ShortImportRoute" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131157</Value>
     </Setting>
     <Setting Name="CheckForUpdateOnStartup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -80,6 +101,9 @@
     <Setting Name="LayoutMode" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="SortingMode" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
     <Setting Name="AutoStart" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
@@ -92,17 +116,8 @@
     <Setting Name="Gow2018Directory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="AutoTog" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">131137</Value>
-    </Setting>
-    <Setting Name="TopTog" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">131156</Value>
-    </Setting>
-    <Setting Name="AdvTog" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">6553</Value>
-    </Setting>
-    <Setting Name="GlobalTog" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">131143</Value>
+    <Setting Name="GameDirect" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">131140</Value>
     </Setting>
   </Settings>
 </SettingsFile>

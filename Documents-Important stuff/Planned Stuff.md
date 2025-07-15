@@ -26,20 +26,9 @@ This document outlines planned support for additional games and features in Rout
 
 ### Short-term Goals
 - Implement improved UI with game switching
-- Add route management system for multiple speedrun categories
 
 ### Long-term Vision
-- Multi-language support
-- LiveSplit integration via server plugin (load routes from splits)
+- Multi-language support(maybe)
+- LiveSplit integration via server plugin (load routes from splits)(maybe)
 - Support for more games
-- User-friendly system for adding custom games, routes and pointers
 - Image support to show collectible locations in-game
-
-## Recently Implemented Features
-- Save/load functionality for route progress
-- "Always On Top" window mode
-- Text wrapping for better readability in route descriptions
-- Game state detection (loading screens and main menu transitions)
-- Automatic game detection
-- Performance optimizations for minimal resource usage
--  Customizable hotkeys for marking route entries

@@ -44,7 +44,7 @@ namespace Route_Tracker
         public TimeSpan GetMinimumUIUpdateInterval() => _minimumUIUpdateInterval;
         public void SetLastUIUpdateTime(DateTime time) => _lastUIUpdateTime = time;
         public void UpdateRouteCompletionStatusPublic(GameStatsEventArgs stats) =>
-    RouteHelpers.UpdateRouteCompletionStatus(routeManager, routeGrid, stats, completionLabel);
+        RouteHelpers.UpdateRouteCompletionStatus(routeManager, routeGrid, stats, completionLabel, settingsManager);
         public void LoadRouteDataPublicManager() => RouteHelpers.LoadRouteData(this, routeManager, routeGrid, settingsManager);
         public bool IsHotkeysEnabled => isHotkeysEnabled;
 
@@ -551,9 +551,79 @@ namespace Route_Tracker
                 UpdateGlobalHotkeys();
                 return true;
             }
+            if (keyData == shortcuts.ImportRoute)
+            {
+                ImportRouteForm.ShowImportDialog(this);
+                return true;
+            }
+            if (keyData == shortcuts.SortingUp)
+            {
+                CycleSorting(true);
+                return true;
+            }
+            if (keyData == shortcuts.SortingDown)
+            {
+                CycleSorting(false);
+                return true;
+            }
+            if (keyData == shortcuts.GameDirect)
+            {
+                OpenGameDirectory();
+                return true;
+            }
 
             bool handled = MainFormHelpers.ProcessCmdKey(this, settingsManager, routeManager, ref msg, keyData);
             return handled || base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        // ==========MY NOTES==============
+        // Cycles through sorting modes and applies them
+        private void CycleSorting(bool forward)
+        {
+            var currentMode = settingsManager.GetSortingMode();
+            var newMode = SortingManager.CycleSortingMode(currentMode, forward);
+
+            settingsManager.SaveSortingMode(newMode);
+            SortingManager.ApplySorting(routeGrid, newMode);
+
+            // Show a brief message about the new sorting mode
+            string modeName = SortingManager.GetSortingModeName(newMode);
+            MessageBox.Show($"Sorting mode changed to: {modeName}", "Sorting Changed",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // ==========MY NOTES==============
+        // Opens the game directory window
+        private void OpenGameDirectory()
+        {
+            bool wasTopMost = this.TopMost;
+            if (wasTopMost)
+                this.TopMost = false;
+
+            try
+            {
+                GameDirectoryForm gameDirectoryForm = new()
+                {
+                    Owner = this,
+                    StartPosition = FormStartPosition.CenterParent
+                };
+
+                gameDirectoryForm.DirectoryChanged += (s, args) => RefreshAutoStartDropdownPublic();
+                gameDirectoryForm.ShowDialog(this);
+            }
+            finally
+            {
+                if (wasTopMost)
+                    this.TopMost = true;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Public method to apply sorting (for use by other classes)
+        public void ApplyCurrentSorting()
+        {
+            var currentMode = settingsManager.GetSortingMode();
+            SortingManager.ApplySorting(routeGrid, currentMode);
         }
 
         private void CycleLayout(bool forward)
