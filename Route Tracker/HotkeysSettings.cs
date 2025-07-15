@@ -33,6 +33,7 @@ namespace Route_Tracker
         private Keys shortTopTog;
         private Keys shortAdvTog;
         private Keys shortGlobalTog;
+        private Keys shortImportRoute;
         public readonly SettingsManager? settingsManager;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "SYSLIB1054",
@@ -470,6 +471,22 @@ namespace Route_Tracker
                 Font = font
             };
             txtShortGlobalTog.KeyDown += TextBoxes_KeysDown;
+            y += spacing;
+            Label lblShortImportRoute = new()
+            {
+                Text = "Import Route:",
+                AutoSize = true,
+                Location = new Point(20, y),
+                Font = font
+            };
+            TextBox txtShortImportRoute = new()
+            {
+                Name = "txtShortImportRoute",
+                Size = new Size(110, 18),
+                Location = new Point(160, y),
+                Font = font
+            };
+            txtShortImportRoute.KeyDown += TextBoxes_KeysDown;
 
             y += spacing + 8;
             Label lblInfo = new()
@@ -557,6 +574,7 @@ namespace Route_Tracker
                 lblShortTopTog, txtShortTopTog,
                 lblShortAdvTog, txtShortAdvTog,
                 lblShortGlobalTog, txtShortGlobalTog,
+                lblShortImportRoute, txtShortImportRoute,
                 lblInfo, chkGlobalHotkeys, chkAdvancedHotkeys,
                 btnSave, btnCancel, btnReset
             ]);
@@ -607,6 +625,7 @@ namespace Route_Tracker
             shortBackNow = (Keys)Settings.Default.ShortBackNow;
             shortRestore = (Keys)Settings.Default.ShortRestore;
             shortSetFold = (Keys)Settings.Default.ShortSetFold;
+            shortImportRoute = (Keys)Settings.Default.ShortImportRoute;
 
             if (this.Controls["txtShortLoad"] is TextBox txtLoad) txtLoad.Text = keysConverter.ConvertToString(shortLoad);
             if (this.Controls["txtShortSave"] is TextBox txtSave) txtSave.Text = keysConverter.ConvertToString(shortSave);
@@ -624,6 +643,7 @@ namespace Route_Tracker
             if (this.Controls["txtShortBackNow"] is TextBox txtBackNow) txtBackNow.Text = keysConverter.ConvertToString(shortBackNow);
             if (this.Controls["txtShortRestore"] is TextBox txtRestore) txtRestore.Text = keysConverter.ConvertToString(shortRestore);
             if (this.Controls["txtShortSetFold"] is TextBox txtSetFold) txtSetFold.Text = keysConverter.ConvertToString(shortSetFold);
+            if (this.Controls["txtShortImportRoute"] is TextBox txtImportRoute) txtImportRoute.Text = keysConverter.ConvertToString(shortImportRoute);
 
             //toggle shortcuts
             shortAutoTog = (Keys)Settings.Default.AutoTog;
@@ -716,6 +736,9 @@ namespace Route_Tracker
                 case "txtShortGlobalTog":
                     shortGlobalTog = value;
                     break;
+                case "txtShortImportRoute":
+                    shortImportRoute = value;
+                    break;
             }
 
             txtBox.Text = keysConverter.ConvertToString(value);
@@ -756,6 +779,7 @@ namespace Route_Tracker
             Settings.Default.TopTog = (int)shortTopTog;
             Settings.Default.AdvTog = (int)shortAdvTog;
             Settings.Default.GlobalTog = (int)shortGlobalTog;
+            Settings.Default.ShortImportRoute = (int)shortImportRoute;
             Settings.Default.Save();
 
             if (this.Owner is MainForm mainForm)
@@ -800,16 +824,17 @@ namespace Route_Tracker
             shortTopTog = Keys.Control | Keys.T;
             shortAdvTog = Keys.Shift | Keys.A;
             shortGlobalTog = Keys.Control | Keys.G;
+            shortImportRoute = Keys.Control | Keys.U;
 
             if (settingsManager != null)
             {
                 settingsManager.SaveHotkeys(Keys.None, Keys.None);
                 settingsManager.SaveHotkeySettings(Keys.None, false, false);
-                settingsManager.SaveShortcuts(shortLoad, shortSave, shortLoadP, 
-                    shortResetP, shortRefresh, shortHelp, shortFilterC, shortConnect, 
-                    shortGameStats, shortRouteStats, shortLayoutUp, shortLayoutDown, 
-                    shortBackFold, shortBackNow, shortRestore, shortSetFold, 
-                    shortAutoTog, shortTopTog, shortAdvTog, shortGlobalTog);
+                settingsManager.SaveShortcuts(shortLoad, shortSave, shortLoadP,
+                    shortResetP, shortRefresh, shortHelp, shortFilterC, shortConnect,
+                    shortGameStats, shortRouteStats, shortLayoutUp, shortLayoutDown,
+                    shortBackFold, shortBackNow, shortRestore, shortSetFold,
+                    shortAutoTog, shortTopTog, shortAdvTog, shortGlobalTog, shortImportRoute);
             }
             else
             {
@@ -838,6 +863,7 @@ namespace Route_Tracker
                 Settings.Default.TopTog = (int)shortTopTog;
                 Settings.Default.AdvTog = (int)shortAdvTog;
                 Settings.Default.GlobalTog = (int)shortGlobalTog;
+                Settings.Default.ShortImportRoute = (int)shortImportRoute;
                 Settings.Default.Save();
             }
 

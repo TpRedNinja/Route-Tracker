@@ -551,6 +551,11 @@ namespace Route_Tracker
                 UpdateGlobalHotkeys();
                 return true;
             }
+            if (keyData == shortcuts.ImportRoute)
+            {
+                ImportRouteForm.ShowImportDialog(this);
+                return true;
+            }
 
             bool handled = MainFormHelpers.ProcessCmdKey(this, settingsManager, routeManager, ref msg, keyData);
             return handled || base.ProcessCmdKey(ref msg, keyData);

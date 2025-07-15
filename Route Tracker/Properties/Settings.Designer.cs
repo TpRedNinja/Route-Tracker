@@ -289,6 +289,66 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131137")]
+        public int AutoTog {
+            get {
+                return ((int)(this["AutoTog"]));
+            }
+            set {
+                this["AutoTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131156")]
+        public int TopTog {
+            get {
+                return ((int)(this["TopTog"]));
+            }
+            set {
+                this["TopTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6553")]
+        public int AdvTog {
+            get {
+                return ((int)(this["AdvTog"]));
+            }
+            set {
+                this["AdvTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131143")]
+        public int GlobalTog {
+            get {
+                return ((int)(this["GlobalTog"]));
+            }
+            set {
+                this["GlobalTog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("131157")]
+        public int ShortImportRoute {
+            get {
+                return ((int)(this["ShortImportRoute"]));
+            }
+            set {
+                this["ShortImportRoute"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool CheckForUpdateOnStartup {
             get {
@@ -380,54 +440,6 @@ namespace Route_Tracker.Properties {
             }
             set {
                 this["Gow2018Directory"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("131137")]
-        public int AutoTog {
-            get {
-                return ((int)(this["AutoTog"]));
-            }
-            set {
-                this["AutoTog"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("131156")]
-        public int TopTog {
-            get {
-                return ((int)(this["TopTog"]));
-            }
-            set {
-                this["TopTog"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6553")]
-        public int AdvTog {
-            get {
-                return ((int)(this["AdvTog"]));
-            }
-            set {
-                this["AdvTog"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("131143")]
-        public int GlobalTog {
-            get {
-                return ((int)(this["GlobalTog"]));
-            }
-            set {
-                this["GlobalTog"] = value;
             }
         }
     }
