@@ -86,9 +86,6 @@
     <Setting Name="GlobalTog" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">131143</Value>
     </Setting>
-    <Setting Name="ShortImportRoute" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">131157</Value>
-    </Setting>
     <Setting Name="CheckForUpdateOnStartup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>

@@ -73,7 +73,6 @@ namespace Route_Tracker
             public int TopTog { get; set; } = (int)(Keys.Control | Keys.T);
             public int AdvTog { get; set; } = (int)(Keys.Shift | Keys.A);
             public int GlobalTog { get; set; } = (int)(Keys.Control | Keys.G);
-            public int ShortImportRoute { get; set; } = (int)(Keys.Control | Keys.U);
             public int SortingMode { get; set; } = 0;
             public int SortingUp { get; set; } = 262212; // Alt+D
             public int SortingDown { get; set; } = 196676; // Shift+D
@@ -130,7 +129,6 @@ namespace Route_Tracker
                     TopTog = Settings.Default.TopTog,
                     AdvTog = Settings.Default.AdvTog,
                     GlobalTog = Settings.Default.GlobalTog,
-                    ShortImportRoute = Settings.Default.ShortImportRoute,
                     SortingMode = Settings.Default.SortingMode,
                     SortingUp = Settings.Default.SortingUp,
                     SortingDown = Settings.Default.SortingDown,
@@ -197,7 +195,6 @@ namespace Route_Tracker
                 Settings.Default.TopTog = backup.TopTog;
                 Settings.Default.AdvTog = backup.AdvTog;
                 Settings.Default.GlobalTog = backup.GlobalTog;
-                Settings.Default.ShortImportRoute = backup.ShortImportRoute;
                 Settings.Default.SortingMode = backup.SortingMode;
                 Settings.Default.SortingUp = backup.SortingUp;
                 Settings.Default.SortingDown = backup.SortingDown;
@@ -472,7 +469,7 @@ namespace Route_Tracker
             Keys Refresh, Keys Help, Keys FilterClear, Keys Connect, Keys GameStats,
             Keys RouteStats, Keys LayoutUp, Keys LayoutDown, Keys BackupFolder,
             Keys BackupNow, Keys Restore, Keys SetFolder, Keys AutoTog, Keys TopTog,
-            Keys AdvTog, Keys GlobalTog, Keys ImportRoute, Keys SortingUp, Keys SortingDown,
+            Keys AdvTog, Keys GlobalTog, Keys SortingUp, Keys SortingDown,
             Keys GameDirect) GetShortcuts()
         {
             return (
@@ -496,7 +493,6 @@ namespace Route_Tracker
                 (Keys)Settings.Default.TopTog,
                 (Keys)Settings.Default.AdvTog,
                 (Keys)Settings.Default.GlobalTog,
-                (Keys)Settings.Default.ShortImportRoute,
                 (Keys)Settings.Default.SortingUp,
                 (Keys)Settings.Default.SortingDown,
                 (Keys)Settings.Default.GameDirect
@@ -511,7 +507,7 @@ namespace Route_Tracker
             Keys resetProgress, Keys refresh, Keys help, Keys filterClear, Keys connect,
             Keys gameStats, Keys routeStats, Keys layoutUp, Keys layoutDown,
             Keys backupFolder, Keys backupNow, Keys restore, Keys setFolder,
-            Keys autoTog, Keys topTog, Keys advTog, Keys globalTog, Keys importRoute,
+            Keys autoTog, Keys topTog, Keys advTog, Keys globalTog,
             Keys sortingUp, Keys sortingDown, Keys gameDirect)
         {
             Settings.Default.ShortLoad = (int)load;
@@ -534,7 +530,6 @@ namespace Route_Tracker
             Settings.Default.TopTog = (int)topTog;
             Settings.Default.AdvTog = (int)advTog;
             Settings.Default.GlobalTog = (int)globalTog;
-            Settings.Default.ShortImportRoute = (int)importRoute;
             Settings.Default.SortingUp = (int)sortingUp;
             Settings.Default.SortingDown = (int)sortingDown;
             Settings.Default.GameDirect = (int)gameDirect;

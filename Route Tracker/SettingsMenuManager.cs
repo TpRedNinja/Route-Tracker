@@ -101,7 +101,6 @@ namespace Route_Tracker
             settingsMenuItem.DropDownItems.Add(new ToolStripSeparator());
 
             AddSettingsBackupMenu(settingsMenuItem, settingsManager);
-            AddRouteImportMenu(settingsMenuItem, mainForm);
 
             AppTheme.ApplyToMenuStrip(menuStrip);
         }
@@ -176,31 +175,6 @@ namespace Route_Tracker
 
             settingsMenuItem.DropDownItems.Add(backupMenuItem);
         }
-
-        private static void AddRouteImportMenu(ToolStripMenuItem settingsMenuItem, MainForm mainForm)
-        {
-            ToolStripMenuItem importRouteMenuItem = new("Import Route from URL");
-            importRouteMenuItem.Click += (s, e) => ImportRouteMenuItem_Click(mainForm);
-            settingsMenuItem.DropDownItems.Add(importRouteMenuItem);
-        }
-
-        private static void ImportRouteMenuItem_Click(MainForm mainForm)
-        {
-            bool wasTopMost = mainForm.TopMost;
-            if (wasTopMost)
-                mainForm.TopMost = false;
-
-            try
-            {
-                ImportRouteForm.ShowImportDialog(mainForm);
-            }
-            finally
-            {
-                if (wasTopMost)
-                    mainForm.TopMost = true;
-            }
-        }
-
 
         // ==========MY NOTES==============
         // Event handlers for settings menu items

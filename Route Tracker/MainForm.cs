@@ -61,10 +61,19 @@ namespace Route_Tracker
         public ToolStripMenuItem? enableAutoStartMenuItem;
 
         // Filtering and search controls
-        public ComboBox typeFilterComboBox = null!;
+        public CheckedListBox typeFilterCheckedListBox = null!;
         public TextBox searchTextBox = null!;
         public Button clearFiltersButton = null!;
         public List<RouteEntry> allRouteEntries = [];
+        public HashSet<string> selectedTypes = [];
+
+        //search history controls
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044",
+        Justification = "NO")]
+        private SearchHistoryManager searchHistoryManager = null!;
+        private ListBox searchHistoryListBox = null!;
+        private bool isSearchHistoryVisible = false;
+        private string lastSearchTerm = string.Empty;
 
         // Application state
         private bool isHotkeysEnabled = false;
@@ -92,6 +101,7 @@ namespace Route_Tracker
             gameConnectionManager = new GameConnectionManager();
             gameConnectionManager.StatsUpdated += (s, e) => RouteHelpers.GameStats_StatsUpdated(this, e);
             settingsManager = new SettingsManager();
+            searchHistoryManager = new SearchHistoryManager();
 
             // Now initialize UI components that need settingsManager
             InitializeCustomComponents();
@@ -124,6 +134,10 @@ namespace Route_Tracker
             SettingsLifecycleManager.LoadSettings(this, settingsManager, gameDirectoryTextBox);
             settingsManager.CheckFirstRun();
             SettingsMenuManager.RefreshAutoStartDropdown(this, settingsManager);
+
+            // Load last search term
+            LoadLastSearchTerm();
+
             this.FormClosing += MainForm_FormClosing;
             this.Text = $"Route Tracker {AppTheme.Version}";
         }
@@ -183,6 +197,12 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Creates the top row with menu, buttons, and filter controls
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0019",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0039",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
         private FlowLayoutPanel CreateTopBarRow()
         {
             var topBar = new FlowLayoutPanel
@@ -235,6 +255,7 @@ namespace Route_Tracker
                         string routeFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Routes", "AC4 100 % Route - Main Route.tsv");
                         routeManager = new RouteManager(routeFilePath, gameConnectionManager);
                         RouteHelpers.LoadRouteData(this, routeManager, routeGrid, settingsManager);
+                        ApplyCurrentSorting();
                     }
                 }
             };
@@ -266,7 +287,7 @@ namespace Route_Tracker
             showCompletionButton.Click += (s, e) => RouteHelpers.ShowCompletionStatsWindow(this, routeManager);
             topBar.Controls.Add(showCompletionButton);
 
-            // Search box
+            // Search box with history support
             searchTextBox = new TextBox
             {
                 PlaceholderText = "Search...",
@@ -278,25 +299,172 @@ namespace Route_Tracker
                 BorderStyle = BorderStyle.FixedSingle,
                 Margin = new Padding(10, 2, 5, 2)
             };
+
+            // Handle text changes for filtering
             searchTextBox.TextChanged += (s, e) => RouteHelpers.ApplyFilters(this);
+
+            // Handle focus events for search history
+            searchTextBox.Enter += (s, e) => ShowSearchHistoryDropdown();
+            searchTextBox.Leave += (s, e) =>
+            {
+                // Save search to history when leaving the textbox
+                SaveCurrentSearchToHistory();
+
+                // Hide dropdown after a small delay to allow clicking on items
+                System.Windows.Forms.Timer hideTimer = new() { Interval = 150 };
+                hideTimer.Tick += (sender, args) =>
+                {
+                    hideTimer.Stop();
+                    hideTimer.Dispose();
+                    HideSearchHistoryDropdown();
+                };
+                hideTimer.Start();
+            };
+
+            // Handle click to show dropdown even if already focused
+            searchTextBox.Click += (s, e) => ShowSearchHistoryDropdown();
             topBar.Controls.Add(searchTextBox);
 
             // Type filter dropdown
-            typeFilterComboBox = new ComboBox
+            var typeFilterPanel = new Panel
             {
-                Width = 100,
+                Width = 120,
                 Height = 23,
-                DropDownStyle = ComboBoxStyle.DropDownList,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.FromArgb(40, 40, 40),
+                Margin = new Padding(0, 2, 5, 2)
+            };
+
+            var typeFilterLabel = new Label
+            {
+                Text = "All Types",
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleLeft,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont,
+                BackColor = Color.FromArgb(40, 40, 40),
+                Padding = new Padding(5, 0, 20, 0),
+                Cursor = Cursors.Hand
+            };
+
+            var dropDownButton = new Button
+            {
+                Text = "▼",
+                Width = 20,
+                Height = 21,
+                Dock = DockStyle.Right,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.FromArgb(50, 50, 50),
+                ForeColor = AppTheme.TextColor,
+                Font = new Font(AppTheme.DefaultFont.FontFamily, 8),
+                Cursor = Cursors.Hand
+            };
+            dropDownButton.FlatAppearance.BorderSize = 0;
+
+            typeFilterCheckedListBox = new CheckedListBox
+            {
+                Width = 120,
+                Height = 150,
                 BackColor = Color.FromArgb(40, 40, 40),
                 ForeColor = AppTheme.TextColor,
                 Font = AppTheme.DefaultFont,
-                FlatStyle = FlatStyle.Flat,
-                Margin = new Padding(0, 2, 5, 2)
+                BorderStyle = BorderStyle.FixedSingle,
+                CheckOnClick = true,
+                Visible = false
             };
-            typeFilterComboBox.Items.Add("All Types");
-            typeFilterComboBox.SelectedIndex = 0;
-            typeFilterComboBox.SelectedIndexChanged += (s, e) => RouteHelpers.ApplyFilters(this);
-            topBar.Controls.Add(typeFilterComboBox);
+
+            typeFilterPanel.Controls.Add(typeFilterLabel);
+            typeFilterPanel.Controls.Add(dropDownButton);
+            typeFilterPanel.Controls.Add(typeFilterCheckedListBox);
+
+            // Event handlers for dropdown functionality
+            EventHandler toggleDropdown = (s, e) =>
+            {
+                if (!typeFilterCheckedListBox.Visible)
+                {
+                    // Show dropdown below the panel, on top of everything
+                    var panel = typeFilterCheckedListBox.Parent as Panel;
+                    if (panel != null)
+                    {
+                        var screenPoint = panel.PointToScreen(new Point(0, panel.Height));
+                        var formPoint = this.PointToClient(screenPoint);
+                        typeFilterCheckedListBox.Location = formPoint;
+                        typeFilterCheckedListBox.Parent = this;
+                        typeFilterCheckedListBox.BringToFront();
+                    }
+                }
+                typeFilterCheckedListBox.Visible = !typeFilterCheckedListBox.Visible;
+            };
+            typeFilterLabel.Click += toggleDropdown;
+            dropDownButton.Click += toggleDropdown;
+
+            // Handle item check changes
+            typeFilterCheckedListBox.ItemCheck += (s, e) =>
+            {
+                this.BeginInvoke(new Action(() =>
+                {
+                    string item = typeFilterCheckedListBox.Items[e.Index].ToString() ?? "";
+
+                    if (item == "All Types")
+                    {
+                        if (e.NewValue == CheckState.Checked)
+                        {
+                            // Select all types
+                            for (int i = 1; i < typeFilterCheckedListBox.Items.Count; i++)
+                            {
+                                typeFilterCheckedListBox.SetItemChecked(i, true);
+                            }
+                            selectedTypes.Clear();
+                            for (int i = 1; i < typeFilterCheckedListBox.Items.Count; i++)
+                            {
+                                selectedTypes.Add(typeFilterCheckedListBox.Items[i].ToString() ?? "");
+                            }
+                        }
+                        else
+                        {
+                            // Unselect all types
+                            for (int i = 1; i < typeFilterCheckedListBox.Items.Count; i++)
+                            {
+                                typeFilterCheckedListBox.SetItemChecked(i, false);
+                            }
+                            selectedTypes.Clear();
+                        }
+                    }
+                    else
+                    {
+                        if (e.NewValue == CheckState.Checked)
+                        {
+                            selectedTypes.Add(item);
+                        }
+                        else
+                        {
+                            selectedTypes.Remove(item);
+                            // Uncheck "All Types" if any individual type is unchecked
+                            typeFilterCheckedListBox.SetItemChecked(0, false);
+                        }
+
+                        // Check "All Types" if all individual types are selected
+                        if (selectedTypes.Count == typeFilterCheckedListBox.Items.Count - 1)
+                        {
+                            typeFilterCheckedListBox.SetItemChecked(0, true);
+                        }
+                    }
+
+                    UpdateTypeFilterLabel(typeFilterLabel);
+                    RouteHelpers.ApplyFilters(this);
+                }));
+            };
+
+            // Handle clicking outside to close dropdown
+            this.Click += (s, e) =>
+            {
+                if (typeFilterCheckedListBox.Visible)
+                {
+                    typeFilterCheckedListBox.Visible = false;
+                }
+            };
+
+            topBar.Controls.Add(typeFilterPanel);
 
             // Clear filters button
             clearFiltersButton = new Button
@@ -334,10 +502,31 @@ namespace Route_Tracker
             toolTip.SetToolTip(showStatsButton, "View the values of certain in game values like percentage, total viewpoints done, etc etc...");
             toolTip.SetToolTip(showCompletionButton, "View your progress and completion statistics for the current route");
             toolTip.SetToolTip(searchTextBox, "Type to search route entries by name, type, or coordinates");
-            toolTip.SetToolTip(typeFilterComboBox, "Filter route entries by type.");
+            toolTip.SetToolTip(typeFilterCheckedListBox, "Filter route entries by type.");
+            toolTip.SetToolTip(typeFilterPanel, "Select multiple route entry types to filter. Click to open dropdown with checkboxes.");
             toolTip.SetToolTip(clearFiltersButton, "Clear all filters and show all route entries.");
 
             return topBar;
+        }
+
+        private void UpdateTypeFilterLabel(Label typeFilterLabel)
+        {
+            if (selectedTypes.Count == 0)
+            {
+                typeFilterLabel.Text = "None";
+            }
+            else if (typeFilterCheckedListBox.GetItemChecked(0)) // "All Types" is checked
+            {
+                typeFilterLabel.Text = "All Types";
+            }
+            else if (selectedTypes.Count == 1)
+            {
+                typeFilterLabel.Text = selectedTypes.First();
+            }
+            else
+            {
+                typeFilterLabel.Text = "Multiple Types";
+            }
         }
 
         // ==========MY NOTES==============
@@ -424,7 +613,7 @@ namespace Route_Tracker
         Justification = "because i said so")]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            Debug.WriteLine($"ProcessCmdKey: {keyData}");
+            //Debug.WriteLine($"ProcessCmdKey: {keyData}");
 
             var shortcuts = settingsManager.GetShortcuts();
 
@@ -549,11 +738,6 @@ namespace Route_Tracker
                 var (CompleteHotkey, SkipHotkey, UndoHotkey, GlobalHotkeys, AdvancedHotkeys) = settingsManager.GetAllHotkeySettings();
                 settingsManager.SaveHotkeySettings(UndoHotkey, !GlobalHotkeys, AdvancedHotkeys);
                 UpdateGlobalHotkeys();
-                return true;
-            }
-            if (keyData == shortcuts.ImportRoute)
-            {
-                ImportRouteForm.ShowImportDialog(this);
                 return true;
             }
             if (keyData == shortcuts.SortingUp)
@@ -734,6 +918,133 @@ namespace Route_Tracker
         }
         #endregion
 
+        #region Search History Management
+        // ==========MY NOTES==============
+        // Loads the last search term when the app starts
+        private void LoadLastSearchTerm()
+        {
+            string lastTerm = searchHistoryManager.GetLastSearchTerm();
+            if (!string.IsNullOrEmpty(lastTerm))
+            {
+                searchTextBox.Text = lastTerm;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Saves the current search term to history when user clicks away
+        private void SaveCurrentSearchToHistory()
+        {
+            string currentSearch = searchTextBox.Text.Trim();
+            if (!string.IsNullOrEmpty(currentSearch) && currentSearch != lastSearchTerm)
+            {
+                _ = searchHistoryManager.AddSearchHistoryAsync(currentSearch);
+                lastSearchTerm = currentSearch;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Shows the search history dropdown when clicking on the search box
+        private void ShowSearchHistoryDropdown()
+        {
+            var history = searchHistoryManager.LoadSearchHistory();
+            if (history.Count == 0)
+                return;
+
+            if (searchHistoryListBox == null)
+            {
+                CreateSearchHistoryListBox();
+            }
+
+            // Clear and populate the dropdown
+            searchHistoryListBox!.Items.Clear();
+            foreach (string term in history.Take(10)) // Show max 10 items
+            {
+                searchHistoryListBox.Items.Add(term);
+            }
+
+            if (searchHistoryListBox.Items.Count > 0)
+            {
+                // Position the dropdown below the search box
+                var searchBoxLocation = searchTextBox.PointToScreen(Point.Empty);
+                var formLocation = this.PointToClient(searchBoxLocation);
+
+                searchHistoryListBox.Location = new Point(formLocation.X, formLocation.Y + searchTextBox.Height);
+                searchHistoryListBox.Width = searchTextBox.Width;
+
+                // Calculate height based on items (max 10 items visible)
+                int itemHeight = searchHistoryListBox.ItemHeight;
+                int visibleItems = Math.Min(searchHistoryListBox.Items.Count, 10);
+                searchHistoryListBox.Height = visibleItems * itemHeight + 4; // +4 for borders
+
+                searchHistoryListBox.Visible = true;
+                searchHistoryListBox.BringToFront();
+                isSearchHistoryVisible = true;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Creates the search history dropdown listbox
+        private void CreateSearchHistoryListBox()
+        {
+            searchHistoryListBox = new ListBox
+            {
+                BackColor = Color.FromArgb(40, 40, 40),
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont,
+                BorderStyle = BorderStyle.FixedSingle,
+                Visible = false,
+                IntegralHeight = false // Allow custom height
+            };
+
+            // Handle item selection
+            searchHistoryListBox.Click += (s, e) =>
+            {
+                if (searchHistoryListBox.SelectedItem != null)
+                {
+                    string selectedTerm = searchHistoryListBox.SelectedItem.ToString() ?? "";
+                    searchTextBox.Text = selectedTerm;
+                    HideSearchHistoryDropdown();
+
+                    // Apply the filter immediately
+                    RouteHelpers.ApplyFilters(this);
+
+                    // Focus back to search box
+                    searchTextBox.Focus();
+                }
+            };
+
+            // Handle mouse leave to hide dropdown
+            searchHistoryListBox.MouseLeave += (s, e) =>
+            {
+                // Small delay to allow clicking on items
+                System.Windows.Forms.Timer hideTimer = new() { Interval = 100 };
+                hideTimer.Tick += (sender, args) =>
+                {
+                    hideTimer.Stop();
+                    hideTimer.Dispose();
+                    if (!searchHistoryListBox.ClientRectangle.Contains(searchHistoryListBox.PointToClient(Cursor.Position)))
+                    {
+                        HideSearchHistoryDropdown();
+                    }
+                };
+                hideTimer.Start();
+            };
+
+            this.Controls.Add(searchHistoryListBox);
+        }
+
+        // ==========MY NOTES==============
+        // Hides the search history dropdown
+        private void HideSearchHistoryDropdown()
+        {
+            if (searchHistoryListBox != null && isSearchHistoryVisible)
+            {
+                searchHistoryListBox.Visible = false;
+                isSearchHistoryVisible = false;
+            }
+        }
+        #endregion
+
         #region Application Lifecycle
         // ==========MY NOTES==============
         // Handles app startup - auto-start logic and update checks
@@ -746,8 +1057,13 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Handles app shutdown - cleans up resources properly
+        // ==========MY NOTES==============
+        // Handles app shutdown - cleans up resources properly
         private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
         {
+            // Save current search term to history before closing
+            SaveCurrentSearchToHistory();
+
             // Cleanup global hotkeys
             if (globalHotkeysRegistered)
             {

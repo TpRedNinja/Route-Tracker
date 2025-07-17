@@ -361,18 +361,6 @@ namespace Route_Tracker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("131157")]
-        public int ShortImportRoute {
-            get {
-                return ((int)(this["ShortImportRoute"]));
-            }
-            set {
-                this["ShortImportRoute"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool CheckForUpdateOnStartup {
             get {

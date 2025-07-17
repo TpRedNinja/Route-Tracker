@@ -78,60 +78,28 @@ Let the user customize their shortcuts. *(Done)*
 
 ---
 
-- [x] 1. import routes from URLs (GitHub raw links, etc.)
-    - *description:*
-        - option to import route from a url to a raw github link or other platforms with similar raws
-    - *how it would work:*
-        - in settings panel, a new option to import route from url
-        - opens a window with a text box to paste the url
-        - tells the user before hand that it must be a raw link ie from github or gist or similar websites with similar types of links
-        - has the option to load the route after downloading
-        - allows the user to choose the name of the route
-        - hotkey topen the window (ctrl + u)(or similar key combo)
-        - save downloaded routes to the backup folder like with settings
-        - historty of downloaded routes(maybe)
+- [x] 1. new sorting options
+    *ideas for new sorting options*
+    - by type (more for like applying to the sorting options below and the current way of sorting. so instead of by entry id u do by type)
+    - remove completed ie hide completed entries but still keep a list of completed in a file
+    - put completed entires at the bottom (so instead of finding the first uncompleted entry it finds the last uncompleted and put completed down their still scrolls to first)
+    - save last used sorting option
+    - add to backup folder like with settings 
 
-*message for sonnet*
-
-#solution
-
-Add a feature to my C# WinForms app (.NET 8) called "Import routes from URLs" with the following requirements:
-
-**Requirements:**
-- User can import a route file from any direct/raw URL (e.g., GitHub raw, Gist, or similar).
-- Access this feature from the Settings panel as a new menu item.
-- When selected, open a dialog with:
-  - Textbox for the URL.
-  - Textbox for the desired route file name.
-  - Button to start download.
-  - Checkbox: "Load route after downloading."
-  - Label: explain only direct/raw links are supported.
-  - Progress bar for download progress.
-- After download, save the file to the backup folder (same as settings backups).
-- Keep a history of all downloaded routes (for restore/re-import).
-- If "Load after download" is checked, load the route immediately.
-- If not, show a "Download Complete" message or screen.
-- Add a customizable hotkey (default: Ctrl+U) to open the import dialog. This hotkey must be configurable in the hotkeys window.
-- The restore from backup feature must support restoring downloaded routes.
-- Code should be structured for easy future expansion to bulk download (separate download logic and UI).
-- Handle errors: invalid URLs, download failures, file name conflicts.
-
-**Instructions:**
-- Generate all code for this feature:
-  - New forms, classes, or methods as needed.
-  - Full function bodies for any replacements or modifications.
-  - All UI code for the dialog (code or designer, but show all relevant code).
-  - Integrate with settings menu and hotkey system, including hotkey customization.
-  - Integrate with restore from backup for downloaded routes.
-  - Include all error handling.
-- For each code block, specify:
-  - File name and path (e.g., `Route Tracker\ImportRouteForm.cs`).
-  - Where in the file to place the code (e.g., "add this method to MainForm.cs").
-  - If a new file, specify the type (form, class, etc.).
-- Do not use placeholders like "rest of code goes here." Show full code for any function or class you add or modify.
-- At the end, provide a step-by-step integration guide summarizing where to add each piece and how to wire up the feature.
-- Ensure the code is easy to expand for bulk download support in the future.
-
+---
+- [X] 2. Updating the filtering and search bar
+    - [x] 2.1 multiple type filtering 
+        - *how it will work*
+            - each type should be like a checklist item thing
+            - ie when u click on it a check mark appears 
+            - if all types has a check mark then all the other types also get check marks
+            - but if u uncheck one of the types then the all checked gets the checkmark removed but all other types still have their check marks
+            - when the route isnt loaded all types option should have a check
+    - [x] 2.2 search history dropdown *(remember recent searches)*
+        - *how it maybe would work whatever is doable is fine*
+            - meant for searching for a entry 
+            - basically ig we type something click enter then it gets added to search history 
+            - or something like that, although the searching is instant so idk how that would work
 ---
 
 ---
@@ -141,78 +109,76 @@ Add a feature to my C# WinForms app (.NET 8) called "Import routes from URLs" wi
 
 ---
 
-- [ ] 2. new sorting options
-    *ideas for new sorting options*
-    - by type (more for like applying to the sorting options below and the current way of sorting. so instead of by entry id u do by type)
-    - remove completed ie hide completed entries but still keep a list of completed in a file
-    - put completed entires at the bottom (so instead of finding the first uncompleted entry it finds the last uncompleted and put completed down their still scrolls to first)
-    - save last used sorting option
-    - add to backup folder like with settings 
-
-#solution
-
-Add a feature to my C# WinForms app (.NET 8) called "New Sorting Options" with the following requirements:
-
-**Requirements:**
-- Add new sorting options for the route grid:
-  - Option to hide completed entries (but keep a list of completed in a file. Technically already have with save progress; just ensure it works).
-  - Option to put completed entries at the bottom (scroll to first uncompleted. Already have; just ensure it works).
-  - Save and restore the last used sorting option.
-  - Add sorting settings to the backup folder (just add it to settings; extend current implementation).
-- Access sorting options from the UI:
-  - Add a button in the settings panel (like the layout options) that opens a separate window for sorting options.
-  - Also allow access via customizable hotkeys to swap between all sorting modes in both up and down directions (defaults: up = Alt+D, down = Shift+D). These hotkeys must be configurable in the hotkeys window.
-- All sorting logic should be integrated with the route grid and update the display accordingly.
-- Error handling for edge cases (e.g., empty grid, all entries completed).
-- Code should be structured for easy future expansion (e.g., adding more sort modes).
-
-**Additional Requirement:**
-- Add a customizable hotkey (default: Ctrl+D) to open the game directory window. This hotkey must be configurable in the hotkeys window.
-
-**Hotkey Persistence:**
-- All new hotkeys (sorting up, sorting down, game directory) must be saved and loaded with the rest of the hotkeys/shortcuts, using the same persistence mechanism as existing hotkeys.
-
-**Instructions:**
-- Generate all code for this feature, including:
-  - New forms, classes, or methods as needed.
-  - Full function bodies for any replacements or modifications.
-  - All UI code for the sorting options window (code or designer, but show all relevant code), and the settings panel button to open it.
-  - Integrate with the settings menu and hotkey system, including hotkey customization, wiring, and persistence for all new hotkeys.
-  - **Explicitly generate all code for adding the hotkeys, including registration, configuration, event handling, and saving/loading with the rest of the hotkeys. Do not just reference existing logic—show the actual code needed.**
-  - Integrate sorting settings and the new hotkeys with the backup/restore system.
-  - Include all error handling.
-- For each code block, specify:
-  - File name and path (e.g., `Route Tracker\SortingOptionsForm.cs`).
-  - Where in the file to place the code (e.g., "add this method to MainForm.cs").
-  - If a new file, specify the type (form, class, etc.).
-- Do not use placeholders like "rest of code goes here." Show full code for any function or class you add or modify.
-- At the end, provide a step-by-step integration guide summarizing where to add each piece and how to wire up the feature.
-- Ensure the code is easy to expand for future sorting modes.
-
-Thank you!
-    
----
-
-## *will add details about these later*
-
-- [ ] 3. exporting current progress to TSV/CSV for sharing
-    - [ ] 3.1 multiple type filtering *(Ctrl+Click to select multiple types)*
-    - [ ] 3.2 search history dropdown *(remember recent searches)*
-    - [ ] 3.3 remove specific types or entries in general (e.g., upgrades, story, chests)
-    - [ ] 3.4 remove all of a entry with a certain type with one button click
-    *- 3.1 - 3.4 are all prerequisites for 3 (exporting).*
+## features for v1.0
 
 ---
 
-- [ ] 4. bulk route download(maybe)
-    *concerns*
-        - only way to do it is to allow the user to submit multiple links ie several text boxes or a text area to paste multiple links
-- [ ] 5. launcher or tutorial launcher(last thing to add)
+- [ ] 3. logging system
+    - app passowrd for google account: cjut ymzr citu xvij
+    - Log errors and important events with timestamps (including dates)
+    - Save logs locally in a file (append, don’t overwrite)
+    - On application close (with user consent), email log file automatically to developer
+    - Use dedicated Gmail account (e.g., TpRouteTrackerApp@gmail.com) for sending emails
+    - Authenticate email sending via Gmail SMTP with App Password (16-char, generated)
+    - Allow user to add optional details/comment before sending log
+    - Detect developer’s own device (by device name or unique ID) to skip sending emails during debugging
+    - Clear log file after successful email sending (optional fallback if user consents)
+    - Notify user about privacy, consent, and what data is sent (transparency)
+    - Provide manual option to send log anytime from the UI (not just on exit)
+    - only create new file if version of application is different and add a -------- seperator if the date isnt the same as last time it was logged
+    - easy to refrence for replacing all current error handlers and for in general program use when its running error handling
+    - developer email address to send to topredninja@gmail.com or hjdomangue@outlook.com if first email fails
+
+---
+
+# Instructions
+
+## What I Want
+
+
+
+## How to Generate the Code for the Feature
+
+- **Generate ALL CODE needed for this feature.**
+- Use well-commented code, following the existing commenting style.
+- *DO NOT put* `// rest of code goes here` *or anything like that.*
+- You shouldn’t need to preserve the existing system if doing so would require a bunch of custom compatibility logic. Just use whatever works.
+- Use best practices.
+- **DO NOT BREAK ANY EXISTING FEATURES.**
+- Avoid errors unless it’s a temporary call to a function you will generate next.
+- Avoid code that causes IDE warnings (e.g., “collection can be simplified”).
+- If anything is unclear, ask questions before generating code.
+    - For example, if unsure about a UI element, use your best judgment unless told otherwise.
+
+---
+
+- [ ] 4. launcher or tutorial launcher(last thing to add)
     - update the md files while doing this features
     - last feature to add
     - should include a thing for every feature in the app along with images
-    - should be indepth tutorial
-    - should be able to be disabled in settings
+    - should be indepth tutorial with images for each feature
+    - should be able to be disabled in settings once main app is opened
+
+---
+
+# Instructions
+
+## What I Want
+
+
+
+## How to Generate the Code for the Feature
+
+- **Generate ALL CODE needed for this feature.**
+- Use well-commented code, following the existing commenting style.
+- *DO NOT put* `// rest of code goes here` *or anything like that.*
+- You shouldn’t need to preserve the existing system if doing so would require a bunch of custom compatibility logic. Just use whatever works.
+- Use best practices.
+- **DO NOT BREAK ANY EXISTING FEATURES.**
+- Avoid errors unless it’s a temporary call to a function you will generate next.
+- Avoid code that causes IDE warnings (e.g., “collection can be simplified”).
+- If anything is unclear, ask questions before generating code.
+    - For example, if unsure about a UI element, use your best judgment unless told otherwise.
 
 ---
 

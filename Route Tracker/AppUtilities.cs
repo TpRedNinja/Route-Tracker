@@ -11,7 +11,7 @@ namespace Route_Tracker
     public static class AppTheme
     {
         #region App Information (from AppTheme.cs)
-        public const string Version = "v0.8-Beta";
+        public const string Version = "v0.9-Beta";
         public const string GitHubRepo = "TpRedNinja/Route-Tracker";
         #endregion
 
