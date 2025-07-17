@@ -20,3 +20,7 @@
    ```csharp
    // WARNING: Assumed [explanation]
 	```
+10. Make sure when generating it u specify which regions for them to go in 
+	1.unless u think they should be a new region then in that case specify. 
+	1. If in a existing region say where in region like after this function 
+	1. before this function start of region end of region etc etc. 
