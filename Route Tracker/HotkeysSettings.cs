@@ -33,7 +33,6 @@ namespace Route_Tracker
         private Keys shortTopTog;
         private Keys shortAdvTog;
         private Keys shortGlobalTog;
-        private Keys shortImportRoute;
         private Keys shortSortingUp;
         private Keys shortSortingDown;
         private Keys shortGameDirect;
@@ -474,22 +473,7 @@ namespace Route_Tracker
                 Font = font
             };
             txtShortGlobalTog.KeyDown += TextBoxes_KeysDown;
-            y += spacing;
-            Label lblShortImportRoute = new()
-            {
-                Text = "Import Route:",
-                AutoSize = true,
-                Location = new Point(20, y),
-                Font = font
-            };
-            TextBox txtShortImportRoute = new()
-            {
-                Name = "txtShortImportRoute",
-                Size = new Size(110, 18),
-                Location = new Point(160, y),
-                Font = font
-            };
-            txtShortImportRoute.KeyDown += TextBoxes_KeysDown;
+
             y += spacing;
             Label lblShortSortingUp = new()
             {
@@ -627,7 +611,6 @@ namespace Route_Tracker
                 lblShortTopTog, txtShortTopTog,
                 lblShortAdvTog, txtShortAdvTog,
                 lblShortGlobalTog, txtShortGlobalTog,
-                lblShortImportRoute, txtShortImportRoute,
                 lblShortSortingUp, txtShortSortingUp,
                 lblShortSortingDown, txtShortSortingDown,
                 lblShortGameDirect, txtShortGameDirect,
@@ -681,7 +664,6 @@ namespace Route_Tracker
             shortBackNow = (Keys)Settings.Default.ShortBackNow;
             shortRestore = (Keys)Settings.Default.ShortRestore;
             shortSetFold = (Keys)Settings.Default.ShortSetFold;
-            shortImportRoute = (Keys)Settings.Default.ShortImportRoute;
             shortSortingUp = (Keys)Settings.Default.SortingUp;
             shortSortingDown = (Keys)Settings.Default.SortingDown;
             shortGameDirect = (Keys)Settings.Default.GameDirect;
@@ -702,7 +684,6 @@ namespace Route_Tracker
             if (this.Controls["txtShortBackNow"] is TextBox txtBackNow) txtBackNow.Text = keysConverter.ConvertToString(shortBackNow);
             if (this.Controls["txtShortRestore"] is TextBox txtRestore) txtRestore.Text = keysConverter.ConvertToString(shortRestore);
             if (this.Controls["txtShortSetFold"] is TextBox txtSetFold) txtSetFold.Text = keysConverter.ConvertToString(shortSetFold);
-            if (this.Controls["txtShortImportRoute"] is TextBox txtImportRoute) txtImportRoute.Text = keysConverter.ConvertToString(shortImportRoute);
             if (this.Controls["txtShortSortingUp"] is TextBox txtSortingUp) txtSortingUp.Text = keysConverter.ConvertToString(shortSortingUp);
             if (this.Controls["txtShortSortingDown"] is TextBox txtSortingDown) txtSortingDown.Text = keysConverter.ConvertToString(shortSortingDown);
             if (this.Controls["txtShortGameDirect"] is TextBox txtGameDirect) txtGameDirect.Text = keysConverter.ConvertToString(shortGameDirect);
@@ -798,9 +779,6 @@ namespace Route_Tracker
                 case "txtShortGlobalTog":
                     shortGlobalTog = value;
                     break;
-                case "txtShortImportRoute":
-                    shortImportRoute = value;
-                    break;
                 case "txtShortSortingUp":
                     shortSortingUp = value;
                     break;
@@ -850,7 +828,6 @@ namespace Route_Tracker
             Settings.Default.TopTog = (int)shortTopTog;
             Settings.Default.AdvTog = (int)shortAdvTog;
             Settings.Default.GlobalTog = (int)shortGlobalTog;
-            Settings.Default.ShortImportRoute = (int)shortImportRoute;
             Settings.Default.SortingUp = (int)shortSortingUp;
             Settings.Default.SortingDown = (int)shortSortingDown;
             Settings.Default.GameDirect = (int)shortGameDirect;
@@ -898,7 +875,6 @@ namespace Route_Tracker
             shortTopTog = Keys.Control | Keys.T;
             shortAdvTog = Keys.Shift | Keys.A;
             shortGlobalTog = Keys.Control | Keys.G;
-            shortImportRoute = Keys.Control | Keys.U;
             shortSortingUp = Keys.Alt | Keys.D;
             shortSortingDown = Keys.Shift | Keys.D;
             shortGameDirect = Keys.Control | Keys.D;
@@ -911,7 +887,7 @@ namespace Route_Tracker
                     shortResetP, shortRefresh, shortHelp, shortFilterC, shortConnect,
                     shortGameStats, shortRouteStats, shortLayoutUp, shortLayoutDown,
                     shortBackFold, shortBackNow, shortRestore, shortSetFold,
-                    shortAutoTog, shortTopTog, shortAdvTog, shortGlobalTog, shortImportRoute,
+                    shortAutoTog, shortTopTog, shortAdvTog, shortGlobalTog,
                     shortSortingUp, shortSortingDown, shortGameDirect);
             }
             else
@@ -941,7 +917,6 @@ namespace Route_Tracker
                 Settings.Default.TopTog = (int)shortTopTog;
                 Settings.Default.AdvTog = (int)shortAdvTog;
                 Settings.Default.GlobalTog = (int)shortGlobalTog;
-                Settings.Default.ShortImportRoute = (int)shortImportRoute;
                 Settings.Default.Save();
             }
 

@@ -740,11 +740,6 @@ namespace Route_Tracker
                 UpdateGlobalHotkeys();
                 return true;
             }
-            if (keyData == shortcuts.ImportRoute)
-            {
-                ImportRouteForm.ShowImportDialog(this);
-                return true;
-            }
             if (keyData == shortcuts.SortingUp)
             {
                 CycleSorting(true);
