@@ -91,46 +91,15 @@ Let the user customize their shortcuts. *(Done)*
         - save downloaded routes to the backup folder like with settings
         - historty of downloaded routes(maybe)
 
-*message for sonnet*
+---
 
-#solution
-
-Add a feature to my C# WinForms app (.NET 8) called "Import routes from URLs" with the following requirements:
-
-**Requirements:**
-- User can import a route file from any direct/raw URL (e.g., GitHub raw, Gist, or similar).
-- Access this feature from the Settings panel as a new menu item.
-- When selected, open a dialog with:
-  - Textbox for the URL.
-  - Textbox for the desired route file name.
-  - Button to start download.
-  - Checkbox: "Load route after downloading."
-  - Label: explain only direct/raw links are supported.
-  - Progress bar for download progress.
-- After download, save the file to the backup folder (same as settings backups).
-- Keep a history of all downloaded routes (for restore/re-import).
-- If "Load after download" is checked, load the route immediately.
-- If not, show a "Download Complete" message or screen.
-- Add a customizable hotkey (default: Ctrl+U) to open the import dialog. This hotkey must be configurable in the hotkeys window.
-- The restore from backup feature must support restoring downloaded routes.
-- Code should be structured for easy future expansion to bulk download (separate download logic and UI).
-- Handle errors: invalid URLs, download failures, file name conflicts.
-
-**Instructions:**
-- Generate all code for this feature:
-  - New forms, classes, or methods as needed.
-  - Full function bodies for any replacements or modifications.
-  - All UI code for the dialog (code or designer, but show all relevant code).
-  - Integrate with settings menu and hotkey system, including hotkey customization.
-  - Integrate with restore from backup for downloaded routes.
-  - Include all error handling.
-- For each code block, specify:
-  - File name and path (e.g., `Route Tracker\ImportRouteForm.cs`).
-  - Where in the file to place the code (e.g., "add this method to MainForm.cs").
-  - If a new file, specify the type (form, class, etc.).
-- Do not use placeholders like "rest of code goes here." Show full code for any function or class you add or modify.
-- At the end, provide a step-by-step integration guide summarizing where to add each piece and how to wire up the feature.
-- Ensure the code is easy to expand for bulk download support in the future.
+- [x] 2. new sorting options
+    *ideas for new sorting options*
+    - by type (more for like applying to the sorting options below and the current way of sorting. so instead of by entry id u do by type)
+    - remove completed ie hide completed entries but still keep a list of completed in a file
+    - put completed entires at the bottom (so instead of finding the first uncompleted entry it finds the last uncompleted and put completed down their still scrolls to first)
+    - save last used sorting option
+    - add to backup folder like with settings 
 
 ---
 
@@ -140,79 +109,103 @@ Add a feature to my C# WinForms app (.NET 8) called "Import routes from URLs" wi
 ## 📝 Future Features TODO List
 
 ---
-
-- [ ] 2. new sorting options
-    *ideas for new sorting options*
-    - by type (more for like applying to the sorting options below and the current way of sorting. so instead of by entry id u do by type)
-    - remove completed ie hide completed entries but still keep a list of completed in a file
-    - put completed entires at the bottom (so instead of finding the first uncompleted entry it finds the last uncompleted and put completed down their still scrolls to first)
-    - save last used sorting option
-    - add to backup folder like with settings 
-
-#solution
-
-Add a feature to my C# WinForms app (.NET 8) called "New Sorting Options" with the following requirements:
-
-**Requirements:**
-- Add new sorting options for the route grid:
-  - Option to hide completed entries (but keep a list of completed in a file. Technically already have with save progress; just ensure it works).
-  - Option to put completed entries at the bottom (scroll to first uncompleted. Already have; just ensure it works).
-  - Save and restore the last used sorting option.
-  - Add sorting settings to the backup folder (just add it to settings; extend current implementation).
-- Access sorting options from the UI:
-  - Add a button in the settings panel (like the layout options) that opens a separate window for sorting options.
-  - Also allow access via customizable hotkeys to swap between all sorting modes in both up and down directions (defaults: up = Alt+D, down = Shift+D). These hotkeys must be configurable in the hotkeys window.
-- All sorting logic should be integrated with the route grid and update the display accordingly.
-- Error handling for edge cases (e.g., empty grid, all entries completed).
-- Code should be structured for easy future expansion (e.g., adding more sort modes).
-
-**Additional Requirement:**
-- Add a customizable hotkey (default: Ctrl+D) to open the game directory window. This hotkey must be configurable in the hotkeys window.
-
-**Hotkey Persistence:**
-- All new hotkeys (sorting up, sorting down, game directory) must be saved and loaded with the rest of the hotkeys/shortcuts, using the same persistence mechanism as existing hotkeys.
-
-**Instructions:**
-- Generate all code for this feature, including:
-  - New forms, classes, or methods as needed.
-  - Full function bodies for any replacements or modifications.
-  - All UI code for the sorting options window (code or designer, but show all relevant code), and the settings panel button to open it.
-  - Integrate with the settings menu and hotkey system, including hotkey customization, wiring, and persistence for all new hotkeys.
-  - **Explicitly generate all code for adding the hotkeys, including registration, configuration, event handling, and saving/loading with the rest of the hotkeys. Do not just reference existing logic—show the actual code needed.**
-  - Integrate sorting settings and the new hotkeys with the backup/restore system.
-  - Include all error handling.
-- For each code block, specify:
-  - File name and path (e.g., `Route Tracker\SortingOptionsForm.cs`).
-  - Where in the file to place the code (e.g., "add this method to MainForm.cs").
-  - If a new file, specify the type (form, class, etc.).
-- Do not use placeholders like "rest of code goes here." Show full code for any function or class you add or modify.
-- At the end, provide a step-by-step integration guide summarizing where to add each piece and how to wire up the feature.
-- Ensure the code is easy to expand for future sorting modes.
-
-Thank you!
-    
----
-
-## *will add details about these later*
+## v0.9-beta features list
 
 - [ ] 3. exporting current progress to TSV/CSV for sharing
-    - [ ] 3.1 multiple type filtering *(Ctrl+Click to select multiple types)*
+    - *3.1 through 3.3 below are all prerequisites for 3 (exporting).*
+    - [ ] 3.1 multiple type filtering 
+        - *how it will work*
+            - each type should be like a checklist item thing
+            - ie when u click on it a check mark appears 
+            - if all types has a check mark then all the other types also get check marks
+            - but if u uncheck one of the types then the all checked gets the checkmark removed but all other types still have their check marks
+            - when the route isnt loaded all types option should have a check
     - [ ] 3.2 search history dropdown *(remember recent searches)*
+        - *how it maybe would work whatever is doable is fine*
+            - meant for searching for a entry 
+            - basically ig we type something click enter then it gets added to search history 
+            - or something like that, although the searching is instant so idk how that would work
     - [ ] 3.3 remove specific types or entries in general (e.g., upgrades, story, chests)
-    - [ ] 3.4 remove all of a entry with a certain type with one button click
-    *- 3.1 - 3.4 are all prerequisites for 3 (exporting).*
+        - *how it will work*
+            - basically theirs a button or in the drop down 
+            - theirs a option to remove all uncheked types
+            - this will exclude the option all types since its tied to everything
+            - to specify more, if the user unchecks upgrades and chests 
+            - then clicks the button it will remove all upgrades and chests from the route
+    - [ ] if all things above are done then move onto the exporting feature
+        - *how it will work*
+            - in settings panel a new option to export current progress 
+                - underneath the import route from url option
+                - also have it when right clicking the route grid put it under neath everything else
+                - have a seperator line above it
+            - opens a window with options to choose between tsv or csv recommend tsv
+            - option to choose the location to save the file
+            - option to include completed entries or not
+            - option to include skipped entries or not
+            - option to include only filtered entries or all entries
+            - button to start the export
+            - shows a window with a progress bar while exporting
+            - once done closes the window and shows a message box of download complete
+            - hotkey/shortcut to quick open the window fully customizable (default ctrl + e)(or similar key combo)
 
 ---
 
-- [ ] 4. bulk route download(maybe)
+I want you to add a new feature its called multi type filtering.
+I currently have a filtering system that allows me to filter by one type at a time.
+I want u to make it so i can filter by multiple types at once.
+Currently when i filter by one type it shows the current type in the box
+when i have multiply types selected i want u to show instead "Multiple Types".
+Currently by default "All Types" is selected when no route is loaded
+I want to keep it that way.
+Their should be some visual indicator that multiple types are selected in the drop down
+it can be a check mark or something else.
+If "All Types" is selected then all other types should also be selected.
+When no types are selected it should on the display show nothing and in the box say "None".
+If the user unselects one of the types when "All Types" is selected
+then "All Types" should be unselected but all other types that werent unselected should remain selected.
+Ideally u shouldnt need to change much of anything in the current filtering system
+But if u do its fine as long as it works and *DOES NOT BREAK ANY OTHER FEATURES*
+U should make optimized code that isnt 100's of lines long
+it shouldnt give me errors and it shouldnt give me messages saying whatever can be simplified
+When generating me the code *GENERATE EVERYTHING I NEED* I WILL NOT STAND FOR TLDR COMMENTS
+What i mean by tldr is comments like "// rest of code goes here" or "// current implementation"
+I want the full code for everything i need to add this feature DO NOT SKIP ANYTHING or say do it yourself
+if you create new files be sure to specify what type of file it is
+DO NOT CHANGING ANYTHING THAT DOESNT NEED TO BE CHANGED KEY WORD NEED
+
+---
+
+## features for v1.0
+- [ ] 4. logging system
+    - app passowrd for google account: cjut ymzr citu xvij
+    - Log errors and important events with timestamps (including dates)
+    - Save logs locally in a file (append, don’t overwrite)
+    - On application close (with user consent), email log file automatically to developer
+    - Use dedicated Gmail account (e.g., TpRouteTrackerApp@gmail.com) for sending emails
+    - Authenticate email sending via Gmail SMTP with App Password (16-char, generated)
+    - Allow user to add optional details/comment before sending log
+    - Detect developer’s own device (by device name or unique ID) to skip sending emails during debugging
+    - Clear log file after successful email sending (optional fallback if user consents)
+    - Notify user about privacy, consent, and what data is sent (transparency)
+    - Provide manual option to send log anytime from the UI (not just on exit)
+    - only create new file if version of application is different and add a -------- seperator if the date isnt the same as last time it was logged
+    - easy to refrence for replacing all current error handlers and for in general program use when its running error handling
+    - developer email address to send to topredninja@gmail.com or hjdomangue@outlook.com if first email fails
+
+---
+
+- [ ] 5. bulk route download(maybe)
     *concerns*
         - only way to do it is to allow the user to submit multiple links ie several text boxes or a text area to paste multiple links
-- [ ] 5. launcher or tutorial launcher(last thing to add)
+
+---
+
+- [ ] 6. launcher or tutorial launcher(last thing to add)
     - update the md files while doing this features
     - last feature to add
     - should include a thing for every feature in the app along with images
-    - should be indepth tutorial
-    - should be able to be disabled in settings
+    - should be indepth tutorial with images for each feature
+    - should be able to be disabled in settings once main app is opened
 
 ---
 
