@@ -67,6 +67,14 @@ namespace Route_Tracker
         public List<RouteEntry> allRouteEntries = [];
         public HashSet<string> selectedTypes = [];
 
+        //search history controls
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044",
+        Justification = "NO")]
+        private SearchHistoryManager searchHistoryManager = null!;
+        private ListBox searchHistoryListBox = null!;
+        private bool isSearchHistoryVisible = false;
+        private string lastSearchTerm = string.Empty;
+
         // Application state
         private bool isHotkeysEnabled = false;
         private readonly string lastSelectedGame = string.Empty;
@@ -93,6 +101,7 @@ namespace Route_Tracker
             gameConnectionManager = new GameConnectionManager();
             gameConnectionManager.StatsUpdated += (s, e) => RouteHelpers.GameStats_StatsUpdated(this, e);
             settingsManager = new SettingsManager();
+            searchHistoryManager = new SearchHistoryManager();
 
             // Now initialize UI components that need settingsManager
             InitializeCustomComponents();
@@ -125,6 +134,10 @@ namespace Route_Tracker
             SettingsLifecycleManager.LoadSettings(this, settingsManager, gameDirectoryTextBox);
             settingsManager.CheckFirstRun();
             SettingsMenuManager.RefreshAutoStartDropdown(this, settingsManager);
+
+            // Load last search term
+            LoadLastSearchTerm();
+
             this.FormClosing += MainForm_FormClosing;
             this.Text = $"Route Tracker {AppTheme.Version}";
         }
@@ -184,6 +197,12 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Creates the top row with menu, buttons, and filter controls
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0019",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0039",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
         private FlowLayoutPanel CreateTopBarRow()
         {
             var topBar = new FlowLayoutPanel
@@ -236,6 +255,7 @@ namespace Route_Tracker
                         string routeFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Routes", "AC4 100 % Route - Main Route.tsv");
                         routeManager = new RouteManager(routeFilePath, gameConnectionManager);
                         RouteHelpers.LoadRouteData(this, routeManager, routeGrid, settingsManager);
+                        ApplyCurrentSorting();
                     }
                 }
             };
@@ -267,7 +287,7 @@ namespace Route_Tracker
             showCompletionButton.Click += (s, e) => RouteHelpers.ShowCompletionStatsWindow(this, routeManager);
             topBar.Controls.Add(showCompletionButton);
 
-            // Search box
+            // Search box with history support
             searchTextBox = new TextBox
             {
                 PlaceholderText = "Search...",
@@ -279,7 +299,30 @@ namespace Route_Tracker
                 BorderStyle = BorderStyle.FixedSingle,
                 Margin = new Padding(10, 2, 5, 2)
             };
+
+            // Handle text changes for filtering
             searchTextBox.TextChanged += (s, e) => RouteHelpers.ApplyFilters(this);
+
+            // Handle focus events for search history
+            searchTextBox.Enter += (s, e) => ShowSearchHistoryDropdown();
+            searchTextBox.Leave += (s, e) =>
+            {
+                // Save search to history when leaving the textbox
+                SaveCurrentSearchToHistory();
+
+                // Hide dropdown after a small delay to allow clicking on items
+                System.Windows.Forms.Timer hideTimer = new() { Interval = 150 };
+                hideTimer.Tick += (sender, args) =>
+                {
+                    hideTimer.Stop();
+                    hideTimer.Dispose();
+                    HideSearchHistoryDropdown();
+                };
+                hideTimer.Start();
+            };
+
+            // Handle click to show dropdown even if already focused
+            searchTextBox.Click += (s, e) => ShowSearchHistoryDropdown();
             topBar.Controls.Add(searchTextBox);
 
             // Type filter dropdown
@@ -570,7 +613,7 @@ namespace Route_Tracker
         Justification = "because i said so")]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            Debug.WriteLine($"ProcessCmdKey: {keyData}");
+            //Debug.WriteLine($"ProcessCmdKey: {keyData}");
 
             var shortcuts = settingsManager.GetShortcuts();
 
@@ -880,6 +923,133 @@ namespace Route_Tracker
         }
         #endregion
 
+        #region Search History Management
+        // ==========MY NOTES==============
+        // Loads the last search term when the app starts
+        private void LoadLastSearchTerm()
+        {
+            string lastTerm = searchHistoryManager.GetLastSearchTerm();
+            if (!string.IsNullOrEmpty(lastTerm))
+            {
+                searchTextBox.Text = lastTerm;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Saves the current search term to history when user clicks away
+        private void SaveCurrentSearchToHistory()
+        {
+            string currentSearch = searchTextBox.Text.Trim();
+            if (!string.IsNullOrEmpty(currentSearch) && currentSearch != lastSearchTerm)
+            {
+                _ = searchHistoryManager.AddSearchHistoryAsync(currentSearch);
+                lastSearchTerm = currentSearch;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Shows the search history dropdown when clicking on the search box
+        private void ShowSearchHistoryDropdown()
+        {
+            var history = searchHistoryManager.LoadSearchHistory();
+            if (history.Count == 0)
+                return;
+
+            if (searchHistoryListBox == null)
+            {
+                CreateSearchHistoryListBox();
+            }
+
+            // Clear and populate the dropdown
+            searchHistoryListBox!.Items.Clear();
+            foreach (string term in history.Take(10)) // Show max 10 items
+            {
+                searchHistoryListBox.Items.Add(term);
+            }
+
+            if (searchHistoryListBox.Items.Count > 0)
+            {
+                // Position the dropdown below the search box
+                var searchBoxLocation = searchTextBox.PointToScreen(Point.Empty);
+                var formLocation = this.PointToClient(searchBoxLocation);
+
+                searchHistoryListBox.Location = new Point(formLocation.X, formLocation.Y + searchTextBox.Height);
+                searchHistoryListBox.Width = searchTextBox.Width;
+
+                // Calculate height based on items (max 10 items visible)
+                int itemHeight = searchHistoryListBox.ItemHeight;
+                int visibleItems = Math.Min(searchHistoryListBox.Items.Count, 10);
+                searchHistoryListBox.Height = visibleItems * itemHeight + 4; // +4 for borders
+
+                searchHistoryListBox.Visible = true;
+                searchHistoryListBox.BringToFront();
+                isSearchHistoryVisible = true;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Creates the search history dropdown listbox
+        private void CreateSearchHistoryListBox()
+        {
+            searchHistoryListBox = new ListBox
+            {
+                BackColor = Color.FromArgb(40, 40, 40),
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont,
+                BorderStyle = BorderStyle.FixedSingle,
+                Visible = false,
+                IntegralHeight = false // Allow custom height
+            };
+
+            // Handle item selection
+            searchHistoryListBox.Click += (s, e) =>
+            {
+                if (searchHistoryListBox.SelectedItem != null)
+                {
+                    string selectedTerm = searchHistoryListBox.SelectedItem.ToString() ?? "";
+                    searchTextBox.Text = selectedTerm;
+                    HideSearchHistoryDropdown();
+
+                    // Apply the filter immediately
+                    RouteHelpers.ApplyFilters(this);
+
+                    // Focus back to search box
+                    searchTextBox.Focus();
+                }
+            };
+
+            // Handle mouse leave to hide dropdown
+            searchHistoryListBox.MouseLeave += (s, e) =>
+            {
+                // Small delay to allow clicking on items
+                System.Windows.Forms.Timer hideTimer = new() { Interval = 100 };
+                hideTimer.Tick += (sender, args) =>
+                {
+                    hideTimer.Stop();
+                    hideTimer.Dispose();
+                    if (!searchHistoryListBox.ClientRectangle.Contains(searchHistoryListBox.PointToClient(Cursor.Position)))
+                    {
+                        HideSearchHistoryDropdown();
+                    }
+                };
+                hideTimer.Start();
+            };
+
+            this.Controls.Add(searchHistoryListBox);
+        }
+
+        // ==========MY NOTES==============
+        // Hides the search history dropdown
+        private void HideSearchHistoryDropdown()
+        {
+            if (searchHistoryListBox != null && isSearchHistoryVisible)
+            {
+                searchHistoryListBox.Visible = false;
+                isSearchHistoryVisible = false;
+            }
+        }
+        #endregion
+
         #region Application Lifecycle
         // ==========MY NOTES==============
         // Handles app startup - auto-start logic and update checks
@@ -892,8 +1062,13 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Handles app shutdown - cleans up resources properly
+        // ==========MY NOTES==============
+        // Handles app shutdown - cleans up resources properly
         private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
         {
+            // Save current search term to history before closing
+            SaveCurrentSearchToHistory();
+
             // Cleanup global hotkeys
             if (globalHotkeysRegistered)
             {

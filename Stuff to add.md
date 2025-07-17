@@ -111,6 +111,11 @@ Let the user customize their shortcuts. *(Done)*
             - if all types has a check mark then all the other types also get check marks
             - but if u uncheck one of the types then the all checked gets the checkmark removed but all other types still have their check marks
             - when the route isnt loaded all types option should have a check
+    - [x] 3.2 search history dropdown *(remember recent searches)*
+        - *how it maybe would work whatever is doable is fine*
+            - meant for searching for a entry 
+            - basically ig we type something click enter then it gets added to search history 
+            - or something like that, although the searching is instant so idk how that would work
 ---
 
 ---
@@ -123,11 +128,6 @@ Let the user customize their shortcuts. *(Done)*
 
 - [ ] 3. exporting current progress to TSV/CSV for sharing
     - *3.1 through 3.3 below are all prerequisites for 3 (exporting).*
-    - [ ] 3.2 search history dropdown *(remember recent searches)*
-        - *how it maybe would work whatever is doable is fine*
-            - meant for searching for a entry 
-            - basically ig we type something click enter then it gets added to search history 
-            - or something like that, although the searching is instant so idk how that would work
     - [ ] 3.3 remove specific types or entries in general (e.g., upgrades, story, chests)
         - *how it will work*
             - basically theirs a button or in the drop down 
@@ -154,18 +154,9 @@ Let the user customize their shortcuts. *(Done)*
 ---
 
 ## what i want
-I want you to add a new feature — it's called search history.
+I want you to add a new feature — it's called .
 
-Basically, I have a search bar, but it doesn’t remember the last thing that was searched. Since it updates the route grid instantly while typing, there’s no “Enter” key to confirm the search — which is fine. But I want it to remember what was typed so it works like this:
-
-- When the user types something in the search bar and then clicks away (or does something that disables typing), it should add that typed string to a list of recent searches.
-- That list should be saved to a `.json` file called `History.json`.
-- The `.json` file should be saved in a new folder **outside** the existing settings folder, but still within the backup directory.
-- Call this folder: `Route Tracker json files`.
-    - This will be the default folder for saving any new/existing `.json` files that aren’t `settings.json` and that arent already saved in the backup.
-- If the user closes the app and then reopens it, the last searched string should still appear in the search bar via loading the json file.
-- When the user clicks on the search bar, it should show a dropdown of previous searches.
-- If you have any questions before doing this feature, just ask. Don’t assume — just ask, even if it feels dumb or minor.
+- 
 
 ## how to generate the code for the feature
 When generating the code, make sure to follow these rules:

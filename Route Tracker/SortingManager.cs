@@ -58,32 +58,29 @@ namespace Route_Tracker
         // Sorts entries with completed ones at the top
         private static List<RouteEntry> SortCompletedAtTop(List<RouteEntry> entries)
         {
-            return entries
+            return [.. entries
                 .Where(e => !e.IsSkipped) // Don't show skipped entries
                 .OrderByDescending(e => e.IsCompleted)
-                .ThenBy(e => e.Id)
-                .ToList();
+                .ThenBy(e => e.Id)];
         }
 
         // ==========MY NOTES==============
         // Sorts entries with completed ones at the bottom
         private static List<RouteEntry> SortCompletedAtBottom(List<RouteEntry> entries)
         {
-            return entries
+            return [.. entries
                 .Where(e => !e.IsSkipped) // Don't show skipped entries
                 .OrderBy(e => e.IsCompleted)
-                .ThenBy(e => e.Id)
-                .ToList();
+                .ThenBy(e => e.Id)];
         }
 
         // ==========MY NOTES==============
         // Hides completed entries completely
         private static List<RouteEntry> SortHideCompleted(List<RouteEntry> entries)
         {
-            return entries
+            return [.. entries
                 .Where(e => !e.IsCompleted && !e.IsSkipped)
-                .OrderBy(e => e.Id)
-                .ToList();
+                .OrderBy(e => e.Id)];
         }
 
         // ==========MY NOTES==============

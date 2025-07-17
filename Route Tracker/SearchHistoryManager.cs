@@ -36,7 +36,7 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Adds a search term to the history if it's not empty or duplicate
         // Moves existing duplicates to the top of the list
-        public void AddSearchHistory(string searchTerm)
+        public async Task AddSearchHistoryAsync(string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
                 return;
@@ -44,13 +44,10 @@ namespace Route_Tracker
             searchTerm = searchTerm.Trim();
             var history = LoadSearchHistory();
 
-            // Remove existing duplicate if it exists
             history.RemoveAll(h => h.Equals(searchTerm, StringComparison.OrdinalIgnoreCase));
-            
-            // Add to the top of the list
             history.Insert(0, searchTerm);
 
-            SaveSearchHistory(history);
+            await SaveSearchHistoryAsync(history);
         }
 
         // ==========MY NOTES==============
@@ -75,12 +72,12 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Saves the search history to the JSON file
-        private void SaveSearchHistory(List<string> history)
+        private async Task SaveSearchHistoryAsync(List<string> history)
         {
             try
             {
                 string json = JsonSerializer.Serialize(history, JsonOptions);
-                File.WriteAllText(historyFilePath, json);
+                await File.WriteAllTextAsync(historyFilePath, json);
             }
             catch (Exception ex)
             {

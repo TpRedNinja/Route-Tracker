@@ -185,10 +185,18 @@ namespace Route_Tracker
             UpdateRouteGridWithEntries(mainForm, [.. filteredEntries]);
         }
 
-        // ==========MY NOTES==============
+                // ==========MY NOTES==============
         // Clears both search and type filter when you click the Clear button
         public static void ClearFilters(MainForm mainForm)
         {
+            // Save current search to history before clearing
+            if (!string.IsNullOrEmpty(mainForm.searchTextBox.Text.Trim()))
+            {
+                string currentSearch = mainForm.searchTextBox.Text.Trim();
+                var searchHistoryManager = new SearchHistoryManager();
+                _ = searchHistoryManager.AddSearchHistoryAsync(currentSearch);
+            }
+            
             mainForm.searchTextBox.Text = "";
 
             // Clear all type selections and set "All Types" as selected
