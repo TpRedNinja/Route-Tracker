@@ -94,6 +94,7 @@ namespace Route_Tracker
             return (false, false);
         }
 
+        #region memory reading functions
         // ==========FORMAL COMMENT=========
         // Generic method to read values from game memory
         // Follows chains of pointers using the provided offsets
@@ -124,6 +125,38 @@ namespace Route_Tracker
             }
             return value;
         }
+
+        // ==========FORMAL COMMENT=========
+        // Generic method to read values from game memory (64-bit version)
+        // Follows chains of pointers using the provided offsets
+        // ==========MY NOTES==============
+        // This is the low-level function for 64-bit games
+        // It follows the trail of addresses to find the specific value we want
+        protected unsafe T Read64Bit<T>(nint baseAddress, int[] offsets) where T : unmanaged
+        {
+            nint address = baseAddress;
+
+            int pointer_size = 8; // Always use 64-bit
+            foreach (int offset in offsets)
+            {
+                if (!ReadProcessMemory(processHandle, address, &address, pointer_size, out nint bytesReads) ||
+                    bytesReads != pointer_size || address == IntPtr.Zero)
+                {
+                    return default;
+                }
+                address += offset;
+            }
+
+            T value;
+            int size = sizeof(T);
+            if (!ReadProcessMemory(processHandle, address, &value, size, out nint bytesRead) ||
+                bytesRead != size)
+            {
+                return default;
+            }
+            return value;
+        }
+        #endregion
 
         #region Stats Retrieval
         // Only required method - each game implements this to provide its stats
@@ -266,6 +299,27 @@ namespace Route_Tracker
         }
 
         // ==========FORMAL COMMENT=========
+        // Reads memory values with caching for 64-bit games
+        // Uses Read64Bit to avoid repeated reads
+        // ==========MY NOTES==============
+        // This is like ReadWithCache but for 64-bit pointer size
+        protected T ReadWithCache64Bit<T>(string cacheKey, nint baseAddress, int[] offsets) where T : unmanaged
+        {
+            // Check if we have a recent cached value
+            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
+                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
+                cachedData.Value is T value)
+            {
+                return value;
+            }
+
+            // Read fresh value from memory using 64-bit pointer size
+            T result = Read64Bit<T>(baseAddress, offsets);
+            _memoryCache[cacheKey] = (DateTime.Now, result);
+            return result;
+        }
+
+        // ==========FORMAL COMMENT=========
         // Attempts to retrieve a cached value without accessing memory
         // ==========MY NOTES==============
         // Quick way to check if we already have the value cached
@@ -302,6 +356,7 @@ namespace Route_Tracker
         }
         #endregion
 
+        #region whatever this is
         // ==========FORMAL COMMENT=========
         // Windows API import for reading data from the memory of another process
         // ==========MY NOTES==============
@@ -319,4 +374,5 @@ namespace Route_Tracker
             nint nSize,
             out nint lpNumberOfBytesRead);
     }
+    #endregion
 }
