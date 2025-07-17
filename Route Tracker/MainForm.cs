@@ -61,10 +61,11 @@ namespace Route_Tracker
         public ToolStripMenuItem? enableAutoStartMenuItem;
 
         // Filtering and search controls
-        public ComboBox typeFilterComboBox = null!;
+        public CheckedListBox typeFilterCheckedListBox = null!;
         public TextBox searchTextBox = null!;
         public Button clearFiltersButton = null!;
         public List<RouteEntry> allRouteEntries = [];
+        public HashSet<string> selectedTypes = [];
 
         // Application state
         private bool isHotkeysEnabled = false;
@@ -282,21 +283,145 @@ namespace Route_Tracker
             topBar.Controls.Add(searchTextBox);
 
             // Type filter dropdown
-            typeFilterComboBox = new ComboBox
+            var typeFilterPanel = new Panel
             {
-                Width = 100,
+                Width = 120,
                 Height = 23,
-                DropDownStyle = ComboBoxStyle.DropDownList,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.FromArgb(40, 40, 40),
+                Margin = new Padding(0, 2, 5, 2)
+            };
+
+            var typeFilterLabel = new Label
+            {
+                Text = "All Types",
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleLeft,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont,
+                BackColor = Color.FromArgb(40, 40, 40),
+                Padding = new Padding(5, 0, 20, 0),
+                Cursor = Cursors.Hand
+            };
+
+            var dropDownButton = new Button
+            {
+                Text = "▼",
+                Width = 20,
+                Height = 21,
+                Dock = DockStyle.Right,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.FromArgb(50, 50, 50),
+                ForeColor = AppTheme.TextColor,
+                Font = new Font(AppTheme.DefaultFont.FontFamily, 8),
+                Cursor = Cursors.Hand
+            };
+            dropDownButton.FlatAppearance.BorderSize = 0;
+
+            typeFilterCheckedListBox = new CheckedListBox
+            {
+                Width = 120,
+                Height = 150,
                 BackColor = Color.FromArgb(40, 40, 40),
                 ForeColor = AppTheme.TextColor,
                 Font = AppTheme.DefaultFont,
-                FlatStyle = FlatStyle.Flat,
-                Margin = new Padding(0, 2, 5, 2)
+                BorderStyle = BorderStyle.FixedSingle,
+                CheckOnClick = true,
+                Visible = false
             };
-            typeFilterComboBox.Items.Add("All Types");
-            typeFilterComboBox.SelectedIndex = 0;
-            typeFilterComboBox.SelectedIndexChanged += (s, e) => RouteHelpers.ApplyFilters(this);
-            topBar.Controls.Add(typeFilterComboBox);
+
+            typeFilterPanel.Controls.Add(typeFilterLabel);
+            typeFilterPanel.Controls.Add(dropDownButton);
+            typeFilterPanel.Controls.Add(typeFilterCheckedListBox);
+
+            // Event handlers for dropdown functionality
+            EventHandler toggleDropdown = (s, e) =>
+            {
+                if (!typeFilterCheckedListBox.Visible)
+                {
+                    // Show dropdown below the panel, on top of everything
+                    var panel = typeFilterCheckedListBox.Parent as Panel;
+                    if (panel != null)
+                    {
+                        var screenPoint = panel.PointToScreen(new Point(0, panel.Height));
+                        var formPoint = this.PointToClient(screenPoint);
+                        typeFilterCheckedListBox.Location = formPoint;
+                        typeFilterCheckedListBox.Parent = this;
+                        typeFilterCheckedListBox.BringToFront();
+                    }
+                }
+                typeFilterCheckedListBox.Visible = !typeFilterCheckedListBox.Visible;
+            };
+            typeFilterLabel.Click += toggleDropdown;
+            dropDownButton.Click += toggleDropdown;
+
+            // Handle item check changes
+            typeFilterCheckedListBox.ItemCheck += (s, e) =>
+            {
+                this.BeginInvoke(new Action(() =>
+                {
+                    string item = typeFilterCheckedListBox.Items[e.Index].ToString() ?? "";
+
+                    if (item == "All Types")
+                    {
+                        if (e.NewValue == CheckState.Checked)
+                        {
+                            // Select all types
+                            for (int i = 1; i < typeFilterCheckedListBox.Items.Count; i++)
+                            {
+                                typeFilterCheckedListBox.SetItemChecked(i, true);
+                            }
+                            selectedTypes.Clear();
+                            for (int i = 1; i < typeFilterCheckedListBox.Items.Count; i++)
+                            {
+                                selectedTypes.Add(typeFilterCheckedListBox.Items[i].ToString() ?? "");
+                            }
+                        }
+                        else
+                        {
+                            // Unselect all types
+                            for (int i = 1; i < typeFilterCheckedListBox.Items.Count; i++)
+                            {
+                                typeFilterCheckedListBox.SetItemChecked(i, false);
+                            }
+                            selectedTypes.Clear();
+                        }
+                    }
+                    else
+                    {
+                        if (e.NewValue == CheckState.Checked)
+                        {
+                            selectedTypes.Add(item);
+                        }
+                        else
+                        {
+                            selectedTypes.Remove(item);
+                            // Uncheck "All Types" if any individual type is unchecked
+                            typeFilterCheckedListBox.SetItemChecked(0, false);
+                        }
+
+                        // Check "All Types" if all individual types are selected
+                        if (selectedTypes.Count == typeFilterCheckedListBox.Items.Count - 1)
+                        {
+                            typeFilterCheckedListBox.SetItemChecked(0, true);
+                        }
+                    }
+
+                    UpdateTypeFilterLabel(typeFilterLabel);
+                    RouteHelpers.ApplyFilters(this);
+                }));
+            };
+
+            // Handle clicking outside to close dropdown
+            this.Click += (s, e) =>
+            {
+                if (typeFilterCheckedListBox.Visible)
+                {
+                    typeFilterCheckedListBox.Visible = false;
+                }
+            };
+
+            topBar.Controls.Add(typeFilterPanel);
 
             // Clear filters button
             clearFiltersButton = new Button
@@ -334,10 +459,31 @@ namespace Route_Tracker
             toolTip.SetToolTip(showStatsButton, "View the values of certain in game values like percentage, total viewpoints done, etc etc...");
             toolTip.SetToolTip(showCompletionButton, "View your progress and completion statistics for the current route");
             toolTip.SetToolTip(searchTextBox, "Type to search route entries by name, type, or coordinates");
-            toolTip.SetToolTip(typeFilterComboBox, "Filter route entries by type.");
+            toolTip.SetToolTip(typeFilterCheckedListBox, "Filter route entries by type.");
+            toolTip.SetToolTip(typeFilterPanel, "Select multiple route entry types to filter. Click to open dropdown with checkboxes.");
             toolTip.SetToolTip(clearFiltersButton, "Clear all filters and show all route entries.");
 
             return topBar;
+        }
+
+        private void UpdateTypeFilterLabel(Label typeFilterLabel)
+        {
+            if (selectedTypes.Count == 0)
+            {
+                typeFilterLabel.Text = "None";
+            }
+            else if (typeFilterCheckedListBox.GetItemChecked(0)) // "All Types" is checked
+            {
+                typeFilterLabel.Text = "All Types";
+            }
+            else if (selectedTypes.Count == 1)
+            {
+                typeFilterLabel.Text = selectedTypes.First();
+            }
+            else
+            {
+                typeFilterLabel.Text = "Multiple Types";
+            }
         }
 
         // ==========MY NOTES==============

@@ -175,11 +175,11 @@ namespace Route_Tracker
                     entry.Coordinates.Contains(searchText, StringComparison.OrdinalIgnoreCase));
             }
 
-            // Apply type filter
-            if (mainForm.typeFilterComboBox.SelectedItem is string selectedType && selectedType != "All Types")
+            // Apply multi-type filter
+            if (mainForm.selectedTypes.Count > 0 && !mainForm.typeFilterCheckedListBox.GetItemChecked(0))
             {
                 filteredEntries = filteredEntries.Where(entry =>
-                    entry.Type.Equals(selectedType, StringComparison.OrdinalIgnoreCase));
+                    mainForm.selectedTypes.Contains(entry.Type, StringComparer.OrdinalIgnoreCase));
             }
 
             UpdateRouteGridWithEntries(mainForm, [.. filteredEntries]);
@@ -190,7 +190,32 @@ namespace Route_Tracker
         public static void ClearFilters(MainForm mainForm)
         {
             mainForm.searchTextBox.Text = "";
-            mainForm.typeFilterComboBox.SelectedIndex = 0;
+
+            // Clear all type selections and set "All Types" as selected
+            mainForm.selectedTypes.Clear();
+            for (int i = 0; i < mainForm.typeFilterCheckedListBox.Items.Count; i++)
+            {
+                mainForm.typeFilterCheckedListBox.SetItemChecked(i, i == 0);
+            }
+            if (mainForm.typeFilterCheckedListBox.Items.Count > 1)
+            {
+                for (int i = 1; i < mainForm.typeFilterCheckedListBox.Items.Count; i++)
+                {
+                    mainForm.selectedTypes.Add(mainForm.typeFilterCheckedListBox.Items[i].ToString() ?? "");
+                }
+            }
+
+            // Update the label
+            var typeFilterPanel = mainForm.typeFilterCheckedListBox.Parent;
+            if (typeFilterPanel != null)
+            {
+                var typeFilterLabel = typeFilterPanel.Controls.OfType<Label>().FirstOrDefault();
+                if (typeFilterLabel != null)
+                {
+                    typeFilterLabel.Text = "All Types";
+                }
+            }
+
             ApplyFilters(mainForm);
         }
 
@@ -205,15 +230,32 @@ namespace Route_Tracker
                 .OrderBy(type => type)
                 .ToList();
 
-            mainForm.typeFilterComboBox.Items.Clear();
-            mainForm.typeFilterComboBox.Items.Add("All Types");
+            mainForm.typeFilterCheckedListBox.Items.Clear();
+            mainForm.typeFilterCheckedListBox.Items.Add("All Types");
 
             foreach (string type in uniqueTypes)
             {
-                mainForm.typeFilterComboBox.Items.Add(type);
+                mainForm.typeFilterCheckedListBox.Items.Add(type);
             }
 
-            mainForm.typeFilterComboBox.SelectedIndex = 0;
+            // Set "All Types" as checked and populate selectedTypes
+            mainForm.typeFilterCheckedListBox.SetItemChecked(0, true);
+            mainForm.selectedTypes.Clear();
+            foreach (string type in uniqueTypes)
+            {
+                mainForm.selectedTypes.Add(type);
+            }
+
+            // Update the label
+            var typeFilterPanel = mainForm.typeFilterCheckedListBox.Parent;
+            if (typeFilterPanel != null)
+            {
+                var typeFilterLabel = typeFilterPanel.Controls.OfType<Label>().FirstOrDefault();
+                if (typeFilterLabel != null)
+                {
+                    typeFilterLabel.Text = "All Types";
+                }
+            }
         }
 
         // ==========MY NOTES==============

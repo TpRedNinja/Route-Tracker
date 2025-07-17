@@ -34,7 +34,7 @@ namespace Route_Tracker
                     // Set default compact size
                     ShowAllControls(mainForm, true);
                     mainForm.searchTextBox.Visible = false;
-                    mainForm.typeFilterComboBox.Visible = false;
+                    mainForm.typeFilterCheckedListBox.Visible = false;
                     mainForm.clearFiltersButton.Visible = false;
                     ScaleInterface(mainForm, 0.9f);
                     mainForm.FormBorderStyle = FormBorderStyle.Sizable;
@@ -79,7 +79,7 @@ namespace Route_Tracker
             mainForm.showStatsButton.Visible = show;
             mainForm.showCompletionButton.Visible = show;
             mainForm.searchTextBox.Visible = show;
-            mainForm.typeFilterComboBox.Visible = show;
+            mainForm.typeFilterCheckedListBox.Visible = show;
             mainForm.clearFiltersButton.Visible = show;
 
             // Don't override size here anymore - handled in ApplyLayoutMode

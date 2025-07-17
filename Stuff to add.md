@@ -102,6 +102,16 @@ Let the user customize their shortcuts. *(Done)*
     - add to backup folder like with settings 
 
 ---
+- [ ] 3. exporting current progress to TSV/CSV for sharing
+    - *3.1 through 3.3 below are all prerequisites for 3 (exporting).*
+    - [x] 3.1 multiple type filtering 
+        - *how it will work*
+            - each type should be like a checklist item thing
+            - ie when u click on it a check mark appears 
+            - if all types has a check mark then all the other types also get check marks
+            - but if u uncheck one of the types then the all checked gets the checkmark removed but all other types still have their check marks
+            - when the route isnt loaded all types option should have a check
+---
 
 ---
 
@@ -113,13 +123,6 @@ Let the user customize their shortcuts. *(Done)*
 
 - [ ] 3. exporting current progress to TSV/CSV for sharing
     - *3.1 through 3.3 below are all prerequisites for 3 (exporting).*
-    - [ ] 3.1 multiple type filtering 
-        - *how it will work*
-            - each type should be like a checklist item thing
-            - ie when u click on it a check mark appears 
-            - if all types has a check mark then all the other types also get check marks
-            - but if u uncheck one of the types then the all checked gets the checkmark removed but all other types still have their check marks
-            - when the route isnt loaded all types option should have a check
     - [ ] 3.2 search history dropdown *(remember recent searches)*
         - *how it maybe would work whatever is doable is fine*
             - meant for searching for a entry 
@@ -150,28 +153,35 @@ Let the user customize their shortcuts. *(Done)*
 
 ---
 
-I want you to add a new feature its called multi type filtering.
-I currently have a filtering system that allows me to filter by one type at a time.
-I want u to make it so i can filter by multiple types at once.
-Currently when i filter by one type it shows the current type in the box
-when i have multiply types selected i want u to show instead "Multiple Types".
-Currently by default "All Types" is selected when no route is loaded
-I want to keep it that way.
-Their should be some visual indicator that multiple types are selected in the drop down
-it can be a check mark or something else.
-If "All Types" is selected then all other types should also be selected.
-When no types are selected it should on the display show nothing and in the box say "None".
-If the user unselects one of the types when "All Types" is selected
-then "All Types" should be unselected but all other types that werent unselected should remain selected.
-Ideally u shouldnt need to change much of anything in the current filtering system
-But if u do its fine as long as it works and *DOES NOT BREAK ANY OTHER FEATURES*
-U should make optimized code that isnt 100's of lines long
-it shouldnt give me errors and it shouldnt give me messages saying whatever can be simplified
-When generating me the code *GENERATE EVERYTHING I NEED* I WILL NOT STAND FOR TLDR COMMENTS
-What i mean by tldr is comments like "// rest of code goes here" or "// current implementation"
-I want the full code for everything i need to add this feature DO NOT SKIP ANYTHING or say do it yourself
-if you create new files be sure to specify what type of file it is
-DO NOT CHANGING ANYTHING THAT DOESNT NEED TO BE CHANGED KEY WORD NEED
+## what i want
+I want you to add a new feature — it's called search history.
+
+Basically, I have a search bar, but it doesn’t remember the last thing that was searched. Since it updates the route grid instantly while typing, there’s no “Enter” key to confirm the search — which is fine. But I want it to remember what was typed so it works like this:
+
+- When the user types something in the search bar and then clicks away (or does something that disables typing), it should add that typed string to a list of recent searches.
+- That list should be saved to a `.json` file called `History.json`.
+- The `.json` file should be saved in a new folder **outside** the existing settings folder, but still within the backup directory.
+- Call this folder: `Route Tracker json files`.
+    - This will be the default folder for saving any new/existing `.json` files that aren’t `settings.json` and that arent already saved in the backup.
+- If the user closes the app and then reopens it, the last searched string should still appear in the search bar via loading the json file.
+- When the user clicks on the search bar, it should show a dropdown of previous searches.
+- If you have any questions before doing this feature, just ask. Don’t assume — just ask, even if it feels dumb or minor.
+
+## how to generate the code for the feature
+When generating the code, make sure to follow these rules:
+
+- Make sure the code is well-commented, based on how existing comments are implemented.
+- Generate **all** the code needed for this feature.
+- DO NOT put `// rest of code goes here` or anything like that.
+- You shouldn’t need to preserve the existing system if doing so would require a bunch of custom compatibility logic. Just use whatever works.
+- Use best practices.
+- **DO NOT BREAK ANY EXISTING FEATURES**.
+- Avoid errors **unless** it’s a temporary call to a function that you’re about to generate in the next step.
+- Avoid giving me code that results in IDE warnings like “collection can be simplified” or similar messages.
+- The most important thing: **don’t break anything**, and please ASK QUESTIONS first.
+    - I know I probably didn’t give enough details.
+    - You can’t assume anything, so ask whatever you need before generating code.
+    - For example, if your question is: “What new UI element should I use for the search history dropdown?” — just go with whatever you think will work unless I say otherwise.
 
 ---
 
