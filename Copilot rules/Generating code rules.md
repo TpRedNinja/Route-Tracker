@@ -20,7 +20,15 @@
    ```csharp
    // WARNING: Assumed [explanation]
 	```
-10. Make sure when generating it u specify which regions for them to go in 
-	1.unless u think they should be a new region then in that case specify. 
-	1. If in a existing region say where in region like after this function 
-	1. before this function start of region end of region etc etc. 
+10. **Always specify where generated code belongs within `#region` blocks.**
+    - If inserting into an existing region, clearly state **where**:
+      - After a specific function
+      - Before a specific function
+      - At the start or end of the region
+    - Be specific to avoid confusion.
+11. **If the code should go into a *new* region, say so explicitly.**
+    - Give the new region a meaningful name.
+    - Make sure it logically fits with surrounding code and doesn't duplicate existing regions.
+    - generate the code with the region included.
+    - generate the full region, not just the code inside it.
+12. if a function isnt in a region and you think u can add it to a new region then do so and say so

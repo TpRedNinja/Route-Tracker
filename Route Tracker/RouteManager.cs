@@ -66,28 +66,18 @@ namespace Route_Tracker
                 string filename = Path.GetFileName(routeFilePath);
                 routeEntries = routeLoader.LoadRoute(filename);
 
-                // Load ID map if it exists
-                string idMapPath = Path.ChangeExtension(routeFilePath, ".ids.json");
-                Dictionary<string, int>? idMap = null;
-                if (File.Exists(idMapPath))
-                {
-                    string json = File.ReadAllText(idMapPath);
-                    idMap = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(json);
-                }
-
-                // Assign IDs
+                // Assign IDs and set up prerequisites
                 for (int i = 0; i < routeEntries.Count; i++)
                 {
-                    string key = $"{routeEntries[i].Name}_{routeEntries[i].Type}_{routeEntries[i].Condition}";
-                    if (idMap != null && idMap.TryGetValue(key, out int savedId))
-                        routeEntries[i].Id = savedId;
-                    else
-                        routeEntries[i].Id = i + 1;
+                    routeEntries[i].Id = i + 1;
                     routeEntries[i].Prerequisite = i > 0 ? routeEntries[i - 1] : null;
                 }
 
-                // Save the ID map after assignment
-                SaveIdMap();
+                LoggingSystem.LogInfo($"LoadEntries: Successfully loaded {routeEntries.Count} entries from {filename}");
+            }
+            else
+            {
+                LoggingSystem.LogError($"LoadEntries: Route file not found: {routeFilePath}");
             }
             return routeEntries;
         }
@@ -169,7 +159,7 @@ namespace Route_Tracker
 
                 // Sort and scroll
                 SortRouteGridByCompletion(routeGrid);
-                ScrollToFirstIncomplete(routeGrid);
+                SortingManager.ScrollToFirstIncomplete(routeGrid);
             }
             catch (Exception ex)
             {
@@ -492,7 +482,7 @@ namespace Route_Tracker
             if (anyChanges)
             {
                 SortRouteGridByCompletion(routeGrid);
-                ScrollToFirstIncomplete(routeGrid);
+                SortingManager.ScrollToFirstIncomplete(routeGrid);
 
                 // Auto-save whenever any entry is marked as completed
                 AutoSaveProgress();
@@ -686,41 +676,6 @@ namespace Route_Tracker
         }
 
         // ==========FORMAL COMMENT=========
-        // Scrolls the route grid to the first incomplete entry and selects it for user attention.
-        // Does not change the order of entries in the grid.
-        // If all entries are complete, scrolls to the top of the grid.
-        // ==========MY NOTES==============
-        // Jumps the list to the first thing you haven't finished yet and highlights it.
-        // Doesn't move anything around, just helps you find what to do next.
-        // If everything is done, scrolls to the very top.
-        public static void ScrollToFirstIncomplete(DataGridView routeGrid)
-        {
-            if (routeGrid == null || routeGrid.Rows.Count == 0)
-                return;
-
-            int firstIncompleteIndex = -1;
-            for (int i = 0; i < routeGrid.Rows.Count; i++)
-            {
-                if (routeGrid.Rows[i].Tag is RouteEntry entry && !entry.IsCompleted)
-                {
-                    firstIncompleteIndex = i;
-                    break;
-                }
-            }
-
-            if (firstIncompleteIndex >= 0)
-            {
-                routeGrid.FirstDisplayedScrollingRowIndex = Math.Max(0, firstIncompleteIndex - 2);
-                routeGrid.ClearSelection();
-                routeGrid.Rows[firstIncompleteIndex].Selected = true;
-            }
-            else if (routeGrid.Rows.Count > 0)
-            {
-                routeGrid.FirstDisplayedScrollingRowIndex = 0;
-            }
-        }
-
-        // ==========FORMAL COMMENT=========
         // Marks the specified route entry as completed
         // Updates UI display and triggers autosave
         // Used by both manual and hotkey completion actions
@@ -744,7 +699,7 @@ namespace Route_Tracker
             }
 
             SortRouteGridByCompletion(routeGrid);
-            ScrollToFirstIncomplete(routeGrid);
+            SortingManager.ScrollToFirstIncomplete(routeGrid);
             AutoSaveProgress();
         }
 
@@ -810,7 +765,7 @@ namespace Route_Tracker
             }
 
             SortRouteGridByCompletion(routeGrid);
-            ScrollToFirstIncomplete(routeGrid);
+            SortingManager.ScrollToFirstIncomplete(routeGrid);
             AutoSaveProgress();
         }
 
@@ -1192,7 +1147,7 @@ namespace Route_Tracker
                 if (anyChanges)
                 {
                     SortRouteGridByCompletion(routeGrid);
-                    ScrollToFirstIncomplete(routeGrid);
+                    SortingManager.ScrollToFirstIncomplete(routeGrid);
                     return true;
                 }
 
@@ -1359,7 +1314,7 @@ namespace Route_Tracker
                     }
 
                     SortRouteGridByCompletion(routeGrid);
-                    ScrollToFirstIncomplete(routeGrid);
+                    SortingManager.ScrollToFirstIncomplete(routeGrid);
 
                     // After loading manually, update autosave as well
                     AutoSaveProgress();
@@ -1439,7 +1394,7 @@ namespace Route_Tracker
                 routeGrid.Rows[rowIndex].Tag = entry;
             }
             SortRouteGridByCompletion(routeGrid);
-            ScrollToFirstIncomplete(routeGrid);
+            SortingManager.ScrollToFirstIncomplete(routeGrid);
         }
 
         private void SaveIdMap()

@@ -108,33 +108,49 @@ namespace Route_Tracker
         // Lets the user choose a folder for the currently selected game
         private void BrowseButton_Click(object? sender, EventArgs e)
         {
-            using FolderBrowserDialog folderBrowserDialog = new();
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            try
             {
-                directoryTextBox.Text = folderBrowserDialog.SelectedPath;
-                SaveDirectory();
+                using FolderBrowserDialog folderBrowserDialog = new();
+                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                {
+                    directoryTextBox.Text = folderBrowserDialog.SelectedPath;
+                    SaveDirectory();
+
+                    string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
+                    LoggingSystem.LogInfo($"Game directory set for {selectedGame}: {folderBrowserDialog.SelectedPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingSystem.LogError("Error selecting game directory", ex);
+                MessageBox.Show($"Error selecting directory: {ex.Message}", "Directory Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // ==========FORMAL COMMENT=========
-        // Saves the current directory path to application settings
-        // Updates the appropriate setting based on which game is selected
         // ==========MY NOTES==============
         // Saves the game folder location to the app settings
         private void SaveDirectory()
         {
-            string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
-            if (selectedGame == "Assassin's Creed 4")
+            try
             {
-                Settings.Default.AC4Directory = directoryTextBox.Text;
-            }
-            else if (selectedGame == "God of War 2018")
-            {
-                Settings.Default.Gow2018Directory = directoryTextBox.Text;
-            }
-            Settings.Default.Save();
+                string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
+                if (selectedGame == "Assassin's Creed 4")
+                {
+                    Settings.Default.AC4Directory = directoryTextBox.Text;
+                }
+                else if (selectedGame == "God of War 2018")
+                {
+                    Settings.Default.Gow2018Directory = directoryTextBox.Text;
+                }
+                Settings.Default.Save();
 
-            DirectoryChanged?.Invoke(this, EventArgs.Empty);
+                DirectoryChanged?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                LoggingSystem.LogError("Error saving game directory", ex);
+            }
         }
     }
 }

@@ -101,19 +101,7 @@ Let the user customize their shortcuts. *(Done)*
             - basically ig we type something click enter then it gets added to search history 
             - or something like that, although the searching is instant so idk how that would work
 ---
-
----
-
-# features to add
-## 📝 Future Features TODO List
-
----
-
-## features for v1.0
-
----
-
-- [ ] 3. logging system
+- [x] 3. logging system
     - app passowrd for google account: cjut ymzr citu xvij
     - Log errors and important events with timestamps (including dates)
     - Save logs locally in a file (append, don’t overwrite)
@@ -128,31 +116,20 @@ Let the user customize their shortcuts. *(Done)*
     - only create new file if version of application is different and add a -------- seperator if the date isnt the same as last time it was logged
     - easy to refrence for replacing all current error handlers and for in general program use when its running error handling
     - developer email address to send to topredninja@gmail.com or hjdomangue@outlook.com if first email fails
+---
 
 ---
 
-# Instructions
-
-## What I Want
-
-
-
-## How to Generate the Code for the Feature
-
-- **Generate ALL CODE needed for this feature.**
-- Use well-commented code, following the existing commenting style.
-- *DO NOT put* `// rest of code goes here` *or anything like that.*
-- You shouldn’t need to preserve the existing system if doing so would require a bunch of custom compatibility logic. Just use whatever works.
-- Use best practices.
-- **DO NOT BREAK ANY EXISTING FEATURES.**
-- Avoid errors unless it’s a temporary call to a function you will generate next.
-- Avoid code that causes IDE warnings (e.g., “collection can be simplified”).
-- If anything is unclear, ask questions before generating code.
-    - For example, if unsure about a UI element, use your best judgment unless told otherwise.
+# features to add
+## 📝 Future Features TODO List
 
 ---
 
-- [ ] 4. launcher or tutorial launcher(last thing to add)
+## features to add eventually
+
+---
+
+- [ ]. launcher or tutorial launcher(last thing to add)
     - update the md files while doing this features
     - last feature to add
     - should include a thing for every feature in the app along with images
@@ -161,7 +138,7 @@ Let the user customize their shortcuts. *(Done)*
 
 ---
 
-# Instructions
+# Instructions for Sonnet Copilot
 
 ## What I Want
 
@@ -169,16 +146,7 @@ Let the user customize their shortcuts. *(Done)*
 
 ## How to Generate the Code for the Feature
 
-- **Generate ALL CODE needed for this feature.**
-- Use well-commented code, following the existing commenting style.
-- *DO NOT put* `// rest of code goes here` *or anything like that.*
-- You shouldn’t need to preserve the existing system if doing so would require a bunch of custom compatibility logic. Just use whatever works.
-- Use best practices.
-- **DO NOT BREAK ANY EXISTING FEATURES.**
-- Avoid errors unless it’s a temporary call to a function you will generate next.
-- Avoid code that causes IDE warnings (e.g., “collection can be simplified”).
-- If anything is unclear, ask questions before generating code.
-    - For example, if unsure about a UI element, use your best judgment unless told otherwise.
+see `#Copilot rules.md` & `#Generating code rules.md`
 
 ---
 
@@ -186,5 +154,16 @@ Let the user customize their shortcuts. *(Done)*
 
 # stuff to update TODO list
 - [ ] ReadMe.md
-- [ ] adding a new game.md
-- [ ] planned stuff.md
+- [x] adding a new game.md
+- [x] planned stuff.md
+
+---
+
+# 📋 Summary Priority List
+- [ ] HIGH PRIORITY: Implement button/control factory methods (saves 100+ lines)
+- [x] HIGH PRIORITY: Consolidate hotkey processing (reduces MainForm by 60+ lines)
+- [x] MEDIUM PRIORITY: Fix timer management in GameStatsBase (prevents memory leaks)
+- [ ] MEDIUM PRIORITY: Create form initialization extension methods
+- [ ] MEDIUM PRIORITY: Implement consistent error handling pattern
+- [x] LOW PRIORITY: Optimize layout switching and font caching
+- [x] LOW PRIORITY: Consolidate scroll logic into extension methods

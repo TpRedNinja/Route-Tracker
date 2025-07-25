@@ -291,8 +291,10 @@ namespace Route_Tracker
         {
             if (gameStats != null)
             {
-                gameStats.StatsUpdated -= OnGameStatsUpdated;
                 gameStats.StopUpdating();
+                if (gameStats is IDisposable disposable)
+                    disposable.Dispose();
+                gameStats = null;
             }
         }
         #endregion
@@ -307,38 +309,63 @@ namespace Route_Tracker
         [SupportedOSPlatform("windows6.1")]
         public async Task<bool> ConnectToGameAsync(string gameName, bool autoStart = false)
         {
-            // Set the correct process name based on game selection
-            if (gameName == "Assassin's Creed 4")
-                currentProcess = "AC4BFSP.exe";
-            else if (gameName == "God of War 2018")
-                currentProcess = "GoW.exe";
-            else
-                return false; // Invalid game selection
-
-            // Auto-start the game if requested and not already running
-            if (autoStart)
+            try
             {
-                if (gameName == "God of War 2018")
-                    return false; // Auto-start not supported for Syndicate
+                LoggingSystem.LogInfo($"Attempting to connect to game: {gameName} (AutoStart: {autoStart})");
 
-                if (!IsProcessRunning(currentProcess))
+                // Set the correct process name based on game selection
+                if (gameName == "Assassin's Creed 4")
+                    currentProcess = "AC4BFSP.exe";
+                else if (gameName == "God of War 2018")
+                    currentProcess = "GoW.exe";
+                else
                 {
-                    StartGame(currentProcess);
-                    await WaitForGameToStartAsync();
+                    LoggingSystem.LogError($"Invalid game selection: {gameName}");
+                    return false; // Invalid game selection
+                }
+
+                // Auto-start the game if requested and not already running
+                if (autoStart)
+                {
+                    if (gameName == "God of War 2018")
+                    {
+                        LoggingSystem.LogWarning("Auto-start not supported for God of War 2018");
+                        return false; // Auto-start not supported for Syndicate
+                    }
+
+                    if (!IsProcessRunning(currentProcess))
+                    {
+                        LoggingSystem.LogInfo($"Starting game process: {currentProcess}");
+                        StartGame(currentProcess);
+                        await WaitForGameToStartAsync();
+                    }
+                    else
+                    {
+                        LoggingSystem.LogInfo($"Game already running: {currentProcess}");
+                    }
+                }
+
+                // Attempt to connect to the game process
+                Connect();
+
+                // Initialize game stats if connection was successful
+                if (processHandle != IntPtr.Zero)
+                {
+                    InitializeGameStats(gameName);
+                    LoggingSystem.LogInfo($"Successfully connected to {gameName}");
+                    return true;
+                }
+                else
+                {
+                    LoggingSystem.LogWarning($"Failed to get process handle for {gameName}");
+                    return false;
                 }
             }
-
-            // Attempt to connect to the game process
-            Connect();
-
-            // Initialize game stats if connection was successful
-            if (processHandle != IntPtr.Zero)
+            catch (Exception ex)
             {
-                InitializeGameStats(gameName);
-                return true;
+                LoggingSystem.LogError($"Error connecting to game {gameName}", ex);
+                return false;
             }
-
-            return false;
         }
         #endregion
 

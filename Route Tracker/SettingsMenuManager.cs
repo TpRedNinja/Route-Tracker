@@ -167,11 +167,20 @@ namespace Route_Tracker
                 }
                 catch (Exception ex)
                 {
+                    LoggingSystem.LogError("Failed to open downloaded routes folder", ex);
                     MessageBox.Show($"Could not open folder: {ex.Message}", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             };
             backupMenuItem.DropDownItems.Add(showDownloadedRoutesMenuItem);
+
+            // Add separator for logging section
+            backupMenuItem.DropDownItems.Add(new ToolStripSeparator());
+
+            // Contact Developer option
+            ToolStripMenuItem contactDeveloperMenuItem = new("Contact Developer");
+            contactDeveloperMenuItem.Click += (s, e) => LoggingSystem.ShowManualSendOption();
+            backupMenuItem.DropDownItems.Add(contactDeveloperMenuItem);
 
             settingsMenuItem.DropDownItems.Add(backupMenuItem);
         }

@@ -8,7 +8,7 @@ Route Tracker reads game memory in real-time to track collectibles, missions, an
 
 ## Game Support
 
-- **Assassin's Creed 4: Black Flag** (Complete)
+- **Assassin's Creed 4: Black Flag** (Complete-ish)
 - **God of War (2018)** (Early Implementation)
 
 See [Planned Stuff.md](Planned Stuff.md) for information about future game support.
@@ -82,15 +82,6 @@ See [Planned Stuff.md](Planned Stuff.md) for information about future game suppo
   - little to no support
   - full support coming after v1.0 releases
 
-### Recent Improvements
-
-- **Enhanced UI Layout System**: Four distinct layout modes for different use cases
-- **Improved Connection Management**: Streamlined connection window with better game detection
-- **Advanced Backup Systems**: Both progress and settings now have robust backup mechanisms
-- **Memory Optimization**: Caching system reduces redundant memory reads
-- **UI Update Throttling**: Prevents excessive redraws for better performance
-- **Developer Tools**: Protected developer mode for testing and development
-
 ### Important Notes
 
 - **Speedrun Focus**: This tool is designed for speedrunners following specific routes
@@ -112,14 +103,13 @@ Route Tracker uses Windows API calls to read game memory and access progression 
 ## Contributing
 
 If you're interested in contributing to this project, please reach out via Discord:
-- **Discord**: NotTpRedNinja
+- **Discord**: TpRedNlnja
 
 Areas where help is particularly welcome:
-- Memory address discovery for new games
-- Route optimization and creation
 - Additional game support implementation
 - UI/UX improvements
 - Performance optimizations
+- code optimizations
 
 ## Technical Details
 
@@ -135,7 +125,7 @@ Areas where help is particularly welcome:
 
 - Guidance on memory-reading method implementation by **Ero** (Discord)
 - Code development assistance through **GitHub Copilot**
-- All memory addresses and pointers discovered by **NotTpRedNinja**
+- All memory addresses and pointers discovered by **NotTpRedNinja aka me the developer**
 
 ## Developer's Note
 

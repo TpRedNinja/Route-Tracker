@@ -13,45 +13,51 @@ namespace Route_Tracker
         // Handles all different sorting modes and updates the display
         public static void ApplySorting(DataGridView routeGrid, SortingOptionsForm.SortingMode sortingMode)
         {
-            if (routeGrid == null || routeGrid.Rows.Count == 0)
+            if (routeGrid?.FindForm() is not MainForm mainForm)
                 return;
 
-            try
+            LoadingHelper.ExecuteWithSpinner(mainForm, () =>
             {
-                // Get all entries from the grid
-                List<RouteEntry> entries = [];
-                for (int i = 0; i < routeGrid.Rows.Count; i++)
-                {
-                    if (routeGrid.Rows[i].Tag is RouteEntry entry)
-                        entries.Add(entry);
-                }
-
-                if (entries.Count == 0)
+                if (routeGrid == null || routeGrid.Rows.Count == 0)
                     return;
 
-                // Apply sorting based on mode
-                List<RouteEntry> sortedEntries = sortingMode switch
+                try
                 {
-                    SortingOptionsForm.SortingMode.CompletedAtTop => SortCompletedAtTop(entries),
-                    SortingOptionsForm.SortingMode.CompletedAtBottom => SortCompletedAtBottom(entries),
-                    SortingOptionsForm.SortingMode.HideCompleted => SortHideCompleted(entries),
-                    _ => SortCompletedAtTop(entries) // Default fallback
-                };
+                    // Get all entries from the grid
+                    List<RouteEntry> entries = [];
+                    for (int i = 0; i < routeGrid.Rows.Count; i++)
+                    {
+                        if (routeGrid.Rows[i].Tag is RouteEntry entry)
+                            entries.Add(entry);
+                    }
 
-                // Update the grid with sorted entries
-                UpdateGridWithSortedEntries(routeGrid, sortedEntries);
+                    if (entries.Count == 0)
+                        return;
 
-                // Scroll to appropriate position
-                ScrollToAppropriatePosition(routeGrid, sortingMode);
+                    // Apply sorting based on mode
+                    List<RouteEntry> sortedEntries = sortingMode switch
+                    {
+                        SortingOptionsForm.SortingMode.CompletedAtTop => SortCompletedAtTop(entries),
+                        SortingOptionsForm.SortingMode.CompletedAtBottom => SortCompletedAtBottom(entries),
+                        SortingOptionsForm.SortingMode.HideCompleted => SortHideCompleted(entries),
+                        _ => SortCompletedAtTop(entries) // Default fallback
+                    };
 
-                Debug.WriteLine($"Applied sorting mode: {sortingMode}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error applying sorting: {ex.Message}");
-                MessageBox.Show($"Error applying sorting: {ex.Message}", "Sorting Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+                    // Update the grid with sorted entries
+                    UpdateGridWithSortedEntries(routeGrid, sortedEntries);
+
+                    // Scroll to appropriate position
+                    ScrollToAppropriatePosition(routeGrid, sortingMode);
+
+                    Debug.WriteLine($"Applied sorting mode: {sortingMode}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error applying sorting: {ex.Message}");
+                    MessageBox.Show($"Error applying sorting: {ex.Message}", "Sorting Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }, "Applying Sorting...");
         }
 
         // ==========MY NOTES==============
@@ -140,7 +146,7 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Scrolls to the first incomplete entry (reused from RouteManager)
-        private static void ScrollToFirstIncomplete(DataGridView routeGrid)
+        public static void ScrollToFirstIncomplete(DataGridView routeGrid)
         {
             if (routeGrid == null || routeGrid.Rows.Count == 0)
                 return;

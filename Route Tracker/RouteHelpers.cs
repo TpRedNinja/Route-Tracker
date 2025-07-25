@@ -69,45 +69,48 @@ namespace Route_Tracker
         Justification = "because i said so")]
         public static void LoadRouteData(MainForm mainForm, RouteManager? routeManager, DataGridView routeGrid, SettingsManager settingsManager)
         {
-            if (routeManager != null)
+            LoadingHelper.ExecuteWithSpinner(mainForm, () =>
             {
-                string selectedGame = GetSelectedGameName(mainForm);
-                routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame);
-
-                // Store all entries for filtering
-                mainForm.allRouteEntries.Clear();
-                foreach (DataGridViewRow row in routeGrid.Rows)
+                if (routeManager != null)
                 {
-                    if (row.Tag is RouteEntry entry)
+                    string selectedGame = GetSelectedGameName(mainForm);
+                    routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame);
+
+                    // Store all entries for filtering
+                    mainForm.allRouteEntries.Clear();
+                    foreach (DataGridViewRow row in routeGrid.Rows)
                     {
-                        mainForm.allRouteEntries.Add(entry);
+                        if (row.Tag is RouteEntry entry)
+                        {
+                            mainForm.allRouteEntries.Add(entry);
+                        }
                     }
-                }
 
-                PopulateTypeFilter(mainForm);
+                    PopulateTypeFilter(mainForm);
 
-                // RESTORED: USE ALL VALUES FROM CALCULATION
-                var (percentage, completed, total) = routeManager.CalculateCompletionStats();
-                mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
+                    // RESTORED: USE ALL VALUES FROM CALCULATION
+                    var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+                    mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
 
-                // Apply current sorting mode
-                var currentMode = settingsManager.GetSortingMode();
-                SortingManager.ApplySorting(routeGrid, currentMode);
-            }
-            else
-            {
-                var (completeHotkey, skipHotkey) = settingsManager.GetHotkeys();
-                bool hotkeysSet = completeHotkey != Keys.None || skipHotkey != Keys.None;
-
-                if (hotkeysSet)
-                {
-                    routeGrid.Rows.Add("Hotkeys are set, but route manager is not initialized.", "");
+                    // Apply current sorting mode
+                    var currentMode = settingsManager.GetSortingMode();
+                    SortingManager.ApplySorting(routeGrid, currentMode);
                 }
                 else
                 {
-                    routeGrid.Rows.Add("Connect to a game or set up hotkeys to load route tracking data", "");
+                    var (completeHotkey, skipHotkey) = settingsManager.GetHotkeys();
+                    bool hotkeysSet = completeHotkey != Keys.None || skipHotkey != Keys.None;
+
+                    if (hotkeysSet)
+                    {
+                        routeGrid.Rows.Add("Hotkeys are set, but route manager is not initialized.", "");
+                    }
+                    else
+                    {
+                        routeGrid.Rows.Add("Connect to a game or set up hotkeys to load route tracking data", "");
+                    }
                 }
-            }
+            }, "Loading Route Data...");
         }
 
         // ==========MY NOTES==============
@@ -153,7 +156,7 @@ namespace Route_Tracker
             }
 
             RouteManager.SortRouteGridByCompletion(mainForm.routeGrid);
-            RouteManager.ScrollToFirstIncomplete(mainForm.routeGrid);
+            SortingManager.ScrollToFirstIncomplete(mainForm.routeGrid);
             UpdateFilteredCompletionStats(mainForm, entries);
         }
 

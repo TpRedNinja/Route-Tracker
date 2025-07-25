@@ -94,6 +94,12 @@ A class in C# is like a blueprint for an object. Here, you’ll make a class cal
 ### Example: GoW2018GameStats.cs
 
 Below is a template. Replace the example offsets with your real pointer chains.
+
+> **Important:**  
+> If your game is **32-bit**, use `ReadWithCache<T>()` for reading memory.  
+> If your game is **64-bit**, use `ReadWithCache64Bit<T>()` instead.  
+> The developer adding the game should know which method to use based on the game's architecture.
+
 ```csharp
 using System;
 using System.Collections.Generic;
@@ -126,10 +132,10 @@ namespace Route_Tracker
         // This method is required. It returns a dictionary of stats for the tracker to use.
         public override Dictionary<string, object> GetStatsAsDictionary()
         {
-            // ReadWithCache<T> is a helper that reads memory and caches the result for performance.
-            int ravens = ReadWithCache<int>("ravens", (nint)baseAddress, ravenOffsets);
-            int chests = ReadWithCache<int>("chests", (nint)baseAddress, chestOffsets);
-            int artifacts = ReadWithCache<int>("artifacts", (nint)baseAddress, artifactOffsets);
+            // ReadWithCache64Bit<T> is a helper that reads memory and caches the result for performance.
+            int ravens = ReadWithCache64Bit<int>("ravens", (nint)baseAddress, ravenOffsets);
+            int chests = ReadWithCache64Bit<int>("chests", (nint)baseAddress, chestOffsets);
+            int artifacts = ReadWithCache64Bit<int>("artifacts", (nint)baseAddress, artifactOffsets);
 
             return new Dictionary<string, object>
             {
@@ -1187,7 +1193,7 @@ Artifact #1	Artifact	1	Midgard - Lookout Tower
 The enhanced architecture supports:
 
 ### • Memory Optimization
-- `ReadWithCache()` for efficient memory access  
+- `ReadWithCache()`(for 32bit games) or `ReadWithCache64Bit()`(for 64bit games) for efficient memory access  
 - Automatic cache invalidation and adaptive update rates  
 
 ### • Enhanced Backup System
