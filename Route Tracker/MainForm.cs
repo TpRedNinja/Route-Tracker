@@ -24,9 +24,9 @@ namespace Route_Tracker
 
         // Game connection and management
         private readonly string currentProcess = string.Empty;
-        private RouteManager? routeManager;
-        private readonly GameConnectionManager gameConnectionManager;
-        private readonly SettingsManager settingsManager;
+        public RouteManager? routeManager;
+        public readonly GameConnectionManager gameConnectionManager;
+        public readonly SettingsManager settingsManager;
         private LayoutSettingsForm.LayoutMode currentLayoutMode = LayoutSettingsForm.LayoutMode.Normal;
 
         public RouteManager? GetRouteManager() => routeManager;
@@ -111,20 +111,20 @@ namespace Route_Tracker
             {
                 var iconPath = "ProjectIcon_Main.ico";
                 this.Icon = new Icon(iconPath);
-                Debug.WriteLine($"Icon loaded from: {iconPath}");
+                LoggingSystem.LogInfo($"Main icon loaded successfully: {iconPath}");
             }
             catch (Exception exMain)
             {
-                Debug.WriteLine($"Failed to load main icon: {exMain.Message}");
+                LoggingSystem.LogWarning($"Failed to load main icon: {exMain.Message}");
                 try
                 {
                     var altIconPath = "ProjectIcon_Alt.ico";
                     this.Icon = new Icon(altIconPath);
-                    Debug.WriteLine($"Fallback icon loaded from: {altIconPath}");
+                    LoggingSystem.LogInfo($"Fallback icon loaded successfully: {altIconPath}");
                 }
                 catch (Exception exAlt)
                 {
-                    Debug.WriteLine($"Failed to load fallback icon: {exAlt.Message}");
+                    LoggingSystem.LogError("Failed to load both main and fallback icons", exAlt);
                 }
             }
 
@@ -140,6 +140,7 @@ namespace Route_Tracker
 
             this.FormClosing += MainForm_FormClosing;
             this.Text = $"Route Tracker {AppTheme.Version}";
+
         }
 
         // ==========MY NOTES==============
@@ -159,6 +160,7 @@ namespace Route_Tracker
         #endregion
 
         #region UI Layout and Component Creation
+
         // ==========MY NOTES==============
         // Sets up the entire UI from scratch since we're not using the designer
         [SupportedOSPlatform("windows6.1")]
@@ -607,162 +609,20 @@ namespace Route_Tracker
         #region Hotkey Management
         // ==========MY NOTES==============
         // Catches key presses and runs hotkey actions if hotkeys are enabled
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
-        Justification = "NO")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
-        Justification = "because i said so")]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            //Debug.WriteLine($"ProcessCmdKey: {keyData}");
+            // Handle hotkeys through the registry system
+            if (HotkeyActionRegistry.HandleHotkey(this, keyData))
+                return true;
 
-            var shortcuts = settingsManager.GetShortcuts();
-
-            if (keyData == shortcuts.Load)
-            {
-                MainFormHelpers.LoadRouteFile(this);
-                return true;
-            }
-            if (keyData == shortcuts.Save)
-            {
-                routeManager?.SaveProgress(this);
-                return true;
-            }
-            if (keyData == shortcuts.LoadProgress)
-            {
-                MainFormHelpers.LoadProgress(this);
-                return true;
-            }
-            if (keyData == shortcuts.ResetProgress)
-            {
-                MainFormHelpers.ResetProgress(this, routeManager);
-                return true;
-            }
-            if (keyData == shortcuts.Refresh)
-            {
-                LoadRouteDataPublicManager();
-                return true;
-            }
-            if (keyData == shortcuts.Help)
-            {
-                using var wizard = new HelpWizard(new HotkeysSettingsForm(settingsManager));
-                wizard.ShowDialog(this);
-                return true;
-            }
-            if (keyData == shortcuts.FilterClear)
-            {
-                RouteHelpers.ClearFilters(this);
-                return true;
-            }
-            if (keyData == shortcuts.Connect)
-            {
-                using var connectionWindow = new ConnectionWindow(gameConnectionManager, settingsManager);
-                connectionWindow.ShowDialog(this);
-                return true;
-            }
-            if (keyData == shortcuts.GameStats)
-            {
-                RouteHelpers.ShowStatsWindow(this, gameConnectionManager);
-                return true;
-            }
-            if (keyData == shortcuts.RouteStats)
-            {
-                RouteHelpers.ShowCompletionStatsWindow(this, routeManager);
-                return true;
-            }
-            if (keyData == shortcuts.LayoutUp)
-            {
-                CycleLayout(true);
-                return true;
-            }
-            if (keyData == shortcuts.LayoutDown)
-            {
-                CycleLayout(false);
-                return true;
-            }
-            if (keyData == shortcuts.BackupFolder)
-            {
-                settingsManager.OpenBackupFolder();
-                return true;
-            }
-            if (keyData == shortcuts.BackupNow)
-            {
-                settingsManager.BackupSettings();
-                MessageBox.Show("Settings backed up successfully!", "Backup Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return true;
-            }
-            if (keyData == shortcuts.Restore)
-            {
-                var (hasBackup, backupDate, backupVersion) = settingsManager.GetBackupInfo();
-                if (hasBackup)
-                {
-                    var result = MessageBox.Show($"Restore settings from backup?\n\nBackup Date: {backupDate:yyyy-MM-dd HH:mm}\nVersion: {backupVersion}", "Restore Settings", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (result == DialogResult.Yes && settingsManager.RestoreFromBackup())
-                    {
-                        MessageBox.Show("Settings restored successfully!", "Restore Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("No backup found!", "No Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                return true;
-            }
-            if (keyData == shortcuts.SetFolder)
-            {
-                settingsManager.OpenSettingsFolder();
-                return true;
-            }
-            if (keyData == shortcuts.AutoTog)
-            {
-                if (enableAutoStartMenuItem != null)
-                {
-                    enableAutoStartMenuItem.Checked = !enableAutoStartMenuItem.Checked;
-                    settingsManager.SaveSettings(Settings.Default.GameDirectory, enableAutoStartMenuItem.Checked ? Settings.Default.AutoStart : "");
-                }
-                return true;
-            }
-            if (keyData == shortcuts.TopTog)
-            {
-                this.TopMost = !this.TopMost;
-                settingsManager.SaveAlwaysOnTop(this.TopMost);
-                return true;
-            }
-            if (keyData == shortcuts.AdvTog)
-            {
-                var (CompleteHotkey, SkipHotkey, UndoHotkey, GlobalHotkeys, AdvancedHotkeys) = settingsManager.GetAllHotkeySettings();
-                settingsManager.SaveHotkeySettings(UndoHotkey, GlobalHotkeys, !AdvancedHotkeys);
-                return true;
-            }
-            if (keyData == shortcuts.GlobalTog)
-            {
-                var (CompleteHotkey, SkipHotkey, UndoHotkey, GlobalHotkeys, AdvancedHotkeys) = settingsManager.GetAllHotkeySettings();
-                settingsManager.SaveHotkeySettings(UndoHotkey, !GlobalHotkeys, AdvancedHotkeys);
-                UpdateGlobalHotkeys();
-                return true;
-            }
-            if (keyData == shortcuts.SortingUp)
-            {
-                CycleSorting(true);
-                return true;
-            }
-            if (keyData == shortcuts.SortingDown)
-            {
-                CycleSorting(false);
-                return true;
-            }
-            if (keyData == shortcuts.GameDirect)
-            {
-                OpenGameDirectory();
-                return true;
-            }
-
+            // Handle remaining hotkeys that need special processing
             bool handled = MainFormHelpers.ProcessCmdKey(this, settingsManager, routeManager, ref msg, keyData);
             return handled || base.ProcessCmdKey(ref msg, keyData);
         }
 
         // ==========MY NOTES==============
         // Cycles through sorting modes and applies them
-        private void CycleSorting(bool forward)
+        public void CycleSorting(bool forward)
         {
             var currentMode = settingsManager.GetSortingMode();
             var newMode = SortingManager.CycleSortingMode(currentMode, forward);
@@ -778,7 +638,7 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Opens the game directory window
-        private void OpenGameDirectory()
+        public void OpenGameDirectory()
         {
             bool wasTopMost = this.TopMost;
             if (wasTopMost)
@@ -810,7 +670,7 @@ namespace Route_Tracker
             SortingManager.ApplySorting(routeGrid, currentMode);
         }
 
-        private void CycleLayout(bool forward)
+        public void CycleLayout(bool forward)
         {
             var modes = Enum.GetValues<LayoutSettingsForm.LayoutMode>();
             int currentIndex = Array.IndexOf(modes, currentLayoutMode);
@@ -923,11 +783,7 @@ namespace Route_Tracker
         // Loads the last search term when the app starts
         private void LoadLastSearchTerm()
         {
-            string lastTerm = searchHistoryManager.GetLastSearchTerm();
-            if (!string.IsNullOrEmpty(lastTerm))
-            {
-                searchTextBox.Text = lastTerm;
-            }
+            searchTextBox.Text = "";
         }
 
         // ==========MY NOTES==============
@@ -1057,9 +913,7 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Handles app shutdown - cleans up resources properly
-        // ==========MY NOTES==============
-        // Handles app shutdown - cleans up resources properly
-        private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
+        private async void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
         {
             // Save current search term to history before closing
             SaveCurrentSearchToHistory();
@@ -1071,6 +925,34 @@ namespace Route_Tracker
             }
 
             RouteHelpers.CleanupGameStats(gameConnectionManager);
+
+            // Cleanup layout manager cache to prevent memory leaks
+            LayoutManager.DisposeCache();
+
+            // Handle logging system exit process
+            try
+            {
+                // Cancel the closing temporarily to handle async email sending
+                if (!e.Cancel)
+                {
+                    e.Cancel = true;
+
+                    // Handle logging system exit in background
+                    await LoggingSystem.HandleApplicationExit();
+
+                    // Now actually close the application without showing designer errors
+                    this.FormClosing -= MainForm_FormClosing; // Prevent recursion
+
+                    // Force immediate exit to prevent IUIService errors
+                    Environment.Exit(0);
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingSystem.LogError("Error during application exit", ex);
+                // Force exit even if logging fails to prevent IUIService errors
+                Environment.Exit(0);
+            }
         }
         #endregion
     }

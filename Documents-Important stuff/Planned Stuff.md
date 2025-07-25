@@ -6,12 +6,11 @@ This document outlines planned support for additional games and features in Rout
 
 ### Immediate Plans
 - **God of War (2018) & Ragnarök**
-  - Collectible and chest tracking
+  - Collectible tracking
   - Upgrade material tracking
   - Realm tear detection
   - Story progression tracking
   - Favor completion tracking
-  - Collectible detection across all realms
   - Equipment upgrade tracking
   - Rune acquisition tracking
 
@@ -28,7 +27,7 @@ This document outlines planned support for additional games and features in Rout
 - Implement improved UI with game switching
 
 ### Long-term Vision
+- Support for more games with a file detailing all games supported
 - Multi-language support(maybe)
 - LiveSplit integration via server plugin (load routes from splits)(maybe)
-- Support for more games
-- Image support to show collectible locations in-game
+- Image support to show collectible locations in-game when hovering over route entry(maybe)

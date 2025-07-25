@@ -190,20 +190,27 @@ namespace Route_Tracker
                         openDialog.InitialDirectory = routesFolder;
                     }
                 }
-                catch { /* Ignore if we can't access the folder */ }
+                catch (Exception ex)
+                {
+                    LoggingSystem.LogError("Could not access Routes folder", ex);
+                }
 
                 if (openDialog.ShowDialog(mainForm) == DialogResult.OK)
                 {
-                    mainForm.SetRouteManager(new RouteManager(openDialog.FileName, mainForm.GameConnectionManager));
-                    mainForm.LoadRouteDataPublic();
+                    LoadingHelper.ExecuteWithSpinner(mainForm, () =>
+                    {
+                        mainForm.SetRouteManager(new RouteManager(openDialog.FileName, mainForm.GameConnectionManager));
+                        mainForm.LoadRouteDataPublic();
 
-                    string fileName = Path.GetFileName(openDialog.FileName);
-                    MessageBox.Show($"Route loaded successfully: {fileName}", "Route Loaded",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        string fileName = Path.GetFileName(openDialog.FileName);
+                        MessageBox.Show($"Route loaded successfully: {fileName}", "Route Loaded",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }, "Loading Route File...");
                 }
             }
             catch (Exception ex)
             {
+                LoggingSystem.LogError("Failed to load route file", ex);
                 MessageBox.Show($"Error loading route file: {ex.Message}", "Load Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -213,21 +220,34 @@ namespace Route_Tracker
         // Loads progress from saved file
         public static void LoadProgress(MainForm mainForm)
         {
-            RouteManager? routeManager = mainForm.GetRouteManager();
-
-            routeManager ??= mainForm.CreateDefaultRouteManager();
-
-            if (routeManager.LoadEntries().Count == 0)
+            try
             {
-                MessageBox.Show("No route entries found. Make sure the route file exists.", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                RouteManager? routeManager = mainForm.GetRouteManager();
+
+                routeManager ??= mainForm.CreateDefaultRouteManager();
+
+                if (routeManager.LoadEntries().Count == 0)
+                {
+                    LoggingSystem.LogError("No route entries found when trying to load progress");
+                    MessageBox.Show("No route entries found. Make sure the route file exists.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                LoadingHelper.ExecuteWithSpinner(mainForm, () =>
+                {
+                    if (routeManager.LoadProgress(mainForm.routeGrid, mainForm))
+                    {
+                        MessageBox.Show("Progress loaded successfully.", "Load Complete",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }, "Loading Progress...");
             }
-
-            if (routeManager.LoadProgress(mainForm.routeGrid, mainForm))
+            catch (Exception ex)
             {
-                MessageBox.Show("Progress loaded successfully.", "Load Complete",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoggingSystem.LogError("Failed to load progress", ex);
+                MessageBox.Show($"Error loading progress: {ex.Message}", "Load Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -235,28 +255,41 @@ namespace Route_Tracker
         // Resets progress with confirmation
         public static void ResetProgress(MainForm mainForm, RouteManager? routeManager)
         {
-            if (routeManager == null)
+            try
             {
-                routeManager = mainForm.CreateDefaultRouteManager();
-                if (routeManager.LoadEntries().Count == 0)
+                if (routeManager == null)
                 {
-                    MessageBox.Show("No route entries found. Make sure the route file exists.", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    routeManager = mainForm.CreateDefaultRouteManager();
+                    if (routeManager.LoadEntries().Count == 0)
+                    {
+                        LoggingSystem.LogError("No route entries found when trying to reset progress");
+                        MessageBox.Show("No route entries found. Make sure the route file exists.", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+
+                var result = MessageBox.Show(
+                    "Are you sure you want to reset your progress?\n\nThis will delete your autosave and cannot be undone.",
+                    "Reset Progress",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    LoadingHelper.ExecuteWithSpinner(mainForm, () =>
+                    {
+                        routeManager.ResetProgress(mainForm.routeGrid);
+                        MessageBox.Show("Progress has been reset.", "Reset Complete",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }, "Resetting Progress...");
                 }
             }
-
-            var result = MessageBox.Show(
-                "Are you sure you want to reset your progress?\n\nThis will delete your autosave and cannot be undone.",
-                "Reset Progress",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (result == DialogResult.Yes)
+            catch (Exception ex)
             {
-                routeManager.ResetProgress(mainForm.routeGrid);
-                MessageBox.Show("Progress has been reset.", "Reset Complete",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoggingSystem.LogError("Failed to reset progress", ex);
+                MessageBox.Show($"Error resetting progress: {ex.Message}", "Reset Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion

@@ -14,7 +14,7 @@ namespace Route_Tracker
     // This reads all the game stats from memory using addresses and offsets
     // It updates automatically every second to keep the UI in sync with the game
     // The core class that powers the entire tracking functionality
-    public abstract unsafe class GameStatsBase : IGameStats
+    public abstract unsafe class GameStatsBase : IGameStats, IDisposable
     {
         #region current. and old. things
         private readonly Dictionary<string, (object Old, object Current)> _statHistory = [];
@@ -73,7 +73,7 @@ namespace Route_Tracker
         private System.Threading.CancellationTokenSource? _updateCancellationTokenSource;
         private bool _isUpdating = false;
         private readonly int _updateIntervalMs = 1000; // Default update interval of 1 second
-        private System.Threading.Timer? _updateTimer; // Timer that controls the periodic stat updates
+        private AppTimer? _updateTimer; // Timer that controls the periodic stat updates
 
         // Memory cache system
         private readonly Dictionary<string, (DateTime Timestamp, object Value)> _memoryCache = [];
@@ -172,9 +172,13 @@ namespace Route_Tracker
         public void StartUpdating()
         {
             if (_isUpdating) return;
+
             _updateCancellationTokenSource = new System.Threading.CancellationTokenSource();
             _isUpdating = true;
-            _updateTimer = new System.Threading.Timer(UpdateCallback, null, 0, _updateIntervalMs);
+
+            // Use AppTimer instead of SafeTimer
+            _updateTimer ??= AppTimer.CreateBackgroundTimer(_updateIntervalMs, UpdateCallback);
+            _updateTimer.Start();
         }
 
         // ==========FORMAL COMMENT=========
@@ -221,7 +225,8 @@ namespace Route_Tracker
             if (shouldBeActive != _inActiveGameplay)
             {
                 _inActiveGameplay = shouldBeActive;
-                _updateTimer?.Change(0, _inActiveGameplay ? _activeUpdateIntervalMs : _idleUpdateIntervalMs);
+                // Use AppTimer's ChangeInterval method
+                _updateTimer?.ChangeInterval(_inActiveGameplay ? _activeUpdateIntervalMs : _idleUpdateIntervalMs);
             }
         }
 
@@ -267,13 +272,8 @@ namespace Route_Tracker
 
             _isUpdating = false;
 
-            // stop and dispose timer
-            if (_updateTimer != null)
-            {
-                _updateTimer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-                _updateTimer.Dispose();
-                _updateTimer = null;
-            }
+            // Use AppTimer's Stop method
+            _updateTimer?.Stop();
         }
         #endregion
 
@@ -357,6 +357,37 @@ namespace Route_Tracker
         #endregion
 
         #region whatever this is
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Stop updates first
+                StopUpdating();
+
+                // Dispose managed resources
+                _updateTimer?.Dispose();
+                _updateTimer = null;
+
+                _updateCancellationTokenSource?.Dispose();
+                _updateCancellationTokenSource = null;
+
+                // Clear memory cache
+                _memoryCache.Clear();
+
+                // Clear stats history
+                _statHistory.Clear();
+
+                // Clear previous stats
+                _previousStats.Clear();
+            }
+        }
+
         // ==========FORMAL COMMENT=========
         // Windows API import for reading data from the memory of another process
         // ==========MY NOTES==============

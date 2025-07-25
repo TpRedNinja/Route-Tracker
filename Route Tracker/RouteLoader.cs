@@ -21,7 +21,7 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Reads a TSV file and creates RouteEntry objects from each line
         // Expects each line to have at least 3 columns with the right data
-        // Shows debug info in the console to help troubleshoot issues
+        // Logs diagnostic info to help troubleshoot issues
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822",
         Justification = "it breaks everything")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
@@ -31,35 +31,56 @@ namespace Route_Tracker
             List<RouteEntry> entries = [];
             string routePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Routes", filename);
 
-            if (File.Exists(routePath))
+            try
             {
-                foreach (string line in File.ReadAllLines(routePath))
+                if (File.Exists(routePath))
                 {
-                    string[] parts = line.Split('\t');
-                    if (parts.Length >= 4) // Now checking for at least 4 columns (including coordinates)
+                    LoggingSystem.LogInfo($"Loading route file: {filename}");
+
+                    foreach (string line in File.ReadAllLines(routePath))
                     {
-                        string displayText = parts[0].Trim();
-                        string collectibleType = parts[1].Trim().ToLowerInvariant();
-
-                        if (int.TryParse(parts[2].Trim(), out int conditionValue))
+                        string[] parts = line.Split('\t');
+                        if (parts.Length >= 4) // Now checking for at least 4 columns (including coordinates)
                         {
-                            // Create RouteEntry with proper type and condition
-                            RouteEntry entry = new(displayText, collectibleType, conditionValue);
+                            string displayText = parts[0].Trim();
+                            string collectibleType = parts[1].Trim().ToLowerInvariant();
 
-                            // Add coordinates from the fourth column if available
-                            if (parts.Length > 3 && !string.IsNullOrWhiteSpace(parts[3]))
+                            if (int.TryParse(parts[2].Trim(), out int conditionValue))
                             {
-                                entry.Coordinates = parts[3].Trim();
+                                // Create RouteEntry with proper type and condition
+                                RouteEntry entry = new(displayText, collectibleType, conditionValue);
+
+                                // Add coordinates from the fourth column if available
+                                if (parts.Length > 3 && !string.IsNullOrWhiteSpace(parts[3]))
+                                {
+                                    entry.Coordinates = parts[3].Trim();
+                                }
+
+                                entries.Add(entry);
                             }
-
-                            entries.Add(entry);
-
-                            // Debug output
-                            Console.WriteLine($"Loaded: {displayText}, Type: {collectibleType}, Condition: {conditionValue}, Coordinates: {entry.Coordinates}");
+                            else
+                            {
+                                LoggingSystem.LogWarning($"Invalid condition value in route entry: {line}");
+                            }
+                        }
+                        else
+                        {
+                            LoggingSystem.LogWarning($"Invalid route entry format (insufficient columns): {line}");
                         }
                     }
+
+                    LoggingSystem.LogInfo($"Successfully loaded {entries.Count} route entries from {filename}");
+                }
+                else
+                {
+                    LoggingSystem.LogError($"Route file not found: {routePath}");
                 }
             }
+            catch (Exception ex)
+            {
+                LoggingSystem.LogError($"Error loading route file {filename}", ex);
+            }
+
             return entries;
         }
         // ==========FORMAL COMMENT=========
