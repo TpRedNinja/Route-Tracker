@@ -1,4 +1,7 @@
 Name	Type	Condition	Coordinates	Condition for locations
+Fleet Map 1	Treasure Map	1	None	1
+Fleet Map 2	Treasure Map	2	None	1
+Fleet Map 3	Treasure Map	3	None	1
 Viewpoint 1 Cape Bonavista	Viewpoint	1	None	1
 Chest 1 Cape Bonavista	Chest	1	None	1
 Chest 2 Cape Bonavista	Chest	2	None	2
@@ -9,10 +12,9 @@ Viewpoint 2 Cape Bonavista	Viewpoint	2	None	2
 Viewpoint 3 Cape Bonavista	Viewpoint	3	None	3
 Fragment 2 Cape Bonavista	Animus Fragment	2	None	2
 Chest 5 Cape Bonavista	Chest	5	None	5
-Treasure Map Cape Bonavista	Treasure Map	1	None	1
+Treasure Map Cape Bonavista	Treasure Map	4	None	1
 Edward Kennway	Story	1	None	1
-Welcome to Abstergo Entertainment	Modern Day	1	None	1
-Fragment 1 Havana	Animus Fragment	3	None	1
+Welcome to Abstergo Entertainment -> Fragment 1 Havana	Animus Fragment	3	None	1
 Manuscript 1 Havana	Manuscripts	1	None	1
 Viewpoint 1 Havana	Viewpoint	4	None	1
 Chest 1 Havana	Chest	6	None	1
@@ -44,7 +46,7 @@ Fragment 9 Havana	Animus Fragment	11	None	9
 Fragment 10 Havana	Animus Fragment	12	None	10
 Chest 10 Havana	Chest	15	None	10
 Fragment 11 Havana	Animus Fragment	13	None	11
-Treasure Map Havana	Treasure Map	2	None	1
+Treasure Map Havana	Treasure Map	5	None	1
 Shanty 3 Havana	Shanty	3	None	3
 Manuscript 3 Havana	Manuscripts	3	None	3
 Fragment 12 Havana	Animus Fragment	14	None	12
@@ -66,7 +68,7 @@ Chest 2 Uncharted	Chest	20	(457,904)	2
 Fragment 3 Uncharted	Animus Fragment	17	(458,903)	3
  Reload -> Chest 3 Uncharted	Chest	21	(550,816)	3
 Letter 1 Abaco Island	Letters	1	None	1
-Shoot Ocolot (skin) -> Treasure Map Abaco Island	Treasure Map	3	None	1
+Shoot Ocolot (skin) -> Treasure Map Abaco Island	Treasure Map	6	None	1
 Air assassinate Ocolot if near (skin) ->Health Upgrade 1	Upgrades	1	None	1
  Pistol Holster 1	Upgrades	2	None	2
 Fragment 1 Abaco Island	Animus Fragment	18	None	1
@@ -112,7 +114,7 @@ Viewpoint AndreasIsland	Viewpoint	12	None	1
 Chest 3 AndreasIsland	Chest	35	None	3
 Chest 4 AndreasIsland	Chest	36	None	4
 Chest 5 AndreasIsland	Chest	37	None	5
-Treasure Map Andreas Island	Treasure Map	4	None	2
+Treasure Map Andreas Island	Treasure Map	7	None	2
 Return to Boat when timer starts near red zone -> Chest 7 Uncharted	Chest	38	(651,723)	7
 When it says reduce distance to target and new objective appears reload -> Chest 1 CatIsland	Chest	39	None	1
 Fragment 1 CatIsland	Animus Fragment	30	None	1
@@ -126,7 +128,7 @@ Sugarcan and its Yeilds	Story	12	None	12
 Chest 5 CatIsland	Chest	43	None	5
 MyanStone Cat Island	Myan Stones	1	None	1
 Fragment 5 Uncharted	Animus Fragment	32	(819,644)	5
-Quit warp -> Treasure Map Salt Lagoon	Treasure Map	5	None	1
+Quit warp -> Treasure Map Salt Lagoon	Treasure Map	8	None	1
 Start Proper Defenses -> Chest 1 Salt Lagoon	Chest	44	None	1
 Viewpoint Salt Lagoon	Viewpoint	14	None	1
 Fragment 1 Salt Lagoon	Animus Fragment	33	None	1
@@ -140,10 +142,9 @@ Fragment 2 Great Inagua	Animus Fragment	35	None	2
 Chest 3 Great Inagua	Chest	48	None	3
 Fragment 3 Great Inagua	Animus Fragment	36	None	3
 Chest 4 Great Inagua	Chest	49	None	4
-Treasure Map Great Inagua	Treasure Map	6	None	1
+Treasure Map Great Inagua	Treasure Map	9	None	1
 A Single Madman	Story	14	None	14
-A Small Favour	Modern Day	2	None	2
-Fragment 4 Great Inagua	Animus Fragment	37	None	4
+A Small Favour -> Fragment 4 Great Inagua	Animus Fragment	37	None	4
 Chest 5 Great Inagua	Chest	50	None	5
 Reload -> Shanty 2	Shanty	7	None	1
 Letter 4 Great Inagua	Letters	4	None	4
@@ -215,7 +216,7 @@ Chest 2 Tortuga	Chest	83	None	2
 Chest 3 Tortuga	Chest	84	None	3
 Viewpoint Tortuga	Viewpoint	18	None	1
 Fragment 1 Tortuga	Animus Fragment	51	None	1
-Treasure Map Tortuga	Treasure Map	7	None	1
+Treasure Map Tortuga	Treasure Map	10	None	1
 Chest 4 Tortuga	Chest	85	None	4
 Warehouse -> Chest 5 Tortuga	Chest	86	None	5
 Chest 6 Tortuga	Chest	87	None	6
@@ -238,7 +239,7 @@ Capture Navassa	Forts	3	None	3
 Refill ammo if needed -> Start Blind Justice -> Letter 7 Uncharted 1	Letters	7	(798,191)	7
 Chest 12 Uncharted	Chest	93	(800,192)	12
 Blind Justice	Naval Contracts	3	None	3
-Treasure Map Ille A Vache	Treasure Map	8	None	1
+Treasure Map Ille A Vache	Treasure Map	11	None	1
 Chest 1 Ille A Vache	Chest	94	None	1
 Fragment 1 Ille A Vache	Animus Fragment	57	None	1
 Viewpoint Ille A Vache	Viewpoint	20	None	1
@@ -253,7 +254,7 @@ Fragment 1 Cumberland Bay	Animus Fragment	58	None	1
 Fast travel back to Viewpoint -> Chest 1 Cumberland Bay	Chest	96	None	1
 Chest 2 Cumberland Bay	Chest	97	None	2
 Chest 3 Cumberland Bay	Chest	98	None	3
-Treasure Map Cumberland Bay	Treasure Map	9	None	1
+Treasure Map Cumberland Bay	Treasure Map	12	None	1
 Fragment 2 Cumberland Bay	Animus Fragment	59	None	2
 Letter 8 Cumberland Bay	Letters	8	None	8
 Fast travel Ille A Vache viewpoint -> Fragment 2 Ille A Vache	Animus Fragment	60	None	2
@@ -401,7 +402,7 @@ Fast travel to Viewpoint Mariguana -> Fragment 1 Mariguana	Animus Fragment	94	No
 Chest 1 Mariguana	Chest	155	None	1
 Chest 2 Mariguana	Chest	156	None	2
 Chest 3 Mariguana	Chest	157	None	3
-Treasure Map Mariguana	Treasure Map	10	None	1
+Treasure Map Mariguana	Treasure Map	13	None	1
 Chest 4 Mariguana	Chest	158	None	4
 Fragment 2 Mariguana	Animus Fragment	95	None	2
 The Treasure Hunter	Assassin Contracts	14	None	14
@@ -449,8 +450,7 @@ Fragment 2 Jiguey	Animus Fragment	106	None	2
 quit warp -> Letter 12 Jiguey	Letters	12	None	12
 Fragment 20 Uncharted	Animus Fragment	107	(585,592)	20
 The Sige of Charles Town	Story	24	None	24
-Corporate Pressure	Modern Day	3	None	3
-Start We Demand A Parlay -> Fragment 2 Nassua	Animus Fragment	108	None	2
+Corporate Pressure -> Start We Demand A Parlay -> Fragment 2 Nassua	Animus Fragment	108	None	2
 Shanty 2 Nassua	Shanty	16	None	2
 Chest 4 Nassua	Chest	180	None	4
 Fragment 3 Nassua	Animus Fragment	109	None	3
@@ -547,7 +547,7 @@ Chest 6 Isla Providencia	Chest	219	None	6
 Viewpoint 2 Isla Providencia	Viewpoint	40	None	2
 Fragment 4 Isla Providencia	Animus Fragment	127	None	4
 Chest 7 Isla Providencia	Chest	220	None	7
-Treasure Map Isla Providencia	Treasure Map	11	None	1
+Treasure Map Isla Providencia	Treasure Map	14	None	1
 Chest 8 Isla Providencia	Chest	221	None	8
 Chest 9 Isla Providencia	Chest	222	None	9
 Myan Stone 2 Isla Providencia	Myan Stones	9	None	9
@@ -608,11 +608,11 @@ Buried Treasure Pinos Isle	Burired Treasure	12	None	12
 Fragment 2 Pinos Isle	Animus Fragment	141	None	2
 Chest 4 Pinos Isle	Chest	247	None	4
 Chest 5 Pinos Isle	Chest	248	None	5
-Treasure Map Pinos Isle	Treasure Map	12	None	1
+Treasure Map Pinos Isle	Treasure Map	15	None	1
 Do Myan stone puzzle -> Fragment 3 Pinos Isle	Animus Fragment	142	None	3
 Myan Stone 1 Pinos Isle	Myan Stones	10	None	10
 Chest 6 Pinos Isle	Chest	249	None	6
-Fast travel to Cayman Sound Viewpoint ->  Treasure Map Cayman Sound	Treasure Map	13	None	1
+Fast travel to Cayman Sound Viewpoint ->  Treasure Map Cayman Sound	Treasure Map	16	None	1
  Chest 3 Cayman Sound	Chest	250	None	3
 Buried Treasure Cayman Sound	Burired Treasure	13	None	13
 Fast Travel to Chinchorro -> Contraband	Naval Contracts	8	None	8
@@ -652,7 +652,7 @@ Chest 5 Arroyos	Chest	266	None	5
 Fast travel to Chinchorro -> Start Smugglers Den -> Chest 37 Uncharted	Chest	267	(93,292)	37
 Smugglers Den	Naval Contracts	10	None	10
 Fragment 24 Uncharted	Animus Fragment	153	(51,321)	24
-Quit warp -> Treasure Map Corozal	Treasure Map	14	None	1
+Quit warp -> Treasure Map Corozal	Treasure Map	17	None	1
 Chest 1 Corozal	Chest	268	None	1
 Cheat reload -> Manuscript Corozal	Manuscripts	12	None	12
 Chest 2 Corozal	Chest	269	None	2
@@ -672,7 +672,7 @@ The Outlaws Cave	Assassin Contracts	24	None	24
 Chest 2 Ambergris Key	Chest	273	None	8
 Chest 3 Ambergris Key	Chest	274	None	9
 Fragment 2 Ambergris Key	Animus Fragment	158	None	5
-Treasure Map Ambergris Key	Treasure Map	15	None	1
+Treasure Map Ambergris Key	Treasure Map	18	None	1
 Fast Travel to New Bone -> Fragment 3 New Bone	Animus Fragment	159	None	3
 Get The Dreaded Pirate -> Fast travel to Kingston viewpoint near Mission -> Start Imagine My Surprise -> Chest 17 Kingston	Chest	275	None	17
 Manuscript 2 Kingston	Manuscripts	13	None	13
@@ -690,7 +690,7 @@ Swim in water for 5 seconds quit warp -> Chest 1 AnottoBay	Chest	278	None	1
 Fragment 1 AnottoBay	Animus Fragment	163	None	1
 Smugglers Squat	Assassin Contracts	26	None	26
 Chest 2 AnottoBay	Chest	279	None	2
-Treasure Map AnottoBay	Treasure Map	16	None	1
+Treasure Map AnottoBay	Treasure Map	19	None	1
 Chest 3 AnottoBay	Chest	280	None	3
 Buried Treasure AnottoBay	Burired Treasure	15	None	15
 Fragment 2 AnottoBay	Animus Fragment	164	None	2
@@ -721,7 +721,7 @@ Trust is Earned	Story	33	None	33
 Chest 1 Misteriosa	Chest	296	None	1
 Chest 2 Misteriosa	Chest	297	None	2
 Cheat reload -> Myan Stone Puzzle -> Fragment 1 Misteriosa	Animus Fragment	169	None	1
-Treasure Map Misteriosa	Treasure Map	17	None	1
+Treasure Map Misteriosa	Treasure Map	20	None	1
 Viewpoint Misteriosa	Viewpoint	50	None	1
 Buried Treasure Misteriosa	Burired Treasure	17	None	17
 Chest 3 Misteriosa	Chest	298	None	3
@@ -740,7 +740,7 @@ Cheat reload -> Fragment 1 Petite Caverne	Animus Fragment	172	None	1
 Chest 1 Petite Caverne	Chest	302	None	1
 Chest 2 Petite Caverne	Chest	303	None	2
 Buried Treasure Petite Caverne	Burired Treasure	19	None	19
-Treasure Map Petite Caverne	Treasure Map	18	None	1
+Treasure Map Petite Caverne	Treasure Map	21	None	1
 Chest 3 Petite Caverne	Chest	304	None	3
 Fragment 2 Petite Caverne	Animus Fragment	173	None	2
 Chest 4 Petite Caverne	Chest	305	None	4
@@ -748,7 +748,7 @@ Fast travel to La Concepcion Wreck -> Fragment 28 Uncharted	Animus Fragment	174	
 Quit warp -> Letter 18 Santanillas	Letters	18	None	18
 Myan Stone 1 Santanillas	Myan Stones	14	None	14
 Fragment 1 Santanillas	Animus Fragment	175	None	1
-Treasure Map Santanillas	Treasure Map	19	None	1
+Treasure Map Santanillas	Treasure Map	22	None	1
 Chest 1 Santanillas	Chest	306	None	1
 Fragment 2 Santanillas	Animus Fragment	176	None	2
 Myan Stone 2 Santanillas	Myan Stones	15	None	15
@@ -811,8 +811,7 @@ Viewpoint 1 LongBay	Viewpoint	54	None	1
 Myan Stone LongBay	Myan Stones	16	None	16
 (On way out of Observatory) Fragment 4 LongBay	Animus Fragment	188	None	4
 The Observatory	Story	35	None	35
-The Bunker(passcode 1 3577)(passcode2 3777)	Modern Day	4	None	4
-Fragment 13 Kingston	Animus Fragment	189	None	13
+The Bunker(passcode 1 3577)(passcode2 3777) -> Fragment 13 Kingston	Animus Fragment	189	None	13
 Viewpoint 9 Kingston	Viewpoint	55	None	9
 Prison -> Manuscript 5 Kingston	Manuscripts	18	None	18
 Manuscript 6 Kingston	Manuscripts	19	None	19
@@ -855,6 +854,5 @@ Fragment 5 LongBay	Animus Fragment	200	None	5
 Viewpoint 3 LongBay	Viewpoint	58	None	3
 Chest 8 LongBay	Chest	340	None	8
 Ever A Splinter	Story	42	None	42
-A Face From The Past	Modern Day	5	None	5
-...The End	Story	43	None	43
+A Face From The Past -> ...The End	Story	43	None	43
 How Grand, Master Kenway 100% WOOOOOOOO!	Story	44	None	44

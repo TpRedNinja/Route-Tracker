@@ -70,7 +70,7 @@ namespace Route_Tracker
         private const int TavernEndOffset = 0x3228;
         private const int TreasureMapsStartOffset = 0x3250;
         private const int TreasureMapsEndOffset = 0x3408;
-        private static readonly int [] SpecialTreasureMapOffsets = [0x33B8, 0x33CC, 0x33E0, 0x33F4]; // Special treasure map offset we dont count this one
+        private static readonly int [] SpecialTreasureMapOffsets = [0x33F4]; // Special treasure map offset we dont count
         #endregion
 
         #region Progress and Upgrade Tracking
@@ -405,59 +405,3 @@ namespace Route_Tracker
         #endregion
     }
 }
-
-
-/*
-// at top of file define these
-public bool isWindmillFragment = false; // this is used to check if we have collected the windmill fragment
-private DateTime lastViewpointUpdate = DateTime.MinValue;
-private DateTime lastFragmentUpdate = DateTime.MinValue;
-private DateTime lastBuriedUpdate = DateTime.MinValue;
-private const int EXPECTED_FRAGMENT_COUNT = 87; // This is the expected fragment count for windmill check
-
-// in getstats() function/method add this
-{
-    // stats define as normal
-    // ... existing code ...
-    // new code for tracking old and new values of stuff
-    RegisterStat("Buried", buriedtreasure);
-    RegisterStat("Fragments", fragments);
-    RegisterStat("Viewpoints", viewpoints);
-
-    // may move these to a separate method if i can
-    if(Current.Viewpoints > Old.Viewpoints)
-    {
-        lastViewpointUpdate = DateTime.Now;
-    } else if(Current.Fragments > Old.Fragments)
-    {
-        lastFragmentUpdate = DateTime.Now;
-    }
-    else if(Current.Treasure > Old.Treasure)
-    {
-        lastBuriedUpdate = DateTime.Now;
-    }
-}
-
-// function to check if we have collected the windmill fragment
-private void windmillfragment()
-{
-    // case 1: We get viewpoint first then fragment within 10 seconds
-    if (Current.Fragments > Old.Fragments && 
-    (DateTime.Now - lastViewpointUpdate).TotalSeconds <= 10)
-    {
-        isWindmillCollected = true;
-    } else if (Current.Viewpoints > Old.Viewpoints &&
-    (DateTime.Now - lastFragmentUpdate).TotalSeconds <= 10) 
-    // Case 2: Fragment then viewpoint within 10 seconds
-    {
-        isWindmillCollected = true;
-    } else if (Current.Buried == 1 && Current.Fragments > EXPECTED_FRAGMENT_COUNT)
-    // Case 3: First chest (New Bone) collected, but fragments is higher than expected
-    {
-        isWindmillCollected = true;
-    } else
-    {
-        isWindmillCollected = false;
-    }
-}
-*/
