@@ -246,7 +246,7 @@ namespace Route_Tracker
             {
                 lastFragmentUpdate = DateTime.Now;
             }
-            else if (Current.Treasure > Old.Treasure)
+            else if (Current.Buried > Old.Buried)
             {
                 lastBuriedUpdate = DateTime.Now;
             }

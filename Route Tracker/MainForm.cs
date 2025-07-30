@@ -82,7 +82,12 @@ namespace Route_Tracker
         // UI update throttling
         private DateTime _lastUIUpdateTime = DateTime.MinValue;
         private readonly TimeSpan _minimumUIUpdateInterval = TimeSpan.FromMilliseconds(100);
-        
+
+        // route load timers
+        public AppTimer? routeLoadDelayTimer;
+        public DateTime routeLoadedTime = DateTime.MinValue;
+        public bool routeLoadedDelayActive = false;
+
         // global hotkey support
         private bool globalHotkeysRegistered = false;
 
@@ -256,8 +261,10 @@ namespace Route_Tracker
                     {
                         string routeFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Routes", "AC4 100 % Route - Main Route.tsv");
                         routeManager = new RouteManager(routeFilePath, gameConnectionManager);
+                        routeGrid.SuspendLayout();
                         RouteHelpers.LoadRouteData(this, routeManager, routeGrid, settingsManager);
                         ApplyCurrentSorting();
+                        routeGrid.ResumeLayout(true);
                     }
                 }
             };

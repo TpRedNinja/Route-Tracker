@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using System.Diagnostics;
 
 namespace Route_Tracker
 {
+    // ==========MY NOTES==============
+    // Manages different sorting modes for the route grid
+    // Provides methods to sort, filter, and display route entries
     public static class SortingManager
     {
         // ==========MY NOTES==============
@@ -18,8 +21,34 @@ namespace Route_Tracker
 
             LoadingHelper.ExecuteWithSpinner(mainForm, () =>
             {
-                if (routeGrid == null || routeGrid.Rows.Count == 0)
-                    return;
+                ApplySortingInternal(routeGrid, sortingMode);
+            }, "Applying Sorting...");
+        }
+
+        // ==========MY NOTES==============
+        // Applies sorting without showing loading spinner (for automatic updates)
+        // Prevents multiple spinners and scroll jumping during real-time updates
+        public static void ApplySortingQuiet(DataGridView routeGrid, SortingOptionsForm.SortingMode sortingMode)
+        {
+            ApplySortingInternal(routeGrid, sortingMode);
+        }
+
+        // ==========MY NOTES==============
+        // Internal sorting logic that does the actual work
+        // Used by both ApplySorting and ApplySortingQuiet
+        private static void ApplySortingInternal(DataGridView routeGrid, SortingOptionsForm.SortingMode sortingMode)
+        {
+            if (routeGrid == null || routeGrid.Rows.Count == 0)
+                return;
+
+            try
+            {
+                // Store current scroll position to minimize jumping
+                int currentScrollIndex = routeGrid.FirstDisplayedScrollingRowIndex;
+                int selectedRowIndex = routeGrid.CurrentRow?.Index ?? -1;
+
+                // Suspend layout to prevent flickering and scroll jumping
+                routeGrid.SuspendLayout();
 
                 try
                 {
@@ -46,18 +75,30 @@ namespace Route_Tracker
                     // Update the grid with sorted entries
                     UpdateGridWithSortedEntries(routeGrid, sortedEntries);
 
-                    // Scroll to appropriate position
-                    ScrollToAppropriatePosition(routeGrid, sortingMode);
+                    // Only scroll automatically for major operations, not during updates
+                    if (sortingMode != SortingOptionsForm.SortingMode.CompletedAtTop)
+                    {
+                        ScrollToAppropriatePosition(routeGrid, sortingMode);
+                    }
+                    else
+                    {
+                        // For completed at top, just scroll to first incomplete without selection change
+                        ScrollToFirstIncompleteQuiet(routeGrid);
+                    }
 
                     Debug.WriteLine($"Applied sorting mode: {sortingMode}");
                 }
-                catch (Exception ex)
+                finally
                 {
-                    Debug.WriteLine($"Error applying sorting: {ex.Message}");
-                    MessageBox.Show($"Error applying sorting: {ex.Message}", "Sorting Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    routeGrid.ResumeLayout(false); // Don't force layout immediately
                 }
-            }, "Applying Sorting...");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error applying sorting: {ex.Message}");
+                MessageBox.Show($"Error applying sorting: {ex.Message}", "Sorting Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         // ==========MY NOTES==============
@@ -94,7 +135,7 @@ namespace Route_Tracker
         private static void UpdateGridWithSortedEntries(DataGridView routeGrid, List<RouteEntry> sortedEntries)
         {
             routeGrid.Rows.Clear();
-            
+
             foreach (var entry in sortedEntries)
             {
                 string completionMark = entry.IsCompleted ? "X" : "";
@@ -170,6 +211,37 @@ namespace Route_Tracker
             else if (routeGrid.Rows.Count > 0)
             {
                 routeGrid.FirstDisplayedScrollingRowIndex = 0;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Scrolls to first incomplete entry without changing selection (quieter version)
+        // Used during automatic updates to minimize UI disruption
+        private static void ScrollToFirstIncompleteQuiet(DataGridView routeGrid)
+        {
+            if (routeGrid == null || routeGrid.Rows.Count == 0)
+                return;
+
+            int firstIncompleteIndex = -1;
+            for (int i = 0; i < routeGrid.Rows.Count; i++)
+            {
+                if (routeGrid.Rows[i].Tag is RouteEntry entry && !entry.IsCompleted)
+                {
+                    firstIncompleteIndex = i;
+                    break;
+                }
+            }
+
+            if (firstIncompleteIndex >= 0)
+            {
+                // Only scroll if we're not already close to the target
+                int currentScroll = routeGrid.FirstDisplayedScrollingRowIndex;
+                int targetScroll = Math.Max(0, firstIncompleteIndex - 2);
+
+                if (Math.Abs(currentScroll - targetScroll) > 3) // Only scroll if significant difference
+                {
+                    routeGrid.FirstDisplayedScrollingRowIndex = targetScroll;
+                }
             }
         }
 

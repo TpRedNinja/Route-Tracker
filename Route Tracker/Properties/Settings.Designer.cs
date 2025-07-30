@@ -478,5 +478,17 @@ namespace Route_Tracker.Properties {
                 this["GameDirect"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoutesFolderPath {
+            get {
+                return ((string)(this["RoutesFolderPath"]));
+            }
+            set {
+                this["RoutesFolderPath"] = value;
+            }
+        }
     }
 }

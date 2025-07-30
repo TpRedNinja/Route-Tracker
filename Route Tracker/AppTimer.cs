@@ -41,6 +41,24 @@ namespace Route_Tracker
             return timer;
         }
 
+        // ==========MY NOTES==============
+        // Creates a one-shot delay timer for staggered operations
+        public static AppTimer CreateDelayTimer(int delayMs, Action callback)
+        {
+            var timer = new AppTimer(true);
+            timer._winFormsTimer = new System.Windows.Forms.Timer
+            {
+                Interval = delayMs
+            };
+            timer._winFormsTimer.Tick += (s, e) =>
+            {
+                timer.Stop();
+                callback();
+                timer.Dispose();
+            };
+            return timer;
+        }
+
         private AppTimer(bool isUITimer)
         {
             _isUITimer = isUITimer;

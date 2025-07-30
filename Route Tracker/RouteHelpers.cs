@@ -63,18 +63,49 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Fills the route grid with actual data or shows a message
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
-        Justification = "NO")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
-        Justification = "because i said so")]
+        // FIXED: Now properly manages loading spinner to prevent conflicts
         public static void LoadRouteData(MainForm mainForm, RouteManager? routeManager, DataGridView routeGrid, SettingsManager settingsManager)
         {
             LoadingHelper.ExecuteWithSpinner(mainForm, () =>
             {
-                if (routeManager != null)
+                LoadRouteDataCore(mainForm, routeManager, routeGrid, settingsManager);
+            }, "Loading Route Data...");
+        }
+
+        // ==========MY NOTES==============
+        // Core route loading logic without spinner (for internal use)
+        // FIXED: REMOVED all routeGrid.Rows.Add() text - only loads actual route data
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        public static void LoadRouteDataCore(MainForm mainForm, RouteManager? routeManager, DataGridView routeGrid, SettingsManager settingsManager)
+        {
+            if (routeManager != null)
+            {
+                string selectedGame = GetSelectedGameName(mainForm);
+
+                // Load route data (data-only operation)
+                routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame);
+
+                // Check if we have entries loaded
+                var entries = routeManager.LoadEntries();
+                if (entries.Count > 0)
                 {
-                    string selectedGame = GetSelectedGameName(mainForm);
-                    routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame);
+                    // Suspend layout before modifying routeGrid
+                    routeGrid.SuspendLayout();
+
+                    // Clear and show actual entries
+                    routeGrid.Rows.Clear();
+
+                    foreach (var entry in entries)
+                    {
+                        string completionMark = entry.IsCompleted ? "X" : "";
+                        int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                        routeGrid.Rows[rowIndex].Tag = entry;
+                    }
 
                     // Store all entries for filtering
                     mainForm.allRouteEntries.Clear();
@@ -88,76 +119,137 @@ namespace Route_Tracker
 
                     PopulateTypeFilter(mainForm);
 
-                    // RESTORED: USE ALL VALUES FROM CALCULATION
+                    // Calculate completion stats
                     var (percentage, completed, total) = routeManager.CalculateCompletionStats();
                     mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
 
-                    // Apply current sorting mode
-                    var currentMode = settingsManager.GetSortingMode();
-                    SortingManager.ApplySorting(routeGrid, currentMode);
+                    // Dispose previous timer if exists
+                    mainForm.routeLoadDelayTimer?.Dispose();
+
+                    // Set route loaded delay active and start new timer
+                    mainForm.routeLoadedDelayActive = true;
+                    mainForm.routeLoadDelayTimer = AppTimer.CreateDelayTimer(2000, () =>
+                    {
+                        mainForm.routeLoadedDelayActive = false;
+                    });
+                    mainForm.routeLoadDelayTimer.Start();
+
+                    // Set route loaded time for reference
+                    mainForm.routeLoadedTime = DateTime.Now;
+
+                    // Check main menu state
+                    var gameStats = mainForm.gameConnectionManager.GameStats;
+                    bool isMainMenu = gameStats?.GetGameStatus().IsMainMenu ?? false;
+
+                    // Resume layout after all modifications
+                    routeGrid.ResumeLayout(true);
+
+                    // SUCCESS: Show popup notification
+                    string routeFileName = System.IO.Path.GetFileName(routeManager.GetRouteFilePath());
+                    MessageBox.Show($"Route loaded successfully!\n\nFile: {routeFileName}",
+                        "Route Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    LoggingSystem.LogInfo($"Route loaded successfully: {routeFileName} with {entries.Count} entries");
                 }
                 else
                 {
-                    var (completeHotkey, skipHotkey) = settingsManager.GetHotkeys();
-                    bool hotkeysSet = completeHotkey != Keys.None || skipHotkey != Keys.None;
-
-                    if (hotkeysSet)
-                    {
-                        routeGrid.Rows.Add("Hotkeys are set, but route manager is not initialized.", "");
-                    }
-                    else
-                    {
-                        routeGrid.Rows.Add("Connect to a game or set up hotkeys to load route tracking data", "");
-                    }
+                    LoggingSystem.LogError("Failed to load route data: No entries found in route file");
                 }
-            }, "Loading Route Data...");
+            }
+            else
+            {
+                LoggingSystem.LogError("Failed to load route data: RouteManager is null");
+            }
         }
 
         // ==========MY NOTES==============
         // Called automatically when game stats update to mark entries as complete
-        // RESTORED TO ORIGINAL FUNCTIONALITY - ONLY UPDATES IF SOMETHING CHANGED!
+        // FIXED: Prevents conflicts with loading operations by checking spinner state
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060",
         Justification = "NO")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
         Justification = "because i said so")]
         public static void UpdateRouteCompletionStatus(RouteManager? routeManager, DataGridView routeGrid, GameStatsEventArgs stats, Label completionLabel, SettingsManager settingsManager)
         {
-            bool changed = routeManager?.UpdateCompletionStatus(routeGrid, stats) ?? false;
+            // FIXED: Don't update if a loading spinner is active to prevent conflicts
+            if (IsSpinnerActive(routeGrid.FindForm()))
+                return;
 
-            // ONLY UPDATE UI IF SOMETHING ACTUALLY CHANGED - RESTORED ORIGINAL LOGIC!
-            if (changed && routeManager != null)
+            // Suspend layout to prevent scroll jumping during updates
+            routeGrid.SuspendLayout();
+
+            try
             {
-                // RESTORED: USE ALL VALUES FROM CALCULATION - NOT DISCARDED!
-                var (percentage, completed, total) = routeManager.CalculateCompletionStats();
-                completionLabel.Text = $"Completion: {percentage:F2}%";
 
-                UpdateCompletionStatsIfVisible(routeManager);
+                bool changed = routeManager?.UpdateCompletionStatus(routeGrid, stats) ?? false;
+
+                // ONLY UPDATE UI IF SOMETHING ACTUALLY CHANGED
+                if (changed && routeManager != null)
+                {
+                    // Update completion label
+                    var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+                    completionLabel.Text = $"Completion: {percentage:F2}%";
+
+                    UpdateCompletionStatsIfVisible(routeManager);
+
+                    // Apply sorting without triggering additional scroll events
+                    /*var currentMode = settingsManager.GetSortingMode();
+                    SortingManager.ApplySortingQuiet(routeGrid, currentMode);*/
+                }
             }
+            finally
+            {
+                // Always resume layout
+                routeGrid.ResumeLayout(true);
+            }
+        }
 
-            // Apply current sorting mode instead of default sorting
-            var currentMode = settingsManager.GetSortingMode();
-            SortingManager.ApplySorting(routeGrid, currentMode);
+        // ==========MY NOTES==============
+        // Helper method to check if a loading spinner is currently active
+        // Prevents UI operations from interfering with loading operations
+        private static bool IsSpinnerActive(Form? form)
+        {
+            if (form == null) return false;
 
+            // Check if any child control is a LoadingSpinner and is visible
+            foreach (Control control in form.Controls)
+            {
+                if (control is LoadingSpinner spinner && spinner.Visible)
+                    return true;
+            }
+            return false;
         }
         #endregion
 
         #region Filtering (from FilterManager.cs)
         public static void UpdateRouteGridWithEntries(MainForm mainForm, List<RouteEntry> entries)
         {
-            mainForm.routeGrid.Rows.Clear();
+            // Suspend layout to prevent scroll jumping
+            mainForm.routeGrid.SuspendLayout();
 
-            foreach (var entry in entries)
+            try
             {
-                if (entry.IsSkipped) continue;
+                mainForm.routeGrid.Rows.Clear();
 
-                string completionMark = entry.IsCompleted ? "X" : "";
-                int rowIndex = mainForm.routeGrid.Rows.Add(entry.DisplayText, completionMark);
-                mainForm.routeGrid.Rows[rowIndex].Tag = entry;
+                foreach (var entry in entries)
+                {
+                    if (entry.IsSkipped) continue;
+
+                    string completionMark = entry.IsCompleted ? "X" : "";
+                    int rowIndex = mainForm.routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                    mainForm.routeGrid.Rows[rowIndex].Tag = entry;
+                }
+
+                RouteManager.SortRouteGridByCompletion(mainForm.routeGrid);
+                SortingManager.ScrollToFirstIncomplete(mainForm.routeGrid);
+                UpdateFilteredCompletionStats(mainForm, entries);
             }
-
-            RouteManager.SortRouteGridByCompletion(mainForm.routeGrid);
-            SortingManager.ScrollToFirstIncomplete(mainForm.routeGrid);
-            UpdateFilteredCompletionStats(mainForm, entries);
+            finally
+            {
+                mainForm.routeGrid.ResumeLayout(true);
+            }
         }
 
         // ==========MY NOTES==============
@@ -185,10 +277,19 @@ namespace Route_Tracker
                     mainForm.selectedTypes.Contains(entry.Type, StringComparer.OrdinalIgnoreCase));
             }
 
-            UpdateRouteGridWithEntries(mainForm, [.. filteredEntries]);
+            // Suspend layout before updating grid
+            mainForm.routeGrid.SuspendLayout();
+            try
+            {
+                UpdateRouteGridWithEntries(mainForm, [.. filteredEntries]);
+            }
+            finally
+            {
+                mainForm.routeGrid.ResumeLayout(true);
+            }
         }
 
-                // ==========MY NOTES==============
+        // ==========MY NOTES==============
         // Clears both search and type filter when you click the Clear button
         public static void ClearFilters(MainForm mainForm)
         {
@@ -199,7 +300,7 @@ namespace Route_Tracker
                 var searchHistoryManager = new SearchHistoryManager();
                 _ = searchHistoryManager.AddSearchHistoryAsync(currentSearch);
             }
-            
+
             mainForm.searchTextBox.Text = "";
 
             // Clear all type selections and set "All Types" as selected
@@ -227,45 +328,62 @@ namespace Route_Tracker
                 }
             }
 
-            ApplyFilters(mainForm);
+            // Suspend layout before applying filters
+            mainForm.routeGrid.SuspendLayout();
+            try
+            {
+                ApplyFilters(mainForm);
+            }
+            finally
+            {
+                mainForm.routeGrid.ResumeLayout(true);
+            }
         }
 
         // ==========MY NOTES==============
         // Fills the type dropdown with all the different types found in the route
         public static void PopulateTypeFilter(MainForm mainForm)
         {
-            var uniqueTypes = mainForm.allRouteEntries
-                .Select(e => e.Type)
-                .Where(type => !string.IsNullOrEmpty(type))
-                .Distinct()
-                .OrderBy(type => type)
-                .ToList();
-
-            mainForm.typeFilterCheckedListBox.Items.Clear();
-            mainForm.typeFilterCheckedListBox.Items.Add("All Types");
-
-            foreach (string type in uniqueTypes)
+            mainForm.typeFilterCheckedListBox.SuspendLayout();
+            try
             {
-                mainForm.typeFilterCheckedListBox.Items.Add(type);
-            }
+                var uniqueTypes = mainForm.allRouteEntries
+                    .Select(e => e.Type)
+                    .Where(type => !string.IsNullOrEmpty(type))
+                    .Distinct()
+                    .OrderBy(type => type)
+                    .ToList();
 
-            // Set "All Types" as checked and populate selectedTypes
-            mainForm.typeFilterCheckedListBox.SetItemChecked(0, true);
-            mainForm.selectedTypes.Clear();
-            foreach (string type in uniqueTypes)
-            {
-                mainForm.selectedTypes.Add(type);
-            }
+                mainForm.typeFilterCheckedListBox.Items.Clear();
+                mainForm.typeFilterCheckedListBox.Items.Add("All Types");
 
-            // Update the label
-            var typeFilterPanel = mainForm.typeFilterCheckedListBox.Parent;
-            if (typeFilterPanel != null)
-            {
-                var typeFilterLabel = typeFilterPanel.Controls.OfType<Label>().FirstOrDefault();
-                if (typeFilterLabel != null)
+                foreach (string type in uniqueTypes)
                 {
-                    typeFilterLabel.Text = "All Types";
+                    mainForm.typeFilterCheckedListBox.Items.Add(type);
                 }
+
+                // Set "All Types" as checked and populate selectedTypes
+                mainForm.typeFilterCheckedListBox.SetItemChecked(0, true);
+                mainForm.selectedTypes.Clear();
+                foreach (string type in uniqueTypes)
+                {
+                    mainForm.selectedTypes.Add(type);
+                }
+
+                // Update the label
+                var typeFilterPanel = mainForm.typeFilterCheckedListBox.Parent;
+                if (typeFilterPanel != null)
+                {
+                    var typeFilterLabel = typeFilterPanel.Controls.OfType<Label>().FirstOrDefault();
+                    if (typeFilterLabel != null)
+                    {
+                        typeFilterLabel.Text = "All Types";
+                    }
+                }
+            }
+            finally
+            {
+                mainForm.typeFilterCheckedListBox.ResumeLayout(true);
             }
         }
 
@@ -425,6 +543,17 @@ namespace Route_Tracker
             // Throttle UI updates to prevent excessive redraws
             if (DateTime.Now - mainForm.GetLastUIUpdateTime() < mainForm.GetMinimumUIUpdateInterval())
                 return;
+
+            var gameStats = mainForm.gameConnectionManager.GameStats;
+            bool isMainMenu = gameStats?.GetGameStatus().IsMainMenu ?? false;
+
+            // Block stat checking if NOT in main menu and routeLoadedDelayActive is true
+            if (!isMainMenu && mainForm.routeLoadedDelayActive)
+                return;
+
+            // After delay, deactivate flag (timer will also do this, but this is a safety net)
+            if (mainForm.routeLoadedDelayActive && isMainMenu)
+                mainForm.routeLoadedDelayActive = false;
 
             mainForm.SetLastUIUpdateTime(DateTime.Now);
 

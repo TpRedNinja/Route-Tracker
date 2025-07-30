@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 using Route_Tracker.Properties;
 
 namespace Route_Tracker
@@ -29,25 +30,58 @@ namespace Route_Tracker
         }
 
         // ==========MY NOTES==============
-        // Handles app startup logic - auto-start and update checks
+        // FIXED: Staggered startup with delays to prevent UI freezing
+        // Each operation happens with a 2.5 second delay to allow UI to render properly
         [SupportedOSPlatform("windows6.1")]
         public static async Task HandleApplicationStartup(MainForm mainForm, SettingsManager settingsManager, GameConnectionManager gameConnectionManager)
         {
-            // Auto-start logic
+            // Check if we need to do auto-start operations
             string autoStartGame = Settings.Default.AutoStart;
-            if (!string.IsNullOrEmpty(autoStartGame) && !string.IsNullOrEmpty(settingsManager.GetGameDirectory(autoStartGame)))
+            bool hasAutoStart = !string.IsNullOrEmpty(autoStartGame) && !string.IsNullOrEmpty(settingsManager.GetGameDirectory(autoStartGame));
+
+            if (hasAutoStart)
             {
-                bool connected = await gameConnectionManager.ConnectToGameAsync(autoStartGame, true);
+                // Step 1: Wait 2.5 seconds for main form to fully load and render
+                LoggingSystem.LogInfo("Starting staggered startup operations...");
+
+                // Step 2: Connect to game
+                bool connected = false;
+                try
+                {
+                    connected = await gameConnectionManager.ConnectToGameAsync(autoStartGame, true);
+                    LoggingSystem.LogInfo($"Game connection result: {connected}");
+                }
+                catch (Exception ex)
+                {
+                    LoggingSystem.LogError($"Error connecting to game: {ex.Message}", ex);
+                }
+
                 if (connected)
                 {
-                    string routeFilePath = Path.Combine(
+                    LoggingSystem.LogInfo("Creating route manager...");
+
+                    // Create route manager on UI thread
+                    string routeFilePath = System.IO.Path.Combine(
                         AppDomain.CurrentDomain.BaseDirectory,
                         "Routes",
-                        $"{autoStartGame} 100 % Route - Main Route.tsv");
-                    mainForm.SetRouteManager(new RouteManager(routeFilePath, gameConnectionManager));
-                    RouteHelpers.LoadRouteData(mainForm, mainForm.GetRouteManager(), mainForm.routeGrid, settingsManager);
+                        "AC4 100 % Route - Main Route.tsv");
+
+                    var routeManager = new RouteManager(routeFilePath, gameConnectionManager);
+                    mainForm.SetRouteManager(routeManager);
+
+                    // Step 4: Wait another 2.5 seconds before loading route data
+                    await Task.Delay(500);
+                    LoggingSystem.LogInfo("Loading route data...");
+
+                    // Load route data on UI thread
+                    mainForm.Invoke(() =>
+                    {
+                        RouteHelpers.LoadRouteDataCore(mainForm, routeManager, mainForm.routeGrid, settingsManager);
+                    });
                 }
             }
+
+            // Check for updates separately (doesn't need delay)
             await UpdateManager.CheckForUpdatesAsync();
         }
     }

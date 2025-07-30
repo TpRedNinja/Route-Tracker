@@ -87,35 +87,26 @@ namespace Route_Tracker
         // Performs extensive file searching and provides diagnostic feedback
         // Shows route entries with completion status in the DataGridView
         // ==========MY NOTES==============
-        // Fills the route grid with entries from the best matching file
-        // Shows progress messages while it searches for files
-        // Shows errors if files can't be found or loaded properly
+        // FIXED: Removed all UI operations - this now only loads data
+        // The UI layer handles displaying messages and progress updates
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:",
         Justification = "Required for interface compatibility")]
         public void LoadRouteDataIntoGrid(DataGridView routeGrid, string gameName)
         {
-            routeGrid.Rows.Clear();
-            routeGrid.Rows.Add("Searching everywhere for route files...", "");
-
             try
             {
                 // First try to find any Routes folder
                 string? routesFolder = FindRoutesFolderAnywhere();
                 if (routesFolder == null)
                 {
-                    routeGrid.Rows.Add("ERROR: Could not find any Routes folder anywhere!", "");
-                    routeGrid.Rows.Add("Please create a 'Routes' folder somewhere on your system", "");
-                    return;
+                    return; // Let UI layer handle error display
                 }
-
-                routeGrid.Rows.Add($"Found Routes folder at: {routesFolder}", "");
 
                 // Find any TSV file that might be a route file
                 string[] tsvFiles = Directory.GetFiles(routesFolder, "*.tsv");
                 if (tsvFiles.Length == 0)
                 {
-                    routeGrid.Rows.Add("ERROR: No TSV files found in Routes folder!", "");
-                    return;
+                    return; // Let UI layer handle error display
                 }
 
                 // Pick the first file that might be relevant
@@ -135,36 +126,23 @@ namespace Route_Tracker
                 // If no specific match, just take the first TSV file
                 routeFile ??= tsvFiles[0];
 
-                routeGrid.Rows.Add($"Using route file: {routeFile}", "");
-
                 // Load the route entries
                 List<RouteEntry> entries = LoadRouteFromPath(routeFile);
                 if (entries.Count == 0)
                 {
-                    routeGrid.Rows.Add("ERROR: No valid entries found in the route file", "");
-                    return;
-                }
-
-                // Clear diagnostics and show actual entries
-                routeGrid.Rows.Clear();
-                foreach (var entry in entries)
-                {
-                    string completionMark = entry.IsCompleted ? "X" : "";
-                    int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
-                    routeGrid.Rows[rowIndex].Tag = entry;
+                    return; // Let UI layer handle error display
                 }
 
                 // Store the entries for future reference
                 routeEntries = entries;
 
-                // Sort and scroll
-                SortRouteGridByCompletion(routeGrid);
-                SortingManager.ScrollToFirstIncomplete(routeGrid);
+                // REMOVED: All UI operations moved to UI layer
+                // This method now only handles data loading
             }
             catch (Exception ex)
             {
-                routeGrid.Rows.Add($"Error: {ex.Message}", "");
-                routeGrid.Rows.Add($"Stack trace: {ex.StackTrace}", "");
+                LoggingSystem.LogError($"Error loading route data: {ex.Message}", ex);
+                // Let UI layer handle error display
             }
         }
 
@@ -225,29 +203,26 @@ namespace Route_Tracker
         // Remembers where it found the folder to be faster next time
         private static string? FindRoutesFolderAnywhere()
         {
-            // First check the cached location from previous searches
-            if (lastFoundRoutesFolder != null && Directory.Exists(lastFoundRoutesFolder))
+            // First check the persistent setting
+            string? savedPath = Route_Tracker.Properties.Settings.Default.RoutesFolderPath;
+            if (!string.IsNullOrEmpty(savedPath) && Directory.Exists(savedPath))
             {
-                return lastFoundRoutesFolder; // Use cached path if it still exists
+                lastFoundRoutesFolder = savedPath;
+                return savedPath;
             }
 
             // Places to check in order of likelihood
             List<string> possibleLocations =
-    [
-        // App folder and nearby
-        AppDomain.CurrentDomain.BaseDirectory,
+            [
+                AppDomain.CurrentDomain.BaseDirectory,
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".."),
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", ".."),
-        
-        // User folders
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "OneDrive"),
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents"),
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Desktop"),
-        
-        // Project folders (when running from IDE)
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..")
-    ];
+            ];
 
             // First check direct Routes folders in common locations
             foreach (var location in possibleLocations)
@@ -256,7 +231,12 @@ namespace Route_Tracker
                 {
                     string potentialPath = Path.Combine(location, "Routes");
                     if (Directory.Exists(potentialPath))
+                    {
+                        lastFoundRoutesFolder = potentialPath;
+                        Route_Tracker.Properties.Settings.Default.RoutesFolderPath = potentialPath;
+                        Route_Tracker.Properties.Settings.Default.Save();
                         return potentialPath;
+                    }
                 }
                 catch { /* Skip any locations we can't access */ }
             }
@@ -273,24 +253,26 @@ namespace Route_Tracker
                     {
                         try
                         {
-                            // Check for Routes folder in this directory
                             string potentialPath = Path.Combine(dir, "Routes");
                             if (Directory.Exists(potentialPath))
                             {
                                 lastFoundRoutesFolder = potentialPath;
+                                Route_Tracker.Properties.Settings.Default.RoutesFolderPath = potentialPath;
+                                Route_Tracker.Properties.Settings.Default.Save();
                                 return potentialPath;
                             }
 
-                            // Also check children directories one level deeper
                             foreach (var subdir in Directory.GetDirectories(dir))
                             {
                                 try
                                 {
                                     string subPath = Path.Combine(subdir, "Routes");
-                                    if (Directory.Exists(potentialPath))
+                                    if (Directory.Exists(subPath))
                                     {
-                                        lastFoundRoutesFolder = potentialPath;
-                                        return potentialPath;
+                                        lastFoundRoutesFolder = subPath;
+                                        Route_Tracker.Properties.Settings.Default.RoutesFolderPath = subPath;
+                                        Route_Tracker.Properties.Settings.Default.Save();
+                                        return subPath;
                                     }
                                 }
                                 catch { /* Skip any we can't access */ }
@@ -310,8 +292,10 @@ namespace Route_Tracker
                 if (foundPath != null)
                 {
                     lastFoundRoutesFolder = foundPath;
+                    Route_Tracker.Properties.Settings.Default.RoutesFolderPath = foundPath;
+                    Route_Tracker.Properties.Settings.Default.Save();
+                    return foundPath;
                 }
-                return foundPath;
             }
             catch { /* Skip if we can't access */ }
 
@@ -389,14 +373,6 @@ namespace Route_Tracker
             {
                 // Round percentage to 2 decimal places for 100% detection - AC4 specific
                 isGameCompleted = Math.Round(stats.GetValue<float>("Exact Percentage", 0f), 2) >= 100.0f;
-
-                // Log stats for debugging
-                string statsInfo = $"Stats: Percent={stats.GetValue<int>("Completion Percentage", 0)}%, " +
-                    $"PercentFloat={stats.GetValue<float>("Exact Percentage", 0f):F2}%, " +
-                    $"Viewpoints={stats.GetValue<int>("Viewpoints", 0)}, Myan={stats.GetValue<int>("Myan Stones", 0)}, " +
-                    $"Treasure={stats.GetValue<int>("Buried Treasure", 0)}, Fragments={stats.GetValue<int>("Animus Fragments", 0)}, " +
-                    $"Assassin={stats.GetValue<int>("Assassin Contracts", 0)}, Naval={stats.GetValue<int>("Naval Contracts", 0)}";
-                Debug.WriteLine(statsInfo);
 
                 // Handle the case when dropping below 100% after being at 100%
                 if (isAt100Percent && !isGameCompleted)
@@ -481,9 +457,6 @@ namespace Route_Tracker
             // If changes were made sort, scroll, and auto-save
             if (anyChanges)
             {
-                SortRouteGridByCompletion(routeGrid);
-                SortingManager.ScrollToFirstIncomplete(routeGrid);
-
                 // Auto-save whenever any entry is marked as completed
                 AutoSaveProgress();
             }
