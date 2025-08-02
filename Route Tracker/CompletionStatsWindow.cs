@@ -68,7 +68,7 @@ namespace Route_Tracker
 
         public void UpdateStats(float percentage, int completed, int total)
         {
-            percentageLabel.Text = $"Completion: {percentage:F2}%";
+            percentageLabel.Text = percentage == 100.0f? "Completion: 100%" : $"Completion: {percentage:F2}%";
             fractionLabel.Text = $"Completed: {completed}/{total} entries";
         }
     }

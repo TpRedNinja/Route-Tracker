@@ -201,6 +201,7 @@ namespace Route_Tracker
                     {
                         mainForm.SetRouteManager(new RouteManager(openDialog.FileName, mainForm.GameConnectionManager));
                         mainForm.LoadRouteDataPublic();
+                        mainForm.UpdateCurrentLocationLabel();
 
                         string fileName = Path.GetFileName(openDialog.FileName);
                         MessageBox.Show($"Route loaded successfully: {fileName}", "Route Loaded",
@@ -378,6 +379,7 @@ namespace Route_Tracker
             }
 
             UpdateCompletionStats(mainForm, routeManager);
+            mainForm.UpdateCurrentLocationLabel();
         }
 
         // ==========MY NOTES==============
@@ -402,6 +404,7 @@ namespace Route_Tracker
             }
 
             UpdateCompletionStats(mainForm, routeManager);
+            mainForm.UpdateCurrentLocationLabel();
         }
 
         // ==========MY NOTES==============
@@ -417,6 +420,7 @@ namespace Route_Tracker
             {
                 routeManager.UndoEntry(mainForm.routeGrid, targetEntry);
                 UpdateCompletionStats(mainForm, routeManager);
+                mainForm.UpdateCurrentLocationLabel();
             }
         }
 

@@ -32,3 +32,5 @@
     - generate the code with the region included.
     - generate the full region, not just the code inside it.
 12. if a function isnt in a region and you think u can add it to a new region then do so and say so
+13. NEVER generate a single if statement without braces.
+    - Always use braces `{}` for clarity and maintainability.

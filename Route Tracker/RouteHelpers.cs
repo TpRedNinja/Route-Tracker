@@ -121,25 +121,14 @@ namespace Route_Tracker
 
                     // Calculate completion stats
                     var (percentage, completed, total) = routeManager.CalculateCompletionStats();
-                    mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
+                    if (Math.Round(percentage, 2) >= 100.0f)
+                        mainForm.completionLabel.Text = "Completion: 100%";
+                    else
+                        mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
 
-                    // Dispose previous timer if exists
-                    mainForm.routeLoadDelayTimer?.Dispose();
-
-                    // Set route loaded delay active and start new timer
-                    mainForm.routeLoadedDelayActive = true;
-                    mainForm.routeLoadDelayTimer = AppTimer.CreateDelayTimer(2000, () =>
-                    {
-                        mainForm.routeLoadedDelayActive = false;
-                    });
-                    mainForm.routeLoadDelayTimer.Start();
-
-                    // Set route loaded time for reference
-                    mainForm.routeLoadedTime = DateTime.Now;
 
                     // Check main menu state
                     var gameStats = mainForm.gameConnectionManager.GameStats;
-                    bool isMainMenu = gameStats?.GetGameStatus().IsMainMenu ?? false;
 
                     // Resume layout after all modifications
                     routeGrid.ResumeLayout(true);
@@ -190,7 +179,10 @@ namespace Route_Tracker
                 {
                     // Update completion label
                     var (percentage, completed, total) = routeManager.CalculateCompletionStats();
-                    completionLabel.Text = $"Completion: {percentage:F2}%";
+                    if (Math.Round(percentage, 2) >= 100.0f)
+                        completionLabel.Text = "Completion: 100%";
+                    else
+                        completionLabel.Text = $"Completion: {percentage:F2}%";
 
                     UpdateCompletionStatsIfVisible(routeManager);
 
@@ -410,7 +402,11 @@ namespace Route_Tracker
             }
             else
             {
-                mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
+                //mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
+                if (Math.Round(percentage, 2) >= 100.0f)
+                    mainForm.completionLabel.Text = "Completion: 100%";
+                else
+                    mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
             }
         }
         #endregion
@@ -540,22 +536,8 @@ namespace Route_Tracker
         // This catches the stats when they update automatically and updates the UI
         public static void GameStats_StatsUpdated(MainForm mainForm, GameStatsEventArgs e)
         {
-            // Throttle UI updates to prevent excessive redraws
-            if (DateTime.Now - mainForm.GetLastUIUpdateTime() < mainForm.GetMinimumUIUpdateInterval())
-                return;
 
             var gameStats = mainForm.gameConnectionManager.GameStats;
-            bool isMainMenu = gameStats?.GetGameStatus().IsMainMenu ?? false;
-
-            // Block stat checking if NOT in main menu and routeLoadedDelayActive is true
-            if (!isMainMenu && mainForm.routeLoadedDelayActive)
-                return;
-
-            // After delay, deactivate flag (timer will also do this, but this is a safety net)
-            if (mainForm.routeLoadedDelayActive && isMainMenu)
-                mainForm.routeLoadedDelayActive = false;
-
-            mainForm.SetLastUIUpdateTime(DateTime.Now);
 
             mainForm.Invoke(() =>
             {
@@ -642,8 +624,27 @@ namespace Route_Tracker
         // Builds the formatted stats text for display in the stats window
         private static string BuildStatsText(Dictionary<string, object> statsDict)
         {
+            float exactPercentage = 0f;
+            if (statsDict.TryGetValue("Exact Percentage", out var obj))
+            {
+                if (obj is float f)
+                    exactPercentage = f;
+                else if (obj is double d)
+                    exactPercentage = (float)d;
+                else if (obj is string s && float.TryParse(s, out var parsed))
+                    exactPercentage = parsed;
+                else if (obj is int i)
+                    exactPercentage = i;
+            }
+
+            string exactPercentageText;
+            if (Math.Round(exactPercentage, 2) >= 100.0f)
+                exactPercentageText = "100%";
+            else
+                exactPercentageText = $"{exactPercentage:F2}%";
+
             return $"Completion Percentage: {statsDict.GetValueOrDefault("Completion Percentage", 0)}%\n" +
-                   $"Completion Percentage Exact: {statsDict.GetValueOrDefault("Exact Percentage", 0):F2}%\n" +
+                   $"Completion Percentage Exact: {exactPercentageText}%\n" +
                    $"Viewpoints Completed: {statsDict.GetValueOrDefault("Viewpoints", 0)}\n" +
                    $"Myan Stones Collected: {statsDict.GetValueOrDefault("Myan Stones", 0)}\n" +
                    $"Buried Treasure Collected: {statsDict.GetValueOrDefault("Buried Treasure", 0)}\n" +
@@ -679,9 +680,27 @@ namespace Route_Tracker
         {
             if (statsWindow != null && statsWindow.Visible)
             {
+                // Safely extract "Exact Percentage" as float
+                float exactPercentage = 0f;
+                var obj = e.GetValue<object>("Exact Percentage", 0f);
+                if (obj is float f)
+                    exactPercentage = f;
+                else if (obj is double d)
+                    exactPercentage = (float)d;
+                else if (obj is string s && float.TryParse(s, out var parsed))
+                    exactPercentage = parsed;
+                else if (obj is int i)
+                    exactPercentage = i;
+
+                string exactPercentageText;
+                if (Math.Round(exactPercentage, 2) >= 100.0f)
+                    exactPercentageText = "100%";
+                else
+                    exactPercentageText = $"{exactPercentage:F2}%";
+
                 string statsText =
                     $"Completion Percentage: {e.GetValue<int>("Completion Percentage", 0)}%\n" +
-                    $"Completion Percentage Exact: {e.GetValue<float>("Exact Percentage", 0f):F2}%\n" +
+                    $"Completion Percentage Exact: {exactPercentageText}%\n" +
                     $"Viewpoints Completed: {e.GetValue<int>("Viewpoints", 0)}\n" +
                     $"Myan Stones Collected: {e.GetValue<int>("Myan Stones", 0)}\n" +
                     $"Buried Treasure Collected: {e.GetValue<int>("Buried Treasure", 0)}\n" +

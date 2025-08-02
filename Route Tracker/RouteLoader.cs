@@ -40,28 +40,36 @@ namespace Route_Tracker
                     foreach (string line in File.ReadAllLines(routePath))
                     {
                         string[] parts = line.Split('\t');
-                        if (parts.Length >= 4) // Now checking for at least 4 columns (including coordinates)
+                        if (parts.Length >= 6)
                         {
                             string displayText = parts[0].Trim();
                             string collectibleType = parts[1].Trim().ToLowerInvariant();
 
-                            if (int.TryParse(parts[2].Trim(), out int conditionValue))
-                            {
-                                // Create RouteEntry with proper type and condition
-                                RouteEntry entry = new(displayText, collectibleType, conditionValue);
-
-                                // Add coordinates from the fourth column if available
-                                if (parts.Length > 3 && !string.IsNullOrWhiteSpace(parts[3]))
-                                {
-                                    entry.Coordinates = parts[3].Trim();
-                                }
-
-                                entries.Add(entry);
-                            }
-                            else
+                            bool conditionParsed = int.TryParse(parts[2].Trim(), out int conditionValue);
+                            if (!conditionParsed)
                             {
                                 LoggingSystem.LogWarning($"Invalid condition value in route entry: {line}");
+                                continue;
                             }
+
+                            string coordinates = parts[3].Trim();
+                            string location = parts[4].Trim();
+
+                            bool locationConditionParsed = int.TryParse(parts[5].Trim(), out int locationCondition);
+                            if (!locationConditionParsed)
+                            {
+                                LoggingSystem.LogWarning($"Invalid location condition value in route entry: {line}");
+                                continue;
+                            }
+
+                            RouteEntry entry = new(displayText, collectibleType, conditionValue, location, locationCondition);
+
+                            if (!string.IsNullOrWhiteSpace(coordinates))
+                            {
+                                entry.Coordinates = coordinates;
+                            }
+
+                            entries.Add(entry);
                         }
                         else
                         {
@@ -83,6 +91,7 @@ namespace Route_Tracker
 
             return entries;
         }
+
         // ==========FORMAL COMMENT=========
         // Retrieves a list of available route files in the Routes directory
         // Returns filenames of all TSV files that can be loaded as routes

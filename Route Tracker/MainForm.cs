@@ -40,11 +40,6 @@ namespace Route_Tracker
         public void SetHotkeysEnabled(bool enabled) => isHotkeysEnabled = enabled;
         public void SetCurrentLayoutMode(LayoutSettingsForm.LayoutMode mode) => currentLayoutMode = mode;
         public void RefreshAutoStartDropdownPublic() => SettingsMenuManager.RefreshAutoStartDropdown(this, settingsManager);
-        public DateTime GetLastUIUpdateTime() => _lastUIUpdateTime;
-        public TimeSpan GetMinimumUIUpdateInterval() => _minimumUIUpdateInterval;
-        public void SetLastUIUpdateTime(DateTime time) => _lastUIUpdateTime = time;
-        public void UpdateRouteCompletionStatusPublic(GameStatsEventArgs stats) =>
-        RouteHelpers.UpdateRouteCompletionStatus(routeManager, routeGrid, stats, completionLabel, settingsManager);
         public void LoadRouteDataPublicManager() => RouteHelpers.LoadRouteData(this, routeManager, routeGrid, settingsManager);
         public bool IsHotkeysEnabled => isHotkeysEnabled;
 
@@ -53,6 +48,7 @@ namespace Route_Tracker
         public Button showCompletionButton = null!;
         public DataGridView routeGrid = null!;
         public Label completionLabel = null!;
+        public Label currentLocationLabel = null!;
         public TextBox gameDirectoryTextBox = null!;
         private Label helpShortcutLabel = null!;
 
@@ -78,15 +74,6 @@ namespace Route_Tracker
         // Application state
         private bool isHotkeysEnabled = false;
         private readonly string lastSelectedGame = string.Empty;
-
-        // UI update throttling
-        private DateTime _lastUIUpdateTime = DateTime.MinValue;
-        private readonly TimeSpan _minimumUIUpdateInterval = TimeSpan.FromMilliseconds(100);
-
-        // route load timers
-        public AppTimer? routeLoadDelayTimer;
-        public DateTime routeLoadedTime = DateTime.MinValue;
-        public bool routeLoadedDelayActive = false;
 
         // global hotkey support
         private bool globalHotkeysRegistered = false;
@@ -263,6 +250,7 @@ namespace Route_Tracker
                         routeManager = new RouteManager(routeFilePath, gameConnectionManager);
                         routeGrid.SuspendLayout();
                         RouteHelpers.LoadRouteData(this, routeManager, routeGrid, settingsManager);
+                        UpdateCurrentLocationLabel();
                         ApplyCurrentSorting();
                         routeGrid.ResumeLayout(true);
                     }
@@ -518,6 +506,12 @@ namespace Route_Tracker
             return topBar;
         }
 
+        public void UpdateRouteCompletionStatusPublic(GameStatsEventArgs stats)
+        {
+            RouteHelpers.UpdateRouteCompletionStatus(routeManager, routeGrid, stats, completionLabel, settingsManager);
+            UpdateCurrentLocationLabel();
+        }
+
         private void UpdateTypeFilterLabel(Label typeFilterLabel)
         {
             if (selectedTypes.Count == 0)
@@ -561,11 +555,34 @@ namespace Route_Tracker
                 Padding = new Padding(0, 3, 0, 3)
             };
 
+            // Add the new label for current location
+            currentLocationLabel = new Label
+            {
+                Text = "Current Location: ",
+                AutoSize = true,
+                TextAlign = ContentAlignment.MiddleLeft,
+                ForeColor = AppTheme.TextColor,
+                Font = new Font(AppTheme.DefaultFont.FontFamily, AppTheme.DefaultFont.Size + 2),
+                Location = new Point(completionLabel.Right + 30, 0),
+                Padding = new Padding(20, 3, 0, 3)
+            };
+
             labelPanel.Controls.Add(completionLabel);
+            labelPanel.Controls.Add(currentLocationLabel);
+
             var tooltip = new ToolTip();
             tooltip.SetToolTip(completionLabel, "Shows the current completion percentage based on completed route entries.");
+            tooltip.SetToolTip(currentLocationLabel, "Shows the location for the next uncompleted route entry.");
 
             return labelPanel;
+        }
+
+        public void UpdateCurrentLocationLabel()
+        {
+            if (routeManager != null)
+                currentLocationLabel.Text = $"Current Location: {routeManager.GetCurrentLocation()}";
+            else
+                currentLocationLabel.Text = "Current Location: ";
         }
 
         // update help shortcut label based on current hotkey settings

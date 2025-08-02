@@ -66,6 +66,8 @@ namespace Route_Tracker
         // Ranges for flag-based collectibles
         private const int ChestStartOffset = 0x67C;
         private const int ChestEndOffset = 0xA8C;
+        private const int FragmentsStartOffset = -0xAA0;
+        private const int FragmentsEndOffset = -0x690;
         private const int TavernStartOffset = 0x319C;
         private const int TavernEndOffset = 0x3228;
         private const int TreasureMapsStartOffset = 0x3250;
@@ -87,6 +89,7 @@ namespace Route_Tracker
         // this is used to increment the completed modern day mission count and update the state for the next transition.
         private int oldcharacter = 0;
         private int totalUpgrades = 0;
+        private int totalFragments = 0;
 
         // for windmill fragment check
         public bool isWindmillFragment = false; // this is used to check if we have collected the windmill fragment
@@ -94,6 +97,13 @@ namespace Route_Tracker
         private DateTime lastFragmentUpdate = DateTime.MinValue;
         private DateTime lastBuriedUpdate = DateTime.MinValue;
         private const int EXPECTED_FRAGMENT_COUNT = 87; // This is the expected fragment count for windmill check
+        #endregion
+
+        #region Dictionarys for collectibles
+        public Dictionary<string, int> LocationChestCounts { get; } = [];
+        public Dictionary<string, int> LocationFragmentCounts { get; } = [];
+        public Dictionary<string, int> LocationTavernCounts { get; } = [];
+        public Dictionary<string, int> LocationTreasureMapCounts { get; } = [];
         #endregion
 
         // ==========FORMAL COMMENT=========
@@ -158,7 +168,26 @@ namespace Route_Tracker
             {
                 // skip these maps as the user should have them collected already or the map isnt used anyways
                 if (SpecialTreasureMapOffsets.Contains(thirdOffset)) continue;
-                count += ReadCollectible(thirdOffset);
+
+                int value = ReadCollectible(thirdOffset);
+                count += value;
+
+                if (AC4CollectibleOffsets.ChestOffsetToLocation.TryGetValue(thirdOffset, out string? LocationNameChest))
+                {
+                    LocationChestCounts[LocationNameChest] = value;
+                } 
+                if (AC4CollectibleOffsets.FragmentOffsetToLocation.TryGetValue(thirdOffset, out string? LocationNameFragment))
+                {
+                    LocationFragmentCounts[LocationNameFragment] = value;
+                }
+                if (AC4CollectibleOffsets.TavernOffsetToLocation.TryGetValue(thirdOffset, out string? LocationNameTavern))
+                {
+                    LocationTavernCounts[LocationNameTavern] = value;
+                }
+                if (AC4CollectibleOffsets.TreasureMapOffsetToLocation.TryGetValue(thirdOffset, out string? LocationNameTreasureMap))
+                {
+                    LocationTreasureMapCounts[LocationNameTreasureMap] = value;
+                }
             }
 
             // Store in cache
@@ -224,6 +253,7 @@ namespace Route_Tracker
             int music = ReadCollectible(MusicThirdOffset);
             int taverns = CountCollectibles(TavernStartOffset, TavernEndOffset);
             int totalChests = CountCollectibles(ChestStartOffset, ChestEndOffset);
+            totalFragments = CountCollectibles(FragmentsStartOffset, FragmentsEndOffset);
             totalUpgrades = ReadCollectible(HeroUpgradeThirdOffset);
 
             // legendary ship,templar hunt, storymissions, and treasuremaps counts
@@ -260,6 +290,7 @@ namespace Route_Tracker
             // call windmill fragment check
             Windmillfragment();
 
+            //Debug.WriteLine($"AC4 PercentFloat: {percentFloat:F5}");
             // Return all the stats (including the basic ones that we got from memory)
             return (percent, percentFloat, viewpoints, myan, treasure, fragments, assassin, naval,
                 letters, manuscripts, music, forts, taverns, totalChests);

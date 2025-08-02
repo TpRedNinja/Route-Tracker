@@ -165,7 +165,7 @@ namespace Route_Tracker
                     continue;
 
                 string[] parts = line.Split('\t');
-                if (parts.Length >= 3)
+                if (parts.Length >= 6)
                 {
                     string displayText = parts[0].Trim();
 
@@ -175,18 +175,32 @@ namespace Route_Tracker
 
                     string conditionType = parts[1].Trim();
 
-                    if (int.TryParse(parts[2].Trim(), out int conditionValue))
+                    bool conditionParsed = int.TryParse(parts[2].Trim(), out int conditionValue);
+                    if (!conditionParsed)
                     {
-                        RouteEntry entry = new(displayText, conditionType, conditionValue);
-
-                        // Add coordinates from the fourth column if available
-                        if (parts.Length > 3 && !string.IsNullOrWhiteSpace(parts[3]))
-                        {
-                            entry.Coordinates = parts[3].Trim();
-                        }
-
-                        entries.Add(entry);
+                        LoggingSystem.LogWarning($"Invalid condition value in route entry: {line}");
+                        continue;
                     }
+
+                    string coordinates = parts[3].Trim();
+                    string location = parts[4].Trim();
+
+                    bool locationConditionParsed = int.TryParse(parts[5].Trim(), out int locationCondition);
+                    if (!locationConditionParsed)
+                    {
+                        LoggingSystem.LogWarning($"Invalid location condition value in route entry: {line}");
+                        continue;
+                    }
+
+                    RouteEntry entry = new(displayText, conditionType, conditionValue, location, locationCondition);
+
+                    // Add coordinates from the fourth column if available
+                    if (!string.IsNullOrWhiteSpace(coordinates))
+                    {
+                        entry.Coordinates = coordinates;
+                    }
+
+                    entries.Add(entry);
                 }
             }
 
@@ -443,6 +457,7 @@ namespace Route_Tracker
                 {
                     // Check if this entry should be completed based on its conditions
                     bool shouldBeCompleted = CheckCompletion(entry, stats);
+                    //Debug.WriteLine($"CheckCompletion: Entry '{entry.Name}' (Type: {entry.Type}, Condition: {entry.Condition}, Location: {entry.Location}, LocationCondition: {entry.LocationCondition}) => shouldBeCompleted: {shouldBeCompleted}, wasCompleted: {entry.IsCompleted}");
 
                     // Only update if completion status has changed
                     if (shouldBeCompleted != entry.IsCompleted)
@@ -450,6 +465,7 @@ namespace Route_Tracker
                         entry.IsCompleted = shouldBeCompleted;
                         row.Cells[1].Value = shouldBeCompleted ? "X" : "";
                         anyChanges = true;
+                        Debug.WriteLine($"Completion status changed for '{entry.Name}': Now {(shouldBeCompleted ? "Completed" : "Incomplete")}");
                     }
                 }
             }
@@ -483,10 +499,6 @@ namespace Route_Tracker
             if (string.IsNullOrEmpty(entry.Type))
                 return false;
 
-            // Enforce prerequisite for ALL entries (not just upgrades)
-            if (entry.Prerequisite != null && !entry.Prerequisite.IsCompleted)
-                return false;
-
             // Normalize for comparison (trim and ignore case)
             string normalizedType = entry.Type.Trim();
 
@@ -500,14 +512,63 @@ namespace Route_Tracker
                 specialCounts = specialActivities;
             }
             */
+            var ac4Stats = gameConnectionManager?.GameStats as AC4GameStats;
+
+            if (normalizedType.Equals("Chest", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(entry.Location) && ac4Stats != null)
+            {
+                if (ac4Stats.LocationChestCounts.TryGetValue(entry.Location, out int chestCount))
+                {
+                    //Debug.WriteLine($"Entry Location: Location: {entry.Location}");
+                    return chestCount >= entry.LocationCondition;
+                }
+                else
+                {
+                    Debug.WriteLine($"Location '{entry.Location}' not found in LocationChestCounts for entry '{entry.Name}'. Dictionary contents: {System.Text.Json.JsonSerializer.Serialize(ac4Stats.LocationChestCounts)}");
+                }
+            }
+            else if (normalizedType.Equals("Animus Fragment", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(entry.Location) && ac4Stats != null)
+            {
+                if (ac4Stats.LocationFragmentCounts.TryGetValue(entry.Location, out int fragmentCount))
+                {
+                    //Debug.WriteLine($"Entry Location: Location: {entry.Location}");
+                    return fragmentCount >= entry.LocationCondition;
+                }
+                else
+                {
+                    Debug.WriteLine($"Location '{entry.Location}' not found in LocationChestCounts for entry '{entry.Name}'. Dictionary contents: {System.Text.Json.JsonSerializer.Serialize(ac4Stats.LocationFragmentCounts)}");
+                }
+            }
+            else if (normalizedType.Equals("Taverns", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(entry.Location) && ac4Stats != null)
+            {
+                if (ac4Stats.LocationTavernCounts.TryGetValue(entry.Location, out int tavernCount))
+                {
+                    return tavernCount >= entry.LocationCondition;
+                }
+                else
+                {
+                    Debug.WriteLine($"Location '{entry.Location}' not found in LocationChestCounts for entry '{entry.Name}'. Dictionary contents: {System.Text.Json.JsonSerializer.Serialize(ac4Stats.LocationTavernCounts)}");
+                }
+            } 
+            else if (normalizedType.Equals("Treasure Map", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(entry.Location) && ac4Stats != null)
+            {
+                if (ac4Stats.LocationTreasureMapCounts.TryGetValue(entry.Location, out int mapCount))
+                {
+                    return mapCount >= entry.LocationCondition;
+                }
+                else
+                {
+                    Debug.WriteLine($"Location '{entry.Location}' not found in LocationChestCounts for entry '{entry.Name}'. Dictionary contents: {System.Text.Json.JsonSerializer.Serialize(ac4Stats.LocationTreasureMapCounts)}");
+                }
+            }
 
             // Use your exact names for matching with dictionary-based approach
             return normalizedType switch
             {
+
                 "Story" or "story" => stats.GetValue<int>("Story Missions", 0) >= entry.Condition,
                 "Viewpoint" or "viewpoint" => stats.GetValue<int>("Viewpoints", 0) >= entry.Condition,
-                "Chest" or "chest" => stats.GetValue<int>("Chests", 0) >= entry.Condition,
-                "Animus Fragment" or "animus fragment" => stats.GetValue<int>("Animus Fragments", 0) >= entry.Condition,
+                //"Chest" or "chest" => stats.GetValue<int>("Chests", 0) >= entry.Condition,
+                //"Animus Fragment" or "animus fragment" => stats.GetValue<int>("Animus Fragments", 0) >= entry.Condition,
                 "Myan Stones" or "myan stones" => stats.GetValue<int>("Myan Stones", 0) >= entry.Condition,
                 "Burired Treasure" or "burired treasure" => stats.GetValue<int>("Buried Treasure", 0) >= entry.Condition,
                 "Assassin Contracts" or "assassin contracts" => stats.GetValue<int>("Assassin Contracts", 0) >= entry.Condition,
@@ -516,11 +577,11 @@ namespace Route_Tracker
                 "Manuscripts" or "manuscripts" => stats.GetValue<int>("Manuscripts", 0) >= entry.Condition,
                 "Shanty" or "shanty" => stats.GetValue<int>("Music Sheets", 0) >= entry.Condition,
                 "Forts" or "forts" => stats.GetValue<int>("Forts", 0) >= entry.Condition,
-                "Taverns" or "taverns" => stats.GetValue<int>("Taverns", 0) >= entry.Condition,
+                //"Taverns" or "taverns" => stats.GetValue<int>("Taverns", 0) >= entry.Condition,
                 "Legendary Ships" or "legendary ships" => stats.GetValue<int>("Legendary Ships", 0) >= entry.Condition,
                 "Templar Hunts" or "templar hunts" => stats.GetValue<int>("Templar Hunts", 0) >= entry.Condition,
-                "Treasure Map" or "treasure map" => stats.GetValue<int>("Treasure Maps", 0) >= entry.Condition,
-                "Modern Day" or "modern day" => stats.GetValue<int>("Modern Day Missions", 0) >= entry.Condition,
+                //"Treasure Map" or "treasure map" => stats.GetValue<int>("Treasure Maps", 0) >= entry.Condition,
+                //"Modern Day" or "modern day" => stats.GetValue<int>("Modern Day Missions", 0) >= entry.Condition,
                 "Upgrades" or "upgrades" => stats.GetValue<int>("Hero Upgrades", 0) >= entry.Condition,
                 _ => false,
             };
@@ -1382,7 +1443,7 @@ namespace Route_Tracker
         }
         #endregion
 
-        #region completion percentage
+        #region Labels
         public (float CompletionPercentage, int CompletedCount, int TotalCount) CalculateCompletionStats()
         {
             if (routeEntries == null || routeEntries.Count == 0)
@@ -1396,6 +1457,12 @@ namespace Route_Tracker
                 : 0.00f;
 
             return (percentage, completedEntries, totalEntries);
+        }
+
+        public string GetCurrentLocation()
+        {
+            var entry = routeEntries.FirstOrDefault(e => !e.IsCompleted && !e.IsSkipped);
+            return entry?.Location ?? string.Empty;
         }
         #endregion
     }
