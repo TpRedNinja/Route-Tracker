@@ -162,12 +162,45 @@ namespace Route_Tracker
             [0x337C] = "Cumberland Bay",
             [0x3390] = "Mariguana",
             [0x33A4] = "Cayman Sound",
-            [0x33B8] = "Cape Bonavista",
-            [0x33CC] = "Cape Bonavista",
-            [0x33E0] = "Cape Bonavista",
+            [0x33B8] = "Uncharted1",
+            [0x33CC] = "Uncharted2",
+            [0x33E0] = "Uncharted",
             [0x33F4] = "Special",
             [0x3408] = "Cape Bonavista"
         };
 
+        // Viewpoint Dictionary
+        public static readonly Dictionary<int, string> ViewpointOffsetToLocation = new()
+        {
+            [0x2BAC] = "Havana",
+            [0x2BC0] = "Kingston",
+            [0x2BD4] = "Nassua",
+            [0x2BE8] = "Abaco Island",
+            [0x2BFC] = "Cayman Sound",
+            [0x2C10] = "Corozal",
+            [0x2C24] = "Florida",
+            [0x2C38] = "Ille A Vache",
+            [0x2C4C] = "Andreas Island",
+            [0x2C60] = "Mariguana",
+            [0x2C74] = "Cumberland Bay",
+            [0x2C88] = "Salt Lagoon",
+            [0x2C9C] = "Cat Island",
+            [0x2CB0] = "Matanzas",
+            [0x2CC4] = "New Bone",
+            [0x2CD8] = "Tortuga",
+            [0x2CEC] = "Pinos Isle",
+            [0x2D00] = "Misteriosa",
+            [0x2D14] = "Santanillas",
+            [0x2D28] = "Arroyos",
+            [0x2D3C] = "Crooked Island",
+            [0x2D50] = "Grand Cayman",
+            [0x2D64] = "Salt Key Bank",
+            [0x2D78] = "Great Igauna",
+            [0x2E90] = "Isla Providencia",
+            [0x2EA4] = "Principe",
+            [0x2EB8] = "Long Bay",
+            [0x2ECC] = "Tulum",
+            [0x2EE0] = "Cape Bonavista"
+        };
     }
 }

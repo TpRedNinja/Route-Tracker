@@ -141,7 +141,7 @@ LuaCall(cycleFullCompact(nil,false))
           <Address>"AC4BFSP.exe"+026BEAC0</Address>
           <Offsets>
             <Offset>18</Offset>
-            <Offset>-1B30</Offset>
+            <Offset>2B98</Offset>
             <Offset>8BC</Offset>
             <Offset>2D0</Offset>
           </Offsets>
@@ -298,18 +298,205 @@ LuaCall(cycleFullCompact(nil,false))
       </CheatEntries>
     </CheatEntry>
     <CheatEntry>
-      <ID>157</ID>
-      <Description>"Areas"</Description>
-      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <ID>611</ID>
+      <Description>"Missions"</Description>
+      <Options moHideChildren="1"/>
       <GroupHeader>1</GroupHeader>
       <CheatEntries>
         <CheatEntry>
-          <ID>109</ID>
-          <Description>"Location"</Description>
-          <ShowAsSigned>0</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>AC4BFSP.exe+26C1F80</Address>
+          <ID>383</ID>
+          <Description>"Sequences"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>389</ID>
+              <Description>"Sequence 13 Mission Counter"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-3D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>388</ID>
+              <Description>"Sequence 12 Mission Counter"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-430</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>376</ID>
+              <Description>"Sequences 11 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-490</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>377</ID>
+              <Description>"Sequences 10 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-4F0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>381</ID>
+              <Description>"Sequences 9 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-550</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>378</ID>
+              <Description>"Sequences 8 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-5B0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>382</ID>
+              <Description>"Sequences 7 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-610</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>379</ID>
+              <Description>"Sequences 6 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-670</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>380</ID>
+              <Description>"Sequences 5 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-6D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>384</ID>
+              <Description>"Sequences 4 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-730</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>385</ID>
+              <Description>"Sequences 3 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-790</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>386</ID>
+              <Description>"Sequences 2 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-7F0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>387</ID>
+              <Description>"Sequences 1 Mission Counters"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-850</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
+        <CheatEntry>
+          <ID>390</ID>
+          <Description>"Templar Hunts"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"Templar Hunt Opia Apito"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-370</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"Templar Hunt Rhona"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-310</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>4</ID>
+              <Description>"Templar Hunt Anto"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-2B0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>6</ID>
+              <Description>"Templar Hunt Upton Vance"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+00A0E21C</Address>
+              <Offsets>
+                <Offset>-250</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>610</ID>
+      <Description>"Collectibles"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
         <CheatEntry>
           <ID>425</ID>
           <Description>"Chests"</Description>
@@ -1880,623 +2067,1001 @@ LuaCall(cycleFullCompact(nil,false))
             </CheatEntry>
           </CheatEntries>
         </CheatEntry>
-      </CheatEntries>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>345</ID>
-      <Description>"Taverns"</Description>
-      <Options moHideChildren="1"/>
-      <GroupHeader>1</GroupHeader>
-      <CheatEntries>
         <CheatEntry>
-          <ID>373</ID>
-          <Description>"Total Taverns"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3188</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
+          <ID>493</ID>
+          <Description>"Viewpoints"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>495</ID>
+              <Description>"Havana Viewpoints 8 (2BAC)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2BAC</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>498</ID>
+              <Description>"Kingston Viewpoints 9 (2BC0)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2BC0</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>494</ID>
+              <Description>"Nassua Viewpoints 7 (2BD4)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2BD4</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>564</ID>
+              <Description>"Abaco Island Viewpoints 1 (2BE8)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2BE8</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>557</ID>
+              <Description>"Cayman Sound Viewpoints 1 (2BFC)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2BFC</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>554</ID>
+              <Description>"Corozal Viewpoints 1 (2C10)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2C10</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>563</ID>
+              <Description>"Florida Viewpoints 1 (2C24)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2C24</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>550</ID>
+              <Description>"Ille A Vache Viewpoints 1 (2C38)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2C38</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>565</ID>
+              <Description>"Andreas Island Viewpoints 1 (2C4C)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2C4C</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>569</ID>
+              <Description>"Mariguana Island Viewpoints 1 (2C60)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2C60</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>559</ID>
+              <Description>"Cumberland Bay Viewpoints 1 (2C74)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2C74</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>567</ID>
+              <Description>"Salt Lagoon Viewpoints 1 (2C88)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2C88</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>566</ID>
+              <Description>"Cat Island Viewpoints 1 (2C9C)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2C9C</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>562</ID>
+              <Description>"Matanzas Viewpoints 1 (2CB0)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2CB0</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>551</ID>
+              <Description>"New Bone Viewpoints 1 (2CC4)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2CC4</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>560</ID>
+              <Description>"Tortuga Viewpoints 1 (2CD8)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2CD8</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>556</ID>
+              <Description>"Pinos Isle Viewpoints 1 (2CEC)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2CEC</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>552</ID>
+              <Description>"Misteriosa Viewpoints 1 (2D00)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2D00</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>553</ID>
+              <Description>"Santanillas Viewpoints 1 (2D14)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2D14</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>555</ID>
+              <Description>"Arroyos Viewpoints 1 (2D28)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2D28</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>568</ID>
+              <Description>"Crooked Island Viewpoints 1 (2D3C)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2D3C</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>558</ID>
+              <Description>"Grand Cayman Viewpoints 1 (2D50)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2D50</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>561</ID>
+              <Description>"Salt Key Bank Viewpoints 1 (2D64)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2D64</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>549</ID>
+              <Description>"Great Inagua Viewpoints 1 (2D78)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2D78</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>500</ID>
+              <Description>"Isla Providencia Total Viewpoints 3 (2E90)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2E90</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>599</ID>
+                  <Description>"Isla Providencia Viewpoint Shipwreck (2D8C)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2D8C</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>605</ID>
+                  <Description>"Isla Providencia Viewpoint Myan Ruins (2DA0)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2DA0</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>606</ID>
+                  <Description>"Isla Providencia Viewpoint Myan Temple (2DB4)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2DB4</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>497</ID>
+              <Description>"Principe Total Viewpoints 2 (2EA4)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2EA4</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>576</ID>
+                  <Description>"Principe Viewpoint Hut thing (2DC8)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2DC8</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>604</ID>
+                  <Description>"Principe Viewpoint Shipwreck (2DDC)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2DDC</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>499</ID>
+              <Description>"Long Bay Total Viewpoints 3 (2EB8)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2EB8</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>607</ID>
+                  <Description>"Long Bay Viewpoint Shipwreck (2DF0)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2DF0</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>608</ID>
+                  <Description>"Long Bay Viewpoint Guardians Village (2E04)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2E04</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>598</ID>
+                  <Description>"Long Bay Viewpoint Observatory entrance (2E18)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2E18</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>501</ID>
+              <Description>"Tulum Viewpoints Total 2 (2ECC)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2ECC</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>609</ID>
+                  <Description>"Tulum Myan Temple (2E2C)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2E2C</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>600</ID>
+                  <Description>"Tulum Shipwreck Viewpoint (2E40)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2E40</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>496</ID>
+              <Description>"Cape Bonavista Total Viewpoints 3 (2EE0)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>2EE0</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>602</ID>
+                  <Description>" Cape Bonavista Viewpoint 1st area (2E54)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2E54</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>603</ID>
+                  <Description>" Cape Bonavista Viewpoint 2nd area (2E68)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2E68</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>577</ID>
+                  <Description>" Cape Bonavista Viewpoint 3rd area (2E7C)"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"AC4BFSP.exe"+026BEAC0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>2E7C</Offset>
+                    <Offset>8BC</Offset>
+                    <Offset>2D0</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
         <CheatEntry>
-          <ID>372</ID>
-          <Description>"The Kingston Crown"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>319C</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
+          <ID>345</ID>
+          <Description>"Taverns"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>373</ID>
+              <Description>"Total Taverns"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3188</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>372</ID>
+              <Description>"The Kingston Crown"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>319C</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>356</ID>
+              <Description>"Salt Key Banter"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>31B0</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>353</ID>
+              <Description>"The Randy Cayman"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>31C4</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>352</ID>
+              <Description>"Crooked Island Canter"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>31D8</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367</ID>
+              <Description>"Arroyos Arms"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>31EC</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>349</ID>
+              <Description>"The Andreas Inn"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3200</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>351</ID>
+              <Description>"Vino a Vache Tavern"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3214</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>350</ID>
+              <Description>"Corozal Tavern"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3228</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
         <CheatEntry>
-          <ID>356</ID>
-          <Description>"Salt Key Banter"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>31B0</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>353</ID>
-          <Description>"The Randy Cayman"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>31C4</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>352</ID>
-          <Description>"Crooked Island Canter"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>31D8</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>367</ID>
-          <Description>"Arroyos Arms"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>31EC</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>349</ID>
-          <Description>"The Andreas Inn"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3200</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>351</ID>
-          <Description>"Vino a Vache Tavern"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3214</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>350</ID>
-          <Description>"Corozal Tavern"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3228</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-      </CheatEntries>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>383</ID>
-      <Description>"Sequences"</Description>
-      <Options moHideChildren="1"/>
-      <GroupHeader>1</GroupHeader>
-      <CheatEntries>
-        <CheatEntry>
-          <ID>389</ID>
-          <Description>"Sequence 13 Mission Counter"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-3D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>388</ID>
-          <Description>"Sequence 12 Mission Counter"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-430</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>376</ID>
-          <Description>"Sequences 11 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-490</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>377</ID>
-          <Description>"Sequences 10 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-4F0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>381</ID>
-          <Description>"Sequences 9 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-550</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>378</ID>
-          <Description>"Sequences 8 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-5B0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>382</ID>
-          <Description>"Sequences 7 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-610</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>379</ID>
-          <Description>"Sequences 6 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-670</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>380</ID>
-          <Description>"Sequences 5 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-6D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>384</ID>
-          <Description>"Sequences 4 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-730</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>385</ID>
-          <Description>"Sequences 3 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-790</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>386</ID>
-          <Description>"Sequences 2 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-7F0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>387</ID>
-          <Description>"Sequences 1 Mission Counters"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-850</Offset>
-          </Offsets>
-        </CheatEntry>
-      </CheatEntries>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>390</ID>
-      <Description>"Templar Hunts"</Description>
-      <Options moHideChildren="1"/>
-      <GroupHeader>1</GroupHeader>
-      <CheatEntries>
-        <CheatEntry>
-          <ID>3</ID>
-          <Description>"Templar Hunt Opia Apito"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-370</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>5</ID>
-          <Description>"Templar Hunt Rhona"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-310</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>4</ID>
-          <Description>"Templar Hunt Anto"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-2B0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>6</ID>
-          <Description>"Templar Hunt Upton Vance"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+00A0E21C</Address>
-          <Offsets>
-            <Offset>-250</Offset>
-          </Offsets>
-        </CheatEntry>
-      </CheatEntries>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>391</ID>
-      <Description>"Maps"</Description>
-      <Options moHideChildren="1"/>
-      <GroupHeader>1</GroupHeader>
-      <CheatEntries>
-        <CheatEntry>
-          <ID>395</ID>
-          <Description>"Havana (240,607) (3250)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3250</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>396</ID>
-          <Description>"Great Igauna (633,784) (3264)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3264</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>397</ID>
-          <Description>"Abaco (749,625) (3278)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3278</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>398</ID>
-          <Description>"Petite Caverne (70,405) (328C)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>328C</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>400</ID>
-          <Description>"Andreas (606,835) (32A0)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>32A0</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>401</ID>
-          <Description>"Anotto (992,422) (32B4)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>32B4</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>402</ID>
-          <Description>"Misteriosa (623,172) (32C8)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>32C8</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>394</ID>
-          <Description>"Pinos(32DC)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>32DC</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>403</ID>
-          <Description>"Tortuga (333,650) (32F0)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>32F0</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>404</ID>
-          <Description>"Ambergris Key (307,195) (3304)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3304</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>405</ID>
-          <Description>"Corozal (55,178) (3318)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3318</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>406</ID>
-          <Description>"Ille (565,539) (332C)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>332C</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>407</ID>
-          <Description>"Isla (525,253) (3340)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3340</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>408</ID>
-          <Description>"Salt Lagoon (442,118) (3354)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3354</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>409</ID>
-          <Description>"Santanillias (479,487) (3368)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3368</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>410</ID>
-          <Description>"Cumberland Bay (335,469) (337C)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>337C</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>411</ID>
-          <Description>"Mariguana (579,720) (3390)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3390</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>414</ID>
-          <Description>"Cayman Sound (901,263) (33A4)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>33A4</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>415</ID>
-          <Description>"(679,381), (502,44), (621,277) 33B8"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>33B8</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>416</ID>
-          <Description>"(679,381), (502,44), (621,277) 33CC"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>33CC</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>412</ID>
-          <Description>"(679,381), (502,44), (621,277) 33E0"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>33E0</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>413</ID>
-          <Description>"845,468 (33F4)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>33F4</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
-        </CheatEntry>
-        <CheatEntry>
-          <ID>392</ID>
-          <Description>"Cape (179,593) (3408)"</Description>
-          <ShowAsSigned>1</ShowAsSigned>
-          <VariableType>4 Bytes</VariableType>
-          <Address>"AC4BFSP.exe"+026BEAC0</Address>
-          <Offsets>
-            <Offset>18</Offset>
-            <Offset>3408</Offset>
-            <Offset>8BC</Offset>
-            <Offset>2D0</Offset>
-          </Offsets>
+          <ID>391</ID>
+          <Description>"Maps"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>395</ID>
+              <Description>"Havana (240,607) (3250)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3250</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>396</ID>
+              <Description>"Great Igauna (633,784) (3264)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3264</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>397</ID>
+              <Description>"Abaco (749,625) (3278)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3278</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>398</ID>
+              <Description>"Petite Caverne (70,405) (328C)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>328C</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>400</ID>
+              <Description>"Andreas (606,835) (32A0)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>32A0</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>401</ID>
+              <Description>"Anotto (992,422) (32B4)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>32B4</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>402</ID>
+              <Description>"Misteriosa (623,172) (32C8)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>32C8</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>394</ID>
+              <Description>"Pinos(32DC)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>32DC</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>403</ID>
+              <Description>"Tortuga (333,650) (32F0)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>32F0</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>404</ID>
+              <Description>"Ambergris Key (307,195) (3304)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3304</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>405</ID>
+              <Description>"Corozal (55,178) (3318)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3318</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>406</ID>
+              <Description>"Ille (565,539) (332C)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>332C</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>407</ID>
+              <Description>"Isla (525,253) (3340)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3340</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>408</ID>
+              <Description>"Salt Lagoon (442,118) (3354)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3354</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>409</ID>
+              <Description>"Santanillias (479,487) (3368)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3368</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>410</ID>
+              <Description>"Cumberland Bay (335,469) (337C)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>337C</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>411</ID>
+              <Description>"Mariguana (579,720) (3390)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3390</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>414</ID>
+              <Description>"Cayman Sound (901,263) (33A4)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>33A4</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>415</ID>
+              <Description>"(679,381), (502,44), (621,277) 33B8"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>33B8</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>416</ID>
+              <Description>"(679,381), (502,44), (621,277) 33CC"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>33CC</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>412</ID>
+              <Description>"(679,381), (502,44), (621,277) 33E0"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>33E0</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>413</ID>
+              <Description>"845,468 (33F4)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>33F4</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>392</ID>
+              <Description>"Cape (179,593) (3408)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"AC4BFSP.exe"+026BEAC0</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>3408</Offset>
+                <Offset>8BC</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
       </CheatEntries>
     </CheatEntry>
@@ -2508,7 +3073,7 @@ LuaCall(cycleFullCompact(nil,false))
       <Address>"AC4BFSP.exe"+026BEAC0</Address>
       <Offsets>
         <Offset>18</Offset>
-        <Offset>0</Offset>
+        <Offset>67C</Offset>
         <Offset>8BC</Offset>
         <Offset>2D0</Offset>
       </Offsets>

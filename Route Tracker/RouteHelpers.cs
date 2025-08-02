@@ -644,7 +644,7 @@ namespace Route_Tracker
                 exactPercentageText = $"{exactPercentage:F2}%";
 
             return $"Completion Percentage: {statsDict.GetValueOrDefault("Completion Percentage", 0)}%\n" +
-                   $"Completion Percentage Exact: {exactPercentageText}%\n" +
+                   $"Completion Percentage Exact: {exactPercentageText}\n" +
                    $"Viewpoints Completed: {statsDict.GetValueOrDefault("Viewpoints", 0)}\n" +
                    $"Myan Stones Collected: {statsDict.GetValueOrDefault("Myan Stones", 0)}\n" +
                    $"Buried Treasure Collected: {statsDict.GetValueOrDefault("Buried Treasure", 0)}\n" +
@@ -700,7 +700,7 @@ namespace Route_Tracker
 
                 string statsText =
                     $"Completion Percentage: {e.GetValue<int>("Completion Percentage", 0)}%\n" +
-                    $"Completion Percentage Exact: {exactPercentageText}%\n" +
+                    $"Completion Percentage Exact: {exactPercentageText}\n" +
                     $"Viewpoints Completed: {e.GetValue<int>("Viewpoints", 0)}\n" +
                     $"Myan Stones Collected: {e.GetValue<int>("Myan Stones", 0)}\n" +
                     $"Buried Treasure Collected: {e.GetValue<int>("Buried Treasure", 0)}\n" +

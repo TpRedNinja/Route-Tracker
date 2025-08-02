@@ -158,6 +158,85 @@ namespace Route_Tracker
         }
         #endregion
 
+        #region Memory Cache Management
+        // ==========FORMAL COMMENT=========
+        // Reads memory values with caching to reduce redundant memory access
+        // ==========MY NOTES==============
+        // This is like Read<T> but faster since it avoids repeated reads
+        protected T ReadWithCache<T>(string cacheKey, nint baseAddress, int[] offsets) where T : unmanaged
+        {
+            // Check if we have a recent cached value
+            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
+                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
+                cachedData.Value is T value)
+            {
+                return value;
+            }
+
+            // Read fresh value from memory
+            T result = Read<T>(baseAddress, offsets);
+            _memoryCache[cacheKey] = (DateTime.Now, result);
+            return result;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Reads memory values with caching for 64-bit games
+        // Uses Read64Bit to avoid repeated reads
+        // ==========MY NOTES==============
+        // This is like ReadWithCache but for 64-bit pointer size
+        protected T ReadWithCache64Bit<T>(string cacheKey, nint baseAddress, int[] offsets) where T : unmanaged
+        {
+            // Check if we have a recent cached value
+            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
+                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
+                cachedData.Value is T value)
+            {
+                return value;
+            }
+
+            // Read fresh value from memory using 64-bit pointer size
+            T result = Read64Bit<T>(baseAddress, offsets);
+            _memoryCache[cacheKey] = (DateTime.Now, result);
+            return result;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Attempts to retrieve a cached value without accessing memory
+        // ==========MY NOTES==============
+        // Quick way to check if we already have the value cached
+        protected bool TryGetCachedValue<T>(string cacheKey, out T value) where T : unmanaged
+        {
+            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
+                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
+                cachedData.Value is T typedValue)
+            {
+                value = typedValue;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Manually stores a value in the memory cache
+        // ==========MY NOTES==============
+        // Force a value into the cache
+        protected void StoreInCache(string cacheKey, object value)
+        {
+            _memoryCache[cacheKey] = (DateTime.Now, value);
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Invalidates all cached memory values
+        // ==========MY NOTES==============
+        // Wipes out all cached values
+        public void ClearCache()
+        {
+            _memoryCache.Clear();
+        }
+        #endregion
+
         #region Stats Retrieval
         // Only required method - each game implements this to provide its stats
         public abstract Dictionary<string, object> GetStatsAsDictionary();
@@ -274,85 +353,6 @@ namespace Route_Tracker
 
             // Use AppTimer's Stop method
             _updateTimer?.Stop();
-        }
-        #endregion
-
-        #region Memory Cache Management
-        // ==========FORMAL COMMENT=========
-        // Reads memory values with caching to reduce redundant memory access
-        // ==========MY NOTES==============
-        // This is like Read<T> but faster since it avoids repeated reads
-        protected T ReadWithCache<T>(string cacheKey, nint baseAddress, int[] offsets) where T : unmanaged
-        {
-            // Check if we have a recent cached value
-            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
-                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
-                cachedData.Value is T value)
-            {
-                return value;
-            }
-
-            // Read fresh value from memory
-            T result = Read<T>(baseAddress, offsets);
-            _memoryCache[cacheKey] = (DateTime.Now, result);
-            return result;
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Reads memory values with caching for 64-bit games
-        // Uses Read64Bit to avoid repeated reads
-        // ==========MY NOTES==============
-        // This is like ReadWithCache but for 64-bit pointer size
-        protected T ReadWithCache64Bit<T>(string cacheKey, nint baseAddress, int[] offsets) where T : unmanaged
-        {
-            // Check if we have a recent cached value
-            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
-                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
-                cachedData.Value is T value)
-            {
-                return value;
-            }
-
-            // Read fresh value from memory using 64-bit pointer size
-            T result = Read64Bit<T>(baseAddress, offsets);
-            _memoryCache[cacheKey] = (DateTime.Now, result);
-            return result;
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Attempts to retrieve a cached value without accessing memory
-        // ==========MY NOTES==============
-        // Quick way to check if we already have the value cached
-        protected bool TryGetCachedValue<T>(string cacheKey, out T value) where T : unmanaged
-        {
-            if (_memoryCache.TryGetValue(cacheKey, out var cachedData) &&
-                DateTime.Now - cachedData.Timestamp < _cacheDuration &&
-                cachedData.Value is T typedValue)
-            {
-                value = typedValue;
-                return true;
-            }
-
-            value = default;
-            return false;
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Manually stores a value in the memory cache
-        // ==========MY NOTES==============
-        // Force a value into the cache
-        protected void StoreInCache(string cacheKey, object value)
-        {
-            _memoryCache[cacheKey] = (DateTime.Now, value);
-        }
-
-        // ==========FORMAL COMMENT=========
-        // Invalidates all cached memory values
-        // ==========MY NOTES==============
-        // Wipes out all cached values
-        public void ClearCache()
-        {
-            _memoryCache.Clear();
         }
         #endregion
 

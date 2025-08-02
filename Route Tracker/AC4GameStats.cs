@@ -73,6 +73,11 @@ namespace Route_Tracker
         private const int TreasureMapsStartOffset = 0x3250;
         private const int TreasureMapsEndOffset = 0x3408;
         private static readonly int [] SpecialTreasureMapOffsets = [0x33F4]; // Special treasure map offset we dont count
+        private const int ViewpointStartOffset = 0x2BAC;
+        private const int ViewpointEndOffset = 0x2EE0;
+        private static readonly int[] SpecialViewpointOffsets = [0x2D8C, 0x2DA0, 
+        0x2DB4, 0x2DC8, 0x2DDC, 0x2DF0, 0x2E04, 0x2E18, 0x2E2C, 0x2E40, 0x2E54, 
+        0x2E68, 0x2E7C]; // Special viewpoint offsets we dont count
         #endregion
 
         #region Progress and Upgrade Tracking
@@ -90,13 +95,8 @@ namespace Route_Tracker
         private int oldcharacter = 0;
         private int totalUpgrades = 0;
         private int totalFragments = 0;
+        private int totalViewpoints = 0;
 
-        // for windmill fragment check
-        public bool isWindmillFragment = false; // this is used to check if we have collected the windmill fragment
-        private DateTime lastViewpointUpdate = DateTime.MinValue;
-        private DateTime lastFragmentUpdate = DateTime.MinValue;
-        private DateTime lastBuriedUpdate = DateTime.MinValue;
-        private const int EXPECTED_FRAGMENT_COUNT = 87; // This is the expected fragment count for windmill check
         #endregion
 
         #region Dictionarys for collectibles
@@ -104,6 +104,7 @@ namespace Route_Tracker
         public Dictionary<string, int> LocationFragmentCounts { get; } = [];
         public Dictionary<string, int> LocationTavernCounts { get; } = [];
         public Dictionary<string, int> LocationTreasureMapCounts { get; } = [];
+        public Dictionary<string, int> LocationViewpointsCounts { get; } = [];
         #endregion
 
         // ==========FORMAL COMMENT=========
@@ -168,6 +169,7 @@ namespace Route_Tracker
             {
                 // skip these maps as the user should have them collected already or the map isnt used anyways
                 if (SpecialTreasureMapOffsets.Contains(thirdOffset)) continue;
+                if (SpecialViewpointOffsets.Contains(thirdOffset)) continue;
 
                 int value = ReadCollectible(thirdOffset);
                 count += value;
@@ -187,6 +189,10 @@ namespace Route_Tracker
                 if (AC4CollectibleOffsets.TreasureMapOffsetToLocation.TryGetValue(thirdOffset, out string? LocationNameTreasureMap))
                 {
                     LocationTreasureMapCounts[LocationNameTreasureMap] = value;
+                }
+                if (AC4CollectibleOffsets.ViewpointOffsetToLocation.TryGetValue(thirdOffset, out string? LocationNameViewpoint))
+                {
+                    LocationViewpointsCounts[LocationNameViewpoint] = value;
                 }
             }
 
@@ -254,6 +260,7 @@ namespace Route_Tracker
             int taverns = CountCollectibles(TavernStartOffset, TavernEndOffset);
             int totalChests = CountCollectibles(ChestStartOffset, ChestEndOffset);
             totalFragments = CountCollectibles(FragmentsStartOffset, FragmentsEndOffset);
+            totalViewpoints = CountCollectibles(ViewpointStartOffset, ViewpointEndOffset);
             totalUpgrades = ReadCollectible(HeroUpgradeThirdOffset);
 
             // legendary ship,templar hunt, storymissions, and treasuremaps counts
@@ -262,33 +269,11 @@ namespace Route_Tracker
             completedStoryMissions = CountMissions(MissionFirstOffset, MissionEndOffset);
             treasuremaps = CountCollectibles(TreasureMapsStartOffset, TreasureMapsEndOffset);
 
-            // register stats and update last update times
-            RegisterStat("Buried", treasure);
-            RegisterStat("Fragments", fragments);
-            RegisterStat("Viewpoints", viewpoints);
-
-            // may move these to a separate method if i can
-            if (Current.Viewpoints > Old.Viewpoints)
-            {
-                lastViewpointUpdate = DateTime.Now;
-            }
-            else if (Current.Fragments > Old.Fragments)
-            {
-                lastFragmentUpdate = DateTime.Now;
-            }
-            else if (Current.Buried > Old.Buried)
-            {
-                lastBuriedUpdate = DateTime.Now;
-            }
-
             // Detect modern day missions
             DetectModernDayMissions(character, loading);
 
             // DetectStatuses
             DetectStatuses(mainmenu, loading);
-
-            // call windmill fragment check
-            Windmillfragment();
 
             //Debug.WriteLine($"AC4 PercentFloat: {percentFloat:F5}");
             // Return all the stats (including the basic ones that we got from memory)
@@ -339,29 +324,6 @@ namespace Route_Tracker
             else
             {
                 isMainMenu = false;
-            }
-        }
-
-        // function to check if we have collected the windmill fragment
-        private void Windmillfragment()
-        {
-            // case 1: We get viewpoint first then fragment within 10 seconds
-            if (Current.Fragments > Old.Fragments &&
-            (DateTime.Now - lastViewpointUpdate).TotalSeconds <= 10)
-            {
-                isWindmillFragment = true;
-            } else if (Current.Viewpoints > Old.Viewpoints &&
-            (DateTime.Now - lastFragmentUpdate).TotalSeconds <= 10)
-            // Case 2: Fragment then viewpoint within 10 seconds
-            {
-                isWindmillFragment = true;
-            } else if (Current.Buried == 1 && Current.Fragments > EXPECTED_FRAGMENT_COUNT)
-            // Case 3: First chest (New Bone) collected, but fragments is higher than expected
-            {
-                isWindmillFragment = true;
-            } else
-            {
-                isWindmillFragment = false;
             }
         }
         #endregion

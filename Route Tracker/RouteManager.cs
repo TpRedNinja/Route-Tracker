@@ -372,11 +372,6 @@ namespace Route_Tracker
         // Returns true if anything changed so we can update the display
         public bool UpdateCompletionStatus(DataGridView routeGrid, GameStatsEventArgs stats)
         {
-            if (gameConnectionManager?.GameStats is AC4GameStats ac4Stats && ac4Stats.isWindmillFragment)
-            {
-                HandleWindmillFragmentLogic();
-            }
-
             bool anyChanges = false;
 
             // Only check for 100% completion in AC4
@@ -560,13 +555,23 @@ namespace Route_Tracker
                     Debug.WriteLine($"Location '{entry.Location}' not found in LocationChestCounts for entry '{entry.Name}'. Dictionary contents: {System.Text.Json.JsonSerializer.Serialize(ac4Stats.LocationTreasureMapCounts)}");
                 }
             }
+            else if (normalizedType.Equals("Viewpoint", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(entry.Location) && ac4Stats != null)
+            {
+                if (ac4Stats.LocationViewpointsCounts.TryGetValue(entry.Location, out int ViewpointCount))
+                {
+                    return ViewpointCount >= entry.LocationCondition;
+                }
+                else
+                {
+                    Debug.WriteLine($"Location '{entry.Location}' not found in LocationChestCounts for entry '{entry.Name}'. Dictionary contents: {System.Text.Json.JsonSerializer.Serialize(ac4Stats.LocationViewpointsCounts)}");
+                }
+            }
 
             // Use your exact names for matching with dictionary-based approach
             return normalizedType switch
             {
-
                 "Story" or "story" => stats.GetValue<int>("Story Missions", 0) >= entry.Condition,
-                "Viewpoint" or "viewpoint" => stats.GetValue<int>("Viewpoints", 0) >= entry.Condition,
+                //"Viewpoint" or "viewpoint" => stats.GetValue<int>("Viewpoints", 0) >= entry.Condition,
                 //"Chest" or "chest" => stats.GetValue<int>("Chests", 0) >= entry.Condition,
                 //"Animus Fragment" or "animus fragment" => stats.GetValue<int>("Animus Fragments", 0) >= entry.Condition,
                 "Myan Stones" or "myan stones" => stats.GetValue<int>("Myan Stones", 0) >= entry.Condition,
@@ -589,92 +594,6 @@ namespace Route_Tracker
         #endregion
 
         #region UI Management
-
-        private void HandleWindmillFragmentLogic()
-        {
-            if (gameConnectionManager.GameStats is not AC4GameStats ac4Stats || !ac4Stats.isWindmillFragment)
-                return;
-
-            // Find relevant entries by display text
-            var frag1 = routeEntries.FirstOrDefault(e => e.DisplayText.Contains("Skip fragment on windmill Get Castaway -> Fragment 1 New Bone", StringComparison.OrdinalIgnoreCase));
-            var frag2 = routeEntries.FirstOrDefault(e => e.DisplayText.Contains("Fragment 2 New Bone", StringComparison.OrdinalIgnoreCase));
-            var frag3 = routeEntries.FirstOrDefault(e => e.DisplayText.Contains("Fast Travel to New Bone -> Fragment 3 New Bone", StringComparison.OrdinalIgnoreCase));
-            var chest1 = routeEntries.FirstOrDefault(e => e.DisplayText.Contains("Chest 1 New Bone", StringComparison.OrdinalIgnoreCase));
-
-            // Save original index of frag3 before any changes
-            int frag3OriginalIndex = frag3 != null ? routeEntries.IndexOf(frag3) : -1;
-
-            // Case 3: Windmill fragment detected late
-            if (frag1 != null && frag2 != null && chest1 != null &&
-                frag1.IsCompleted && frag2.IsCompleted && chest1.IsCompleted && frag3 != null)
-            {
-                frag2.IsCompleted = false;
-                frag3.IsCompleted = true;
-                if (!frag3.Name.Contains("(completed early)", StringComparison.OrdinalIgnoreCase))
-                    frag3.Name += " (completed early)";
-
-                // Set frag3's condition to frag2's original condition
-                int targetCondition = frag2.Condition;
-                frag3.Condition = targetCondition;
-
-                // Adjust all fragments from frag2 up to (but not including) frag3's original position
-                int frag2Index = routeEntries.IndexOf(frag2);
-                int start = Math.Min(frag2Index, frag3OriginalIndex);
-                int end = Math.Max(frag2Index, frag3OriginalIndex);
-
-                for (int i = start; i < end; i++)
-                {
-                    var entry = routeEntries[i];
-                    if (entry.Type.Equals(frag2.Type, StringComparison.OrdinalIgnoreCase) && entry != frag3)
-                    {
-                        entry.Condition += 1;
-                    }
-                }
-                UpdateEntryIdsAndConditions(frag2Index, frag3OriginalIndex);
-                SaveIdMap();
-                return;
-            }
-
-            // Case 1 & 2: Windmill fragment collected early/on time
-            if (frag1 != null && frag3 != null)
-            {
-                frag1.IsCompleted = false;
-                frag3.IsCompleted = true;
-                if (!frag3.Name.Contains("(completed early)", StringComparison.OrdinalIgnoreCase))
-                    frag3.Name += " (completed early)";
-
-                // Set frag3's condition to frag1's original condition
-                int targetCondition = frag1.Condition;
-                frag3.Condition = targetCondition;
-
-                // Adjust all fragments from frag1 up to (but not including) frag3's original position
-                int frag1Index = routeEntries.IndexOf(frag1);
-                int start = Math.Min(frag1Index, frag3OriginalIndex);
-                int end = Math.Max(frag1Index, frag3OriginalIndex);
-
-                for (int i = start; i < end; i++)
-                {
-                    var entry = routeEntries[i];
-                    if (entry.Type.Equals(frag1.Type, StringComparison.OrdinalIgnoreCase) && entry != frag3)
-                    {
-                        entry.Condition += 1;
-                    }
-                }
-                UpdateEntryIdsAndConditions(frag1Index, frag3OriginalIndex); // See next step for this helper
-                SaveIdMap();
-            }
-        }
-
-        private void UpdateEntryIdsAndConditions(int startIndex, int endIndex)
-        {
-            int min = Math.Min(startIndex, endIndex);
-            int max = Math.Max(startIndex, endIndex);
-            for (int i = min; i <= max; i++)
-            {
-                routeEntries[i].Id = i + 1;
-                routeEntries[i].Prerequisite = i > 0 ? routeEntries[i - 1] : null;
-            }
-        }
 
         // ==========FORMAL COMMENT=========
         // Sorts the route grid so completed entries are at the top (by Id), followed by incomplete entries (by Id).
@@ -1429,17 +1348,6 @@ namespace Route_Tracker
             }
             SortRouteGridByCompletion(routeGrid);
             SortingManager.ScrollToFirstIncomplete(routeGrid);
-        }
-
-        private void SaveIdMap()
-        {
-            string idMapPath = Path.ChangeExtension(routeFilePath, ".ids.json");
-            var idMap = routeEntries.ToDictionary(
-                e => $"{e.Name}_{e.Type}_{e.Condition}",
-                e => e.Id
-            );
-            string json = System.Text.Json.JsonSerializer.Serialize(idMap, JsonOptions);
-            File.WriteAllText(idMapPath, json);
         }
         #endregion
 

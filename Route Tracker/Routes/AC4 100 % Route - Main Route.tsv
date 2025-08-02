@@ -1,7 +1,7 @@
 Name	Type	Condition	Coordinates	Location	Location Condition
-Fleet Map 1	Treasure Map	1	None	Cape Bonavista	1
-Fleet Map 2	Treasure Map	2	None	Cape Bonavista	1
-Fleet Map 3	Treasure Map	3	None	Cape Bonavista	1
+Fleet Map 1	Treasure Map	1	None	Uncharted1	1
+Fleet Map 2	Treasure Map	2	None	Uncharted2	1
+Fleet Map 3	Treasure Map	3	None	Uncharted	1
 Viewpoint 1 Cape Bonavista	Viewpoint	1	None	Cape Bonavista	1
 Chest 1 Cape Bonavista	Chest	1	None	Cape Bonavista	1
 Chest 2 Cape Bonavista	Chest	2	None	Cape Bonavista	2
