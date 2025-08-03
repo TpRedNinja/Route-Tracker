@@ -38,7 +38,7 @@ namespace Route_Tracker
         // Used by both ApplySorting and ApplySortingQuiet
         private static void ApplySortingInternal(DataGridView routeGrid, SortingOptionsForm.SortingMode sortingMode)
         {
-            if (routeGrid == null || routeGrid.Rows.Count == 0)
+            if (routeGrid == null || routeGrid.RowCount == 0)
                 return;
 
             try
@@ -52,12 +52,24 @@ namespace Route_Tracker
 
                 try
                 {
-                    // Get all entries from the grid
                     List<RouteEntry> entries = [];
-                    for (int i = 0; i < routeGrid.Rows.Count; i++)
+
+                    if (routeGrid.VirtualMode)
                     {
-                        if (routeGrid.Rows[i].Tag is RouteEntry entry)
-                            entries.Add(entry);
+                        // For virtual mode, get entries from the route manager
+                        if (routeGrid.FindForm() is MainForm mainForm && mainForm.GetRouteManager() is RouteManager routeManager)
+                        {
+                            entries = routeManager.GetRouteEntries();
+                        }
+                    }
+                    else
+                    {
+                        // For traditional mode, get entries from grid rows
+                        for (int i = 0; i < routeGrid.Rows.Count; i++)
+                        {
+                            if (routeGrid.Rows[i].Tag is RouteEntry entry)
+                                entries.Add(entry);
+                        }
                     }
 
                     if (entries.Count == 0)
@@ -139,10 +151,8 @@ namespace Route_Tracker
                 // For virtual mode, update the underlying data source
                 if (routeGrid.FindForm() is MainForm mainForm && mainForm.GetRouteManager() is RouteManager routeManager)
                 {
-                    // Update the route manager's internal entries using reflection
-                    var routeEntriesField = typeof(RouteManager).GetField("routeEntries",
-                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    routeEntriesField?.SetValue(routeManager, sortedEntries);
+                    // Update the route manager's internal entries
+                    routeManager.UpdateRouteEntries(sortedEntries);
 
                     // Update virtual grid display
                     routeGrid.RowCount = sortedEntries.Count;
@@ -179,18 +189,26 @@ namespace Route_Tracker
                         break;
                     case SortingOptionsForm.SortingMode.CompletedAtBottom:
                         // Scroll to top (first incomplete entries)
-                        routeGrid.FirstDisplayedScrollingRowIndex = 0;
-                        if (routeGrid.Rows.Count > 0)
+                        if (routeGrid.VirtualMode)
                         {
+                            routeGrid.FirstDisplayedScrollingRowIndex = 0;
+                        }
+                        else if (routeGrid.Rows.Count > 0)
+                        {
+                            routeGrid.FirstDisplayedScrollingRowIndex = 0;
                             routeGrid.ClearSelection();
                             routeGrid.Rows[0].Selected = true;
                         }
                         break;
                     case SortingOptionsForm.SortingMode.HideCompleted:
                         // Scroll to top (all entries are incomplete)
-                        routeGrid.FirstDisplayedScrollingRowIndex = 0;
-                        if (routeGrid.Rows.Count > 0)
+                        if (routeGrid.VirtualMode)
                         {
+                            routeGrid.FirstDisplayedScrollingRowIndex = 0;
+                        }
+                        else if (routeGrid.Rows.Count > 0)
+                        {
+                            routeGrid.FirstDisplayedScrollingRowIndex = 0;
                             routeGrid.ClearSelection();
                             routeGrid.Rows[0].Selected = true;
                         }
@@ -207,28 +225,59 @@ namespace Route_Tracker
         // Scrolls to the first incomplete entry (reused from RouteManager)
         public static void ScrollToFirstIncomplete(DataGridView routeGrid)
         {
-            if (routeGrid == null || routeGrid.Rows.Count == 0)
+            if (routeGrid == null || routeGrid.RowCount == 0)
                 return;
 
-            int firstIncompleteIndex = -1;
-            for (int i = 0; i < routeGrid.Rows.Count; i++)
+            if (routeGrid.VirtualMode)
             {
-                if (routeGrid.Rows[i].Tag is RouteEntry entry && !entry.IsCompleted)
+                // For virtual mode, need to access the underlying data
+                if (routeGrid.FindForm() is MainForm mainForm && mainForm.GetRouteManager() is RouteManager routeManager)
                 {
-                    firstIncompleteIndex = i;
-                    break;
+                    var entries = routeManager.GetRouteEntries();
+                    int firstIncompleteIndex = -1;
+
+                    for (int i = 0; i < entries.Count; i++)
+                    {
+                        if (!entries[i].IsCompleted)
+                        {
+                            firstIncompleteIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (firstIncompleteIndex >= 0)
+                    {
+                        routeGrid.FirstDisplayedScrollingRowIndex = Math.Max(0, firstIncompleteIndex - 2);
+                    }
+                    else
+                    {
+                        routeGrid.FirstDisplayedScrollingRowIndex = 0;
+                    }
                 }
             }
+            else
+            {
+                // Traditional mode
+                int firstIncompleteIndex = -1;
+                for (int i = 0; i < routeGrid.Rows.Count; i++)
+                {
+                    if (routeGrid.Rows[i].Tag is RouteEntry entry && !entry.IsCompleted)
+                    {
+                        firstIncompleteIndex = i;
+                        break;
+                    }
+                }
 
-            if (firstIncompleteIndex >= 0)
-            {
-                routeGrid.FirstDisplayedScrollingRowIndex = Math.Max(0, firstIncompleteIndex - 2);
-                routeGrid.ClearSelection();
-                routeGrid.Rows[firstIncompleteIndex].Selected = true;
-            }
-            else if (routeGrid.Rows.Count > 0)
-            {
-                routeGrid.FirstDisplayedScrollingRowIndex = 0;
+                if (firstIncompleteIndex >= 0)
+                {
+                    routeGrid.FirstDisplayedScrollingRowIndex = Math.Max(0, firstIncompleteIndex - 2);
+                    routeGrid.ClearSelection();
+                    routeGrid.Rows[firstIncompleteIndex].Selected = true;
+                }
+                else if (routeGrid.Rows.Count > 0)
+                {
+                    routeGrid.FirstDisplayedScrollingRowIndex = 0;
+                }
             }
         }
 
@@ -237,28 +286,62 @@ namespace Route_Tracker
         // Used during automatic updates to minimize UI disruption
         private static void ScrollToFirstIncompleteQuiet(DataGridView routeGrid)
         {
-            if (routeGrid == null || routeGrid.Rows.Count == 0)
+            if (routeGrid == null || routeGrid.RowCount == 0)
                 return;
 
-            int firstIncompleteIndex = -1;
-            for (int i = 0; i < routeGrid.Rows.Count; i++)
+            if (routeGrid.VirtualMode)
             {
-                if (routeGrid.Rows[i].Tag is RouteEntry entry && !entry.IsCompleted)
+                // For virtual mode, need to access the underlying data
+                if (routeGrid.FindForm() is MainForm mainForm && mainForm.GetRouteManager() is RouteManager routeManager)
                 {
-                    firstIncompleteIndex = i;
-                    break;
+                    var entries = routeManager.GetRouteEntries();
+                    int firstIncompleteIndex = -1;
+
+                    for (int i = 0; i < entries.Count; i++)
+                    {
+                        if (!entries[i].IsCompleted)
+                        {
+                            firstIncompleteIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (firstIncompleteIndex >= 0)
+                    {
+                        // Only scroll if we're not already close to the target
+                        int currentScroll = routeGrid.FirstDisplayedScrollingRowIndex;
+                        int targetScroll = Math.Max(0, firstIncompleteIndex - 2);
+
+                        if (Math.Abs(currentScroll - targetScroll) > 3) // Only scroll if significant difference
+                        {
+                            routeGrid.FirstDisplayedScrollingRowIndex = targetScroll;
+                        }
+                    }
                 }
             }
-
-            if (firstIncompleteIndex >= 0)
+            else
             {
-                // Only scroll if we're not already close to the target
-                int currentScroll = routeGrid.FirstDisplayedScrollingRowIndex;
-                int targetScroll = Math.Max(0, firstIncompleteIndex - 2);
-
-                if (Math.Abs(currentScroll - targetScroll) > 3) // Only scroll if significant difference
+                // Traditional mode
+                int firstIncompleteIndex = -1;
+                for (int i = 0; i < routeGrid.Rows.Count; i++)
                 {
-                    routeGrid.FirstDisplayedScrollingRowIndex = targetScroll;
+                    if (routeGrid.Rows[i].Tag is RouteEntry entry && !entry.IsCompleted)
+                    {
+                        firstIncompleteIndex = i;
+                        break;
+                    }
+                }
+
+                if (firstIncompleteIndex >= 0)
+                {
+                    // Only scroll if we're not already close to the target
+                    int currentScroll = routeGrid.FirstDisplayedScrollingRowIndex;
+                    int targetScroll = Math.Max(0, firstIncompleteIndex - 2);
+
+                    if (Math.Abs(currentScroll - targetScroll) > 3) // Only scroll if significant difference
+                    {
+                        routeGrid.FirstDisplayedScrollingRowIndex = targetScroll;
+                    }
                 }
             }
         }

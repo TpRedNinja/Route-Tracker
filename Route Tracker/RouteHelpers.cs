@@ -701,20 +701,119 @@ namespace Route_Tracker
             string saveDir = Path.Combine(
                 Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
                 "SavedProgress");
-            string routeName = Path.GetFileNameWithoutExtension(routeFilePath);
-            string autosaveFile = Path.Combine(saveDir, $"{routeName}_AutoSave.json");
-            if (File.Exists(autosaveFile))
-                File.Delete(autosaveFile);
 
-            // Refresh the UI
-            routeGrid.Rows.Clear();
-            foreach (var entry in routeEntries)
+            // Try to delete both old and new autosave formats
+            string routeName = Path.GetFileNameWithoutExtension(routeFilePath);
+            string oldAutosaveFile = Path.Combine(saveDir, $"{routeName}_AutoSave.json");
+            if (File.Exists(oldAutosaveFile))
             {
-                int rowIndex = routeGrid.Rows.Add(entry.DisplayText, "");
-                routeGrid.Rows[rowIndex].Tag = entry;
+                File.Delete(oldAutosaveFile);
             }
-            RouteManager.SortRouteGridByCompletion(routeGrid);
-            SortingManager.ScrollToFirstIncomplete(routeGrid);
+
+            // Delete new format autosave files
+            try
+            {
+                string gameAbbreviation = GetGameAbbreviationForReset(routeManager);
+                string routeType = GetRouteTypeForReset(routeManager);
+                string newAutosaveFile = Path.Combine(saveDir, $"{gameAbbreviation}AutoSave{routeType}.json");
+                if (File.Exists(newAutosaveFile))
+                {
+                    File.Delete(newAutosaveFile);
+                }
+
+                // Also delete numbered backups
+                for (int i = 1; i <= 10; i++)
+                {
+                    string backupFile = Path.Combine(saveDir, $"{gameAbbreviation}AutoSave{routeType}{i}.json");
+                    if (File.Exists(backupFile))
+                    {
+                        File.Delete(backupFile);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Warning: Could not delete all autosave files: {ex.Message}");
+            }
+
+            // Refresh the UI - handle both virtual and traditional modes
+            if (routeGrid.VirtualMode)
+            {
+                // For virtual mode, just refresh the display
+                routeGrid.RowCount = routeEntries.Count;
+                routeGrid.Invalidate();
+
+                // Apply current sorting and scroll to first incomplete
+                if (routeGrid.FindForm() is MainForm mainForm)
+                {
+                    mainForm.ApplyCurrentSorting();
+                }
+                else
+                {
+                    SortingManager.ScrollToFirstIncomplete(routeGrid);
+                }
+            }
+            else
+            {
+                // Traditional mode - rebuild rows
+                routeGrid.Rows.Clear();
+                foreach (var entry in routeEntries)
+                {
+                    int rowIndex = routeGrid.Rows.Add(entry.DisplayText, "");
+                    routeGrid.Rows[rowIndex].Tag = entry;
+                }
+                RouteManager.SortRouteGridByCompletion(routeGrid);
+                SortingManager.ScrollToFirstIncomplete(routeGrid);
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Helper methods for reset progress to determine autosave file names
+        private static string GetGameAbbreviationForReset(RouteManager routeManager)
+        {
+            string routeFilePath = routeManager.GetRouteFilePath();
+            string routeFileName = Path.GetFileNameWithoutExtension(routeFilePath).ToLower();
+
+            // Check route file name for game indicators
+            if (routeFileName.Contains("ac4") || (routeFileName.Contains("assassin") && routeFileName.Contains("creed") && routeFileName.Contains("4")))
+                return "AC4";
+            if (routeFileName.Contains("gow") || (routeFileName.Contains("god") && routeFileName.Contains("war")))
+                return "GoW";
+            if (routeFileName.Contains("tr13") || (routeFileName.Contains("tomb") && routeFileName.Contains("raider")))
+                return "TR13";
+
+            // Try to get from game connection if available
+            var gameConnectionManager = routeManager.GetGameConnectionManager();
+            if (gameConnectionManager?.GameStats != null)
+            {
+                var statsType = gameConnectionManager.GameStats.GetType().Name;
+                if (statsType.Contains("AC4"))
+                    return "AC4";
+                if (statsType.Contains("GoW"))
+                    return "GoW";
+            }
+
+            // Default fallback - use first 3-4 characters of route name
+            string safeName = new([.. routeFileName.Take(4).Where(char.IsLetterOrDigit)]);
+            return string.IsNullOrEmpty(safeName) ? "Game" : safeName.ToUpper();
+        }
+
+        private static string GetRouteTypeForReset(RouteManager routeManager)
+        {
+            string routeFilePath = routeManager.GetRouteFilePath();
+            string routeFileName = Path.GetFileNameWithoutExtension(routeFilePath).ToLower();
+
+            // Check for indicators of user-created routes
+            if (routeFileName.Contains("user") ||
+                routeFileName.Contains("custom") ||
+                routeFileName.Contains("personal") ||
+                routeFileName.Contains("test") ||
+                (!routeFileName.Contains("100") && !routeFileName.Contains("main")))
+            {
+                return "User";
+            }
+
+            return ""; // Official route
         }
         #endregion
 

@@ -684,7 +684,7 @@ namespace Route_Tracker
         public void ApplyCurrentSorting()
         {
             var currentMode = settingsManager.GetSortingMode();
-            SortingManager.ApplySorting(routeGrid, currentMode);
+            SortingManager.ApplySortingQuiet(routeGrid, currentMode);
         }
 
         public void CycleLayout(bool forward)
