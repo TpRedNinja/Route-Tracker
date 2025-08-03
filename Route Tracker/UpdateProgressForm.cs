@@ -17,25 +17,14 @@ namespace Route_Tracker
 
         public UpdateProgressForm()
         {
-            this.Text = "Updating Route Tracker";
+            this.SetupAsSettingsForm("Updating Route Tracker");
             this.Size = new System.Drawing.Size(500, 280);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.StartPosition = FormStartPosition.CenterParent;
-            this.BackColor = AppTheme.BackgroundColor;
-            this.ForeColor = AppTheme.TextColor;
 
             // Status label
-            StatusLabel = new Label
-            {
-                Text = "Ready to download update...",
-                AutoSize = false,
-                Width = 450,
-                Height = 24,
-                Location = new System.Drawing.Point(20, 20),
-                ForeColor = AppTheme.TextColor
-            };
+            StatusLabel = UIControlFactory.CreateThemedLabel("Ready to download update...", false);
+            StatusLabel.Width = 450;
+            StatusLabel.Height = 24;
+            StatusLabel.Location = new System.Drawing.Point(20, 20);
 
             // Download progress bar
             DownloadProgressBar = new ProgressBar
@@ -47,29 +36,15 @@ namespace Route_Tracker
                 Maximum = 100
             };
 
-            // Download path
-            var downloadLabel = new Label
-            {
-                Text = "Download to:",
-                Location = new System.Drawing.Point(20, 80),
-                AutoSize = true,
-                ForeColor = AppTheme.TextColor
-            };
-            DownloadPathBox = new TextBox
-            {
-                Width = 350,
-                Location = new System.Drawing.Point(20, 100),
-                Text = "",
-                BackColor = AppTheme.InputBackgroundColor,
-                ForeColor = AppTheme.TextColor
-            };
-            BrowseDownloadButton = new Button
-            {
-                Text = "Browse...",
-                Location = new System.Drawing.Point(380, 98),
-                Width = 80,
-                Height = 23
-            };
+            // Download path section
+            var downloadLabel = UIControlFactory.CreateThemedLabel("Download to:");
+            downloadLabel.Location = new System.Drawing.Point(20, 80);
+
+            DownloadPathBox = UIControlFactory.CreateThemedTextBox(350);
+            DownloadPathBox.Location = new System.Drawing.Point(20, 100);
+
+            BrowseDownloadButton = UIControlFactory.CreateThemedButton("Browse...", 80, 23);
+            BrowseDownloadButton.Location = new System.Drawing.Point(380, 98);
 
             // Extract progress bar
             ExtractProgressBar = new ProgressBar
@@ -81,29 +56,15 @@ namespace Route_Tracker
                 Maximum = 100
             };
 
-            // Extract path
-            var extractLabel = new Label
-            {
-                Text = "Extract to:",
-                Location = new System.Drawing.Point(20, 160),
-                AutoSize = true,
-                ForeColor = AppTheme.TextColor
-            };
-            ExtractPathBox = new TextBox
-            {
-                Width = 350,
-                Location = new System.Drawing.Point(20, 180),
-                Text = "",
-                BackColor = AppTheme.InputBackgroundColor,
-                ForeColor = AppTheme.TextColor
-            };
-            BrowseExtractButton = new Button
-            {
-                Text = "Browse...",
-                Location = new System.Drawing.Point(380, 178),
-                Width = 80,
-                Height = 23
-            };
+            // Extract path section
+            var extractLabel = UIControlFactory.CreateThemedLabel("Extract to:");
+            extractLabel.Location = new System.Drawing.Point(20, 160);
+
+            ExtractPathBox = UIControlFactory.CreateThemedTextBox(350);
+            ExtractPathBox.Location = new System.Drawing.Point(20, 180);
+
+            BrowseExtractButton = UIControlFactory.CreateThemedButton("Browse...", 80, 23);
+            BrowseExtractButton.Location = new System.Drawing.Point(380, 178);
 
             // Launch checkbox
             LaunchNewVersionCheckBox = new CheckBox
@@ -117,15 +78,10 @@ namespace Route_Tracker
             };
 
             // Continue button
-            ContinueButton = new Button
-            {
-                Text = "Continue",
-                Width = 100,
-                Height = 28,
-                Location = new System.Drawing.Point(370, 210),
-                DialogResult = DialogResult.OK,
-                Enabled = false
-            };
+            ContinueButton = UIControlFactory.CreateThemedButton("Continue", 100, 28);
+            ContinueButton.Location = new System.Drawing.Point(370, 210);
+            ContinueButton.DialogResult = DialogResult.OK;
+            ContinueButton.Enabled = false;
 
             // Add controls
             this.Controls.Add(StatusLabel);
@@ -140,26 +96,23 @@ namespace Route_Tracker
             this.Controls.Add(LaunchNewVersionCheckBox);
             this.Controls.Add(ContinueButton);
 
-            // Apply theme
-            AppTheme.ApplyToButton(BrowseDownloadButton);
-            AppTheme.ApplyToButton(BrowseExtractButton);
-            AppTheme.ApplyToButton(ContinueButton);
-            AppTheme.ApplyToTextBox(DownloadPathBox);
-            AppTheme.ApplyToTextBox(ExtractPathBox);
-
             // Wire up events
             BrowseDownloadButton.Click += (s, e) =>
             {
                 using var fbd = new FolderBrowserDialog();
                 if (fbd.ShowDialog() == DialogResult.OK)
+                {
                     DownloadPathBox.Text = fbd.SelectedPath;
+                }
             };
 
             BrowseExtractButton.Click += (s, e) =>
             {
                 using var fbd = new FolderBrowserDialog();
                 if (fbd.ShowDialog() == DialogResult.OK)
+                {
                     ExtractPathBox.Text = fbd.SelectedPath;
+                }
             };
 
             this.AcceptButton = ContinueButton;

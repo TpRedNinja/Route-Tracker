@@ -86,13 +86,8 @@ namespace Route_Tracker
         private int totalTemplarHunts = 0;
         private int legendaryShips = 0;
         private int treasuremaps = 0;
-        private int modernDayMissions = 0;
 
-        // Modern Day mission tracking
-        // Tracks the previous value of the 'character' variable to detect transitions in and out of modern day missions.
-        // Default is 0 (not in modern day). When entering modern day, value becomes 1. When returning to main game (1 -> 0),
-        // this is used to increment the completed modern day mission count and update the state for the next transition.
-        private int oldcharacter = 0;
+        // Total upgrades and collectibles
         private int totalUpgrades = 0;
         private int totalFragments = 0;
         private int totalViewpoints = 0;
@@ -107,10 +102,6 @@ namespace Route_Tracker
         public Dictionary<string, int> LocationViewpointsCounts { get; } = [];
         #endregion
 
-        // ==========FORMAL COMMENT=========
-        // Initializes a new game statistics tracker for Assassin's Creed 4
-        // Configures memory access and calculates the base address for collectibles
-        // ==========MY NOTES==============
         // Sets up our tracker to read AC4's memory
         // Calculates the starting point for finding all the collectibles
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290",
@@ -126,11 +117,6 @@ namespace Route_Tracker
         }
 
         #region Memory Reading Methods
-
-        // ==========FORMAL COMMENT=========
-        // Helper method to read collectibles using shared memory pattern
-        // Uses common base address and offset structure with specific third offset
-        // ==========MY NOTES==============
         // Simplifies reading collectibles that follow the standard pattern
         // Makes the code cleaner by removing duplicated memory reading logic
         private int ReadCollectible(int thirdOffset)
@@ -146,10 +132,6 @@ namespace Route_Tracker
             return ReadWithCache<int>(cacheKey, missionBaseAddress, [missionOffset]);
         }
 
-        // ==========FORMAL COMMENT=========
-        // Helper method to count collectibles that are stored as individual flags
-        // Iterates through a range of third offsets and sums their values
-        // ==========MY NOTES==============
         // Used for things like chests and taverns that have many individual locations
         // Each location has its own memory address with a predictable pattern
         // startOffset and endOffset are comes from getstats() we pass them through lol
@@ -201,7 +183,7 @@ namespace Route_Tracker
             return count;
         }
 
-        // startOffset and endOffset are comes from getstats() we pass them through lol
+        // startOffset and endOffset comes from getstats() we pass them through lol
         // function made by me
         private int CountMissions(int startOffset, int endOffset) 
         {
@@ -225,11 +207,6 @@ namespace Route_Tracker
             return count;
         }
 
-        // ==========FORMAL COMMENT=========
-        // Retrieves current game statistics by reading from multiple memory locations
-        // Collects data on completion percentage, collectibles, and other trackable items
-        // Also processes percentage changes to detect special activities
-        // ==========MY NOTES==============
         // The main method that gets all the stats from the game
         // Reads everything from memory: percentage, collectibles, etc.
         // Also checks if you've completed any special activities
@@ -245,7 +222,7 @@ namespace Route_Tracker
             // for other functions
             int mainmenu = ReadWithCache<int>("mainmenu", (nint)baseAddress + 0x49D2204, mainMenuPtrOffsets);
             bool loading = ReadWithCache<bool>("loading", (nint)baseAddress + 0x04A1A6CC, loadingPtrOffsets);
-            int character = ReadWithCache<int>("character", (nint)baseAddress + 0x23485C0, characterPtrOffsets);
+            //int character = ReadWithCache<int>("character", (nint)baseAddress + 0x23485C0, characterPtrOffsets);
 
             // Read all other collectibles
             int viewpoints = ReadCollectible(ViewpointsThirdOffset);
@@ -269,9 +246,6 @@ namespace Route_Tracker
             completedStoryMissions = CountMissions(MissionFirstOffset, MissionEndOffset);
             treasuremaps = CountCollectibles(TreasureMapsStartOffset, TreasureMapsEndOffset);
 
-            // Detect modern day missions
-            DetectModernDayMissions(character, loading);
-
             // DetectStatuses
             DetectStatuses(mainmenu, loading);
 
@@ -283,27 +257,6 @@ namespace Route_Tracker
         #endregion
 
         #region State Detection Methods
-        // ==========FORMAL COMMENT=========
-        // Methods that analyze game memory to detect specific events or states
-        // Includes activity detection, upgrade tracking, and game status monitoring
-        // ==========MY NOTES==============
-        // These methods figure out what the player is doing or has done
-        // They watch for changes in memory values that indicate game activities
-        // Used to track progress through the route
-        private void DetectModernDayMissions(int character, bool loading)
-        {
-            if (character > 0 && oldcharacter != character && !loading)
-            {
-                oldcharacter = character;
-            }
-            else if(character == 0 && oldcharacter > 0 && !loading)
-            {
-                modernDayMissions++;
-                oldcharacter = character;
-                
-            }
-        }
-
         private void DetectStatuses(int mainmenu, bool loading)
         {
             //loading status
@@ -329,11 +282,6 @@ namespace Route_Tracker
         #endregion
 
         #region Public Stats Interface
-        // ==========FORMAL COMMENT=========
-        // Returns the current counters for special activities tracked directly from memory.
-        // Provides access to story mission, templar hunt, legendary ship, and treasure map completion counts.
-        // Used by the route tracking system to mark these activities as completed.
-        // ==========MY NOTES==============
         // Tells the route tracker how many special activities we've completed.
         // This is how the UI knows when to check off story missions, legendary ships, and treasure maps.
         // Returns a tuple with all four counter values at once.
@@ -347,10 +295,6 @@ namespace Route_Tracker
             return (isLoading, isMainMenu);
         }
 
-        // ==========FORMAL COMMENT=========
-        // Returns all game statistics as a dictionary for flexible usage
-        // Gathers data from all memory reading methods into a single structure
-        // ==========MY NOTES==============
         // This is the primary method that the UI uses to get all stats
         // Returns everything in a dictionary so different games can have different stats
         public override Dictionary<string, object> GetStatsAsDictionary()
@@ -387,14 +331,12 @@ namespace Route_Tracker
 
                 // Other stats
                 ["Hero Upgrades"] = totalUpgrades,
-                ["Modern Day Missions"] = modernDayMissions,
 
                 // Game state
                 ["Is Loading"] = IsLoading,
                 ["Is Main Menu"] = IsMainMenu
             };
         }
-
         #endregion
     }
 }

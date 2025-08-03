@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
-using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Route_Tracker.Properties;
 
 namespace Route_Tracker
@@ -12,55 +13,6 @@ namespace Route_Tracker
     public static class RouteHelpers
     {
         #region Route Data Management (from RouteDataManager.cs)
-        // ==========MY NOTES==============
-        // Runs when the user clicks Save Progress (legacy - moved to context menu)
-        public static void SaveProgress(RouteManager? routeManager, MainForm mainForm)
-        {
-            routeManager?.SaveProgress(mainForm);
-        }
-
-        // ==========MY NOTES==============
-        // Runs when the user clicks Load Progress (legacy - moved to context menu)
-        public static void LoadProgress(ref RouteManager? routeManager, DataGridView routeGrid, MainForm mainForm)
-        {
-            routeManager ??= new RouteManager(
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Routes", "AC4 100 % Route - Main Route.tsv"),
-                new GameConnectionManager()
-            );
-
-            if (routeManager.LoadEntries().Count == 0)
-            {
-                MessageBox.Show("No route entries found. Make sure the route file exists.", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            if (routeManager.LoadProgress(routeGrid, mainForm))
-            {
-                MessageBox.Show("Progress loaded successfully.", "Load Complete",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        // ==========MY NOTES==============
-        // Resets all progress when you click Reset Progress (legacy - moved to context menu)
-        public static void ResetProgress(RouteManager? routeManager, DataGridView? routeGrid)
-        {
-            if (routeManager == null || routeGrid == null)
-                return;
-
-            var result = MessageBox.Show(
-                "Are you sure you want to reset your progress?\n\nThis will delete your autosave and cannot be undone.",
-                "Reset Progress",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (result == DialogResult.Yes)
-            {
-                routeManager.ResetProgress(routeGrid);
-            }
-        }
-
         // ==========MY NOTES==============
         // Fills the route grid with actual data or shows a message
         // FIXED: Now properly manages loading spinner to prevent conflicts
@@ -88,34 +40,15 @@ namespace Route_Tracker
                 string selectedGame = GetSelectedGameName(mainForm);
 
                 // Load route data (data-only operation)
-                routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame);
+                routeManager.LoadRouteDataIntoGrid(routeGrid, selectedGame, mainForm);
 
                 // Check if we have entries loaded
                 var entries = routeManager.LoadEntries();
                 if (entries.Count > 0)
                 {
-                    // Suspend layout before modifying routeGrid
-                    routeGrid.SuspendLayout();
-
-                    // Clear and show actual entries
-                    routeGrid.Rows.Clear();
-
-                    foreach (var entry in entries)
-                    {
-                        string completionMark = entry.IsCompleted ? "X" : "";
-                        int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
-                        routeGrid.Rows[rowIndex].Tag = entry;
-                    }
-
-                    // Store all entries for filtering
+                    // Store all entries for filtering - NO GRID POPULATION HERE
                     mainForm.allRouteEntries.Clear();
-                    foreach (DataGridViewRow row in routeGrid.Rows)
-                    {
-                        if (row.Tag is RouteEntry entry)
-                        {
-                            mainForm.allRouteEntries.Add(entry);
-                        }
-                    }
+                    mainForm.allRouteEntries.AddRange(entries);
 
                     PopulateTypeFilter(mainForm);
 
@@ -125,13 +58,6 @@ namespace Route_Tracker
                         mainForm.completionLabel.Text = "Completion: 100%";
                     else
                         mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
-
-
-                    // Check main menu state
-                    var gameStats = mainForm.gameConnectionManager.GameStats;
-
-                    // Resume layout after all modifications
-                    routeGrid.ResumeLayout(true);
 
                     // SUCCESS: Show popup notification
                     string routeFileName = System.IO.Path.GetFileName(routeManager.GetRouteFilePath());
@@ -215,32 +141,598 @@ namespace Route_Tracker
         }
         #endregion
 
-        #region Filtering (from FilterManager.cs)
-        public static void UpdateRouteGridWithEntries(MainForm mainForm, List<RouteEntry> entries)
+        #region Progress Persistence (from RouteManager.cs)
+        // ==========FORMAL COMMENT=========
+        // Automatically saves current progress with cycling backup system
+        // Creates numbered backup files and cycles through them for redundancy
+        // ==========MY NOTES==============
+        // Enhanced autosave that creates multiple backup files
+        // Gives users automatic protection with rotating save files
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1869:",
+        Justification = "Performance optimizations are minimal")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079:",
+        Justification = "because i said so")]
+        public static void AutoSaveProgress(RouteManager routeManager)
         {
-            // Suspend layout to prevent scroll jumping
-            mainForm.routeGrid.SuspendLayout();
+            if (routeManager == null || routeManager.GetRouteEntries().Count == 0)
+                return;
 
             try
             {
-                mainForm.routeGrid.Rows.Clear();
+                var routeEntries = routeManager.GetRouteEntries();
+                string routeFilePath = routeManager.GetRouteFilePath();
 
-                foreach (var entry in entries)
+                // Create save data with completion and skip status
+                Dictionary<string, (bool IsCompleted, bool IsSkipped)> entryStatus = [];
+                foreach (var entry in routeEntries)
                 {
-                    if (entry.IsSkipped) continue;
-
-                    string completionMark = entry.IsCompleted ? "X" : "";
-                    int rowIndex = mainForm.routeGrid.Rows.Add(entry.DisplayText, completionMark);
-                    mainForm.routeGrid.Rows[rowIndex].Tag = entry;
+                    string key = $"{entry.Id}_{entry.Name}_{entry.Type}_{entry.Condition}";
+                    entryStatus[key] = (entry.IsCompleted, entry.IsSkipped);
                 }
 
-                RouteManager.SortRouteGridByCompletion(mainForm.routeGrid);
-                SortingManager.ScrollToFirstIncomplete(mainForm.routeGrid);
-                UpdateFilteredCompletionStats(mainForm, entries);
+                // Create directory for saves if it doesn't exist
+                string saveDir = Path.Combine(
+                    Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                    "SavedProgress");
+
+                if (!Directory.Exists(saveDir))
+                    Directory.CreateDirectory(saveDir);
+
+                // Determine game abbreviation and route type
+                string gameAbbreviation = GetGameAbbreviation(routeManager);
+                string routeType = GetRouteType(routeManager);
+
+                // Create the cycling autosave with numbered backups
+                CreateCyclingAutoSave(saveDir, gameAbbreviation, routeType, entryStatus);
+
+                Debug.WriteLine($"Auto-saved progress with cycling backup system");
             }
-            finally
+            catch (Exception ex)
             {
-                mainForm.routeGrid.ResumeLayout(true);
+                Debug.WriteLine($"Error auto-saving progress: {ex.Message}");
+            }
+        }
+
+        // The core of the cycling backup system
+        // Rotates through numbered backups (1-10) and cycles back to 1
+        private static void CreateCyclingAutoSave(string saveDir, string gameAbbreviation, string routeType, Dictionary<string, (bool IsCompleted, bool IsSkipped)> entryStatus)
+        {
+            var JsonOptions = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+
+            // Create file names
+            string baseFileName = $"{gameAbbreviation}AutoSave{routeType}.json";
+            string mainAutosaveFile = Path.Combine(saveDir, baseFileName);
+
+            string json = System.Text.Json.JsonSerializer.Serialize(entryStatus, JsonOptions);
+
+            // If main autosave exists, we need to cycle it into numbered backups
+            if (File.Exists(mainAutosaveFile))
+            {
+                // Find the next backup number to use (1-10, cycling)
+                int nextBackupNumber = GetNextBackupNumber(saveDir, gameAbbreviation, routeType);
+
+                // Move current main autosave to numbered backup
+                string backupFileName = $"{gameAbbreviation}AutoSave{routeType}{nextBackupNumber}.json";
+                string backupFilePath = Path.Combine(saveDir, backupFileName);
+
+                try
+                {
+                    File.Copy(mainAutosaveFile, backupFilePath, overwrite: true);
+                    Debug.WriteLine($"Backed up previous autosave to {backupFileName}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Warning: Could not create backup {backupFileName}: {ex.Message}");
+                }
+            }
+
+            // Save new main autosave
+            File.WriteAllText(mainAutosaveFile, json);
+            Debug.WriteLine($"Created new autosave: {baseFileName}");
+        }
+
+        // Figures out which numbered backup to create next
+        // Cycles through 1-10 and starts over, giving us rolling backups
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        private static int GetNextBackupNumber(string saveDir, string gameAbbreviation, string routeType)
+        {
+            // Find the highest existing backup number
+            int highestBackup = 0;
+            string searchPattern = $"{gameAbbreviation}AutoSave{routeType}*.json";
+
+            try
+            {
+                var backupFiles = Directory.GetFiles(saveDir, searchPattern);
+                foreach (string file in backupFiles)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file);
+                    string expectedPrefix = $"{gameAbbreviation}AutoSave{routeType}";
+
+                    if (fileName.StartsWith(expectedPrefix) && fileName != expectedPrefix)
+                    {
+                        string numberPart = fileName[expectedPrefix.Length..];
+                        if (int.TryParse(numberPart, out int backupNumber) && backupNumber > 0 && backupNumber <= 10)
+                        {
+                            highestBackup = Math.Max(highestBackup, backupNumber);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Warning: Error checking backup files: {ex.Message}");
+            }
+
+            // Return next number in cycle (1-10)
+            return highestBackup >= 10 ? 1 : highestBackup + 1;
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Determines game abbreviation based on route file or game connection
+        // Returns standard abbreviations like AC4, GoW, TR13, etc.
+        // ==========MY NOTES==============
+        // Creates short game names for the autosave files
+        // Uses common abbreviations that gamers would recognize
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1847",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "because i said so")]
+        private static string GetGameAbbreviation(RouteManager routeManager)
+        {
+            string routeFilePath = routeManager.GetRouteFilePath();
+            string routeFileName = Path.GetFileNameWithoutExtension(routeFilePath).ToLower();
+
+            // Check route file name for game indicators
+            if (routeFileName.Contains("ac4") || (routeFileName.Contains("assassin") && routeFileName.Contains("creed") && routeFileName.Contains("4")))
+                return "AC4";
+            if (routeFileName.Contains("gow") || (routeFileName.Contains("god") && routeFileName.Contains("war")))
+                return "GoW";
+            if (routeFileName.Contains("tr13") || (routeFileName.Contains("tomb") && routeFileName.Contains("raider")))
+                return "TR13";
+
+            // Try to get from game connection if available
+            var gameConnectionManager = routeManager.GetGameConnectionManager();
+            if (gameConnectionManager?.GameStats != null)
+            {
+                var statsType = gameConnectionManager.GameStats.GetType().Name;
+                if (statsType.Contains("AC4"))
+                    return "AC4";
+                if (statsType.Contains("GoW"))
+                    return "GoW";
+            }
+
+            // Default fallback - use first 3-4 characters of route name
+            string safeName = new([.. routeFileName.Take(4).Where(char.IsLetterOrDigit)]);
+            return string.IsNullOrEmpty(safeName) ? "Game" : safeName.ToUpper();
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Determines if this is a user-created route or official route
+        // Returns "User" for custom routes, empty string for official routes
+        // ==========MY NOTES==============
+        // Distinguishes between official game routes and user-made custom routes
+        // Adds "User" to filename for custom routes so they don't conflict
+        private static string GetRouteType(RouteManager routeManager)
+        {
+            string routeFilePath = routeManager.GetRouteFilePath();
+            string routeFileName = Path.GetFileNameWithoutExtension(routeFilePath).ToLower();
+
+            // Check for indicators of user-created routes
+            if (routeFileName.Contains("user") ||
+                routeFileName.Contains("custom") ||
+                routeFileName.Contains("personal") ||
+                routeFileName.Contains("test") ||
+                (!routeFileName.Contains("100") && !routeFileName.Contains("main")))
+            {
+                return "User";
+            }
+
+            return ""; // Official route
+        }
+
+        // Enhanced autosave loading that can find backups if main file is corrupted
+        // Tries the main autosave first, then looks for numbered backups
+        public static bool LoadAutoSave(RouteManager routeManager, DataGridView routeGrid)
+        {
+            var routeEntries = routeManager.GetRouteEntries();
+            if (routeEntries == null || routeEntries.Count == 0 || routeGrid == null)
+                return false;
+
+            try
+            {
+                string routeFilePath = routeManager.GetRouteFilePath();
+                string saveDir = Path.Combine(
+                    Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                    "SavedProgress");
+
+                if (!Directory.Exists(saveDir))
+                    return false;
+
+                // Get file naming info
+                string gameAbbreviation = GetGameAbbreviation(routeManager);
+                string routeType = GetRouteType(routeManager);
+                string baseFileName = $"{gameAbbreviation}AutoSave{routeType}.json";
+                string mainAutosaveFile = Path.Combine(saveDir, baseFileName);
+
+                // Try to load main autosave first
+                if (File.Exists(mainAutosaveFile))
+                {
+                    if (TryLoadAutosaveFile(mainAutosaveFile, routeManager, routeGrid))
+                    {
+                        Debug.WriteLine($"Loaded autosave from {baseFileName}");
+                        return true;
+                    }
+                }
+
+                // If main autosave failed, try numbered backups (newest first)
+                return TryLoadFromBackups(saveDir, gameAbbreviation, routeType, routeManager, routeGrid);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading autosave: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Fallback system that looks for working backup files
+        // Starts with the most recent backup and works backwards
+        private static bool TryLoadFromBackups(string saveDir, string gameAbbreviation, string routeType, RouteManager routeManager, DataGridView routeGrid)
+        {
+            try
+            {
+                // Find all backup files for this game/route
+                string searchPattern = $"{gameAbbreviation}AutoSave{routeType}*.json";
+                var backupFiles = Directory.GetFiles(saveDir, searchPattern)
+                    .Where(f =>
+                    {
+                        string fileName = Path.GetFileNameWithoutExtension(f);
+                        string expectedPrefix = $"{gameAbbreviation}AutoSave{routeType}";
+                        return fileName.StartsWith(expectedPrefix) && fileName != expectedPrefix;
+                    })
+                    .OrderByDescending(f => File.GetLastWriteTime(f))
+                    .ToList();
+
+                foreach (string backupFile in backupFiles)
+                {
+                    if (TryLoadAutosaveFile(backupFile, routeManager, routeGrid))
+                    {
+                        Debug.WriteLine($"Loaded autosave from backup: {Path.GetFileName(backupFile)}");
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading from backups: {ex.Message}");
+                return false;
+            }
+        }
+
+        // The actual file loading logic that works with any autosave file
+        // Handles different save formats for backwards compatibility
+        private static bool TryLoadAutosaveFile(string filePath, RouteManager routeManager, DataGridView routeGrid)
+        {
+            try
+            {
+                var routeEntries = routeManager.GetRouteEntries();
+                string json = File.ReadAllText(filePath);
+
+                try
+                {
+                    // Try new tuple format first
+                    var entryStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, (bool IsCompleted, bool IsSkipped)>>(json);
+
+                    foreach (var entry in routeEntries!)
+                    {
+                        string key = $"{entry.Id}_{entry.Name}_{entry.Type}_{entry.Condition}";
+                        if (entryStatus != null && entryStatus.TryGetValue(key, out var status))
+                        {
+                            entry.IsCompleted = status.IsCompleted;
+                            entry.IsSkipped = status.IsSkipped;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Fallback to legacy format
+                    var completionStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, bool>>(json);
+
+                    foreach (var entry in routeEntries!)
+                    {
+                        string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
+                        if (completionStatus != null && completionStatus.TryGetValue(key, out bool isCompleted))
+                        {
+                            entry.IsCompleted = isCompleted;
+                        }
+                    }
+                }
+
+                // Update UI
+                routeGrid.Rows.Clear();
+                bool anyChanges = false;
+
+                foreach (var entry in routeEntries)
+                {
+                    if (entry.IsSkipped)
+                        continue;
+
+                    string completionMark = entry.IsCompleted ? "X" : "";
+                    int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                    routeGrid.Rows[rowIndex].Tag = entry;
+                    anyChanges = true;
+                }
+
+                if (anyChanges)
+                {
+                    RouteManager.SortRouteGridByCompletion(routeGrid);
+                    SortingManager.ScrollToFirstIncomplete(routeGrid);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading autosave file {filePath}: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Detects when the game is loading, in menu, or in active gameplay
+        // Preserves progress across these state changes
+        public static void HandleGameStateTransition(RouteManager routeManager, DataGridView routeGrid)
+        {
+            var gameConnectionManager = routeManager.GetGameConnectionManager();
+
+            // Get current states from the game through base class method (works with any game)
+            (bool IsLoading, bool IsMainMenu) = gameConnectionManager?.GameStats?.GetGameStatus() ?? (false, false);
+
+            bool isCurrentlyInNonGameplay = IsLoading || IsMainMenu;
+            bool wasPreviouslyInNonGameplay = routeManager.GetWasPreviouslyInNonGameplay();
+
+            // Entering loading or menu from gameplay
+            if (isCurrentlyInNonGameplay && !wasPreviouslyInNonGameplay)
+            {
+                string gameName = gameConnectionManager?.GameStats?.GetType().Name ?? "Game";
+                Debug.WriteLine($"{gameName}: Entering non-gameplay state (Loading: {IsLoading}, Menu: {IsMainMenu}) - saving progress");
+                AutoSaveProgress(routeManager);
+            }
+            // Returning to gameplay from loading or menu
+            else if (!isCurrentlyInNonGameplay && wasPreviouslyInNonGameplay)
+            {
+                string gameName = gameConnectionManager?.GameStats?.GetType().Name ?? "Game";
+                Debug.WriteLine($"{gameName}: Returning to gameplay - loading saved progress");
+                LoadAutoSave(routeManager, routeGrid);
+            }
+
+            // Update previous state
+            routeManager.SetWasPreviouslyInNonGameplay(isCurrentlyInNonGameplay);
+        }
+
+        // Saves your progress to any file name you choose
+        // Lets you create multiple save files for different segments or runs
+        public static void SaveProgressToFile(RouteManager routeManager, Form parentForm)
+        {
+            var routeEntries = routeManager.GetRouteEntries();
+            if (routeEntries == null || routeEntries.Count == 0)
+                return;
+
+            try
+            {
+                string routeFilePath = routeManager.GetRouteFilePath();
+
+                // Create save data with completion status
+                Dictionary<string, bool> completionStatus = [];
+                foreach (var entry in routeEntries)
+                {
+                    string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
+                    completionStatus[key] = entry.IsCompleted;
+                }
+
+                // Setup save dialog
+                using SaveFileDialog saveDialog = new()
+                {
+                    Filter = "Progress Files|*.json|All Files|*.*",
+                    Title = "Save Route Progress",
+                    DefaultExt = "json",
+                    FileName = $"RouteProgress_{DateTime.Now:yyyyMMdd_HHmmss}"
+                };
+
+                // Try to use a logical starting folder
+                string initialDir = Path.GetDirectoryName(routeFilePath) ?? string.Empty;
+                string saveDir = Path.Combine(initialDir, "SavedProgress");
+                if (Directory.Exists(saveDir))
+                    saveDialog.InitialDirectory = saveDir;
+                else if (Directory.Exists(initialDir))
+                    saveDialog.InitialDirectory = initialDir;
+
+                // Show dialog and save if confirmed
+                if (saveDialog.ShowDialog(parentForm) == DialogResult.OK)
+                {
+                    string json = System.Text.Json.JsonSerializer.Serialize(completionStatus);
+                    File.WriteAllText(saveDialog.FileName, json);
+
+                    // Also update autosave when manually saving
+                    AutoSaveProgress(routeManager);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving progress: {ex.Message}", "Save Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Lets you pick any saved file to load progress from
+        // Updates the display to show loaded completion status
+        public static bool LoadProgressFromFile(RouteManager routeManager, DataGridView routeGrid, Form parentForm)
+        {
+            var routeEntries = routeManager.GetRouteEntries();
+            if (routeEntries == null || routeEntries.Count == 0 || routeGrid == null)
+                return false;
+
+            try
+            {
+                string routeFilePath = routeManager.GetRouteFilePath();
+
+                // Setup open file dialog
+                using OpenFileDialog openDialog = new()
+                {
+                    Filter = "Progress Files|*.json|All Files|*.*",
+                    Title = "Load Route Progress",
+                    CheckFileExists = true
+                };
+
+                // Try to use a logical starting folder
+                string initialDir = Path.GetDirectoryName(routeFilePath) ?? string.Empty;
+                string saveDir = Path.Combine(initialDir, "SavedProgress");
+                if (Directory.Exists(saveDir))
+                    openDialog.InitialDirectory = saveDir;
+                else if (Directory.Exists(initialDir))
+                    openDialog.InitialDirectory = initialDir;
+
+                // Show dialog and load if confirmed
+                if (openDialog.ShowDialog(parentForm) != DialogResult.OK)
+                    return false;
+
+                // Load and apply saved data
+                string json = File.ReadAllText(openDialog.FileName);
+                var completionStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, bool>>(json);
+
+                if (completionStatus == null || completionStatus.Count == 0)
+                    return false;
+
+                // Apply saved completion status
+                bool anyChanges = false;
+                foreach (var entry in routeEntries)
+                {
+                    string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
+                    if (completionStatus.TryGetValue(key, out bool isCompleted))
+                    {
+                        if (entry.IsCompleted != isCompleted)
+                        {
+                            entry.IsCompleted = isCompleted;
+                            anyChanges = true;
+                        }
+                    }
+                }
+
+                // Update UI if needed
+                if (anyChanges)
+                {
+                    routeGrid.Rows.Clear();
+                    foreach (var entry in routeEntries)
+                    {
+                        string completionMark = entry.IsCompleted ? "X" : "";
+                        int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                        routeGrid.Rows[rowIndex].Tag = entry;
+                    }
+
+                    RouteManager.SortRouteGridByCompletion(routeGrid);
+                    SortingManager.ScrollToFirstIncomplete(routeGrid);
+
+                    // After loading manually, update autosave as well
+                    AutoSaveProgress(routeManager);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading progress: {ex.Message}", "Load Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Shows the save location folder and opens it in Explorer
+        public static void ShowSaveLocation(RouteManager routeManager, Form parentForm)
+        {
+            string routeFilePath = routeManager.GetRouteFilePath();
+            string saveDir = Path.Combine(
+                Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                "SavedProgress");
+
+            MessageBox.Show(parentForm,
+                $"Autosave files are stored in:\n{saveDir}",
+                "Autosave Location",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+
+            // Try to open the folder
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = saveDir,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to open save directory: {ex.Message}");
+            }
+        }
+
+        // ==========FORMAL COMMENT=========
+        // Resets all route progress, clears autosave, and updates the UI
+        // ==========MY NOTES==============
+        // Sets all entries to not completed/skipped, deletes autosave, and refreshes the grid
+        public static void ResetProgressData(RouteManager routeManager, DataGridView routeGrid)
+        {
+            var routeEntries = routeManager.GetRouteEntries();
+            string routeFilePath = routeManager.GetRouteFilePath();
+
+            // Clear completion/skipped state in memory
+            foreach (var entry in routeEntries)
+            {
+                entry.IsCompleted = false;
+                entry.IsSkipped = false;
+            }
+
+            // Delete autosave file if it exists
+            string saveDir = Path.Combine(
+                Path.GetDirectoryName(routeFilePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                "SavedProgress");
+            string routeName = Path.GetFileNameWithoutExtension(routeFilePath);
+            string autosaveFile = Path.Combine(saveDir, $"{routeName}_AutoSave.json");
+            if (File.Exists(autosaveFile))
+                File.Delete(autosaveFile);
+
+            // Refresh the UI
+            routeGrid.Rows.Clear();
+            foreach (var entry in routeEntries)
+            {
+                int rowIndex = routeGrid.Rows.Add(entry.DisplayText, "");
+                routeGrid.Rows[rowIndex].Tag = entry;
+            }
+            RouteManager.SortRouteGridByCompletion(routeGrid);
+            SortingManager.ScrollToFirstIncomplete(routeGrid);
+        }
+        #endregion
+
+        #region Filtering (from FilterManager.cs)
+        public static void UpdateRouteGridWithEntries(MainForm mainForm, List<RouteEntry> entries)
+        {
+            if (mainForm.GetRouteManager() is RouteManager routeManager)
+            {
+                var filteredEntries = entries.Where(e => !e.IsSkipped).ToList();
+
+                // Update the route manager's data source
+                routeManager.UpdateRouteEntries(filteredEntries);
+
+                // Update virtual grid display
+                mainForm.routeGrid.RowCount = filteredEntries.Count;
+                mainForm.routeGrid.Invalidate();
+
+                UpdateFilteredCompletionStats(mainForm, entries);
             }
         }
 

@@ -27,7 +27,7 @@ namespace Route_Tracker
 
         private void InitializeCustomComponents()
         {
-            this.Text = "Connect to Game";
+            this.SetupAsSettingsForm("Connect to Game");
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -35,13 +35,8 @@ namespace Route_Tracker
             this.Width = 400;
             this.Height = 180;
 
-            connectionLabel = new Label
-            {
-                Text = "Not connected",
-                AutoSize = true,
-                Top = 20,
-                Left = 20
-            };
+            connectionLabel = UIControlFactory.CreateThemedLabel("Not connected");
+            connectionLabel.Location = new Point(20, 20);
             this.Controls.Add(connectionLabel);
 
             gameDropdown = new ComboBox
@@ -55,23 +50,13 @@ namespace Route_Tracker
             gameDropdown.SelectedIndex = 0;
             this.Controls.Add(gameDropdown);
 
-            autoDetectButton = new Button
-            {
-                Text = "Auto-Detect",
-                Left = 230,
-                Top = 50,
-                Width = 100
-            };
+            autoDetectButton = UIControlFactory.CreateThemedButton("Auto-Detect", 100, 25);
+            autoDetectButton.Location = new Point(230, 50);
             autoDetectButton.Click += AutoDetectButton_Click;
             this.Controls.Add(autoDetectButton);
 
-            connectButton = new Button
-            {
-                Text = "Connect",
-                Left = 20,
-                Top = 90,
-                Width = 310
-            };
+            connectButton = UIControlFactory.CreateThemedButton("Connect", 310, 25);
+            connectButton.Location = new Point(20, 90);
             connectButton.Click += ConnectButton_Click;
             this.Controls.Add(connectButton);
 

@@ -30,12 +30,10 @@ namespace Route_Tracker
         public HelpWizard(HotkeysSettingsForm parentForm)
         {
             this.parentForm = parentForm;
-            this.Text = "Help";
+            this.SetupAsSettingsForm("Help");
             this.Size = new Size(500, 500);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.StartPosition = FormStartPosition.CenterParent;
+            this.Owner = parentForm;
+            this.TopMost = true;
             this.BackColor = AppTheme.BackgroundColor;
             this.ForeColor = AppTheme.TextColor;
 

@@ -26,25 +26,19 @@ namespace Route_Tracker
 
         private void InitializeCustomComponents()
         {
-            this.Text = "Layout Settings";
-            this.Size = new Size(350, 150); // Make it smaller since no transparency option
+            this.SetupAsSettingsForm("Layout Settings");
+            this.Size = new Size(350, 150);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.CenterParent;
 
             // Apply theme
-            AppTheme.ApplyTo(this);
+            //AppTheme.ApplyTo(this);
 
             // Layout selection
-            var layoutLabel = new Label
-            {
-                Text = "Layout Mode:",
-                Location = new Point(20, 20),
-                Size = new Size(100, 23),
-                ForeColor = AppTheme.TextColor,
-                Font = AppTheme.DefaultFont
-            };
+            var layoutLabel = UIControlFactory.CreateThemedLabel("Layout Mode:");
+            layoutLabel.Location = new Point(20, 20);
             this.Controls.Add(layoutLabel);
 
             layoutComboBox = new ComboBox
@@ -69,29 +63,21 @@ namespace Route_Tracker
             this.Controls.Add(layoutComboBox);
 
             // Buttons
-            okButton = new Button
-            {
-                Text = "OK",
-                Location = new Point(155, 70), // Move up since no transparency option
-                Size = new Size(75, 25),
-                DialogResult = DialogResult.OK
-            };
+            var (okButton, cancelButton) = UIControlFactory.CreateOkCancelButtons();
+            okButton.Location = new Point(155, 70);
             okButton.Click += OkButton_Click;
-            AppTheme.ApplyTo(okButton);
-            this.Controls.Add(okButton);
 
-            cancelButton = new Button
-            {
-                Text = "Cancel",
-                Location = new Point(235, 70), // Move up since no transparency option
-                Size = new Size(75, 25),
-                DialogResult = DialogResult.Cancel
-            };
-            AppTheme.ApplyTo(cancelButton);
-            this.Controls.Add(cancelButton);
+            cancelButton.Location = new Point(235, 70);
 
             this.AcceptButton = okButton;
             this.CancelButton = cancelButton;
+
+            this.Controls.Add(okButton);
+            this.Controls.Add(cancelButton);
+
+            // Store references
+            this.okButton = okButton;
+            this.cancelButton = cancelButton;
         }
 
         private void OkButton_Click(object? sender, EventArgs e)

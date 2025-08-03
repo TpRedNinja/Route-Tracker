@@ -106,24 +106,11 @@ namespace Route_Tracker
             toolTip.SetToolTip(hideCompletedRadio, "Hide completed entries from view (they are still saved in progress)");
 
             // Buttons
-            var okButton = new Button
-            {
-                Text = "OK",
-                Size = new Size(75, 23),
-                Location = new Point(185, 170),
-                DialogResult = DialogResult.OK,
-                Font = font
-            };
+            var (okButton, cancelButton) = UIControlFactory.CreateOkCancelButtons();
+            okButton.Location = new Point(185, 170);
             okButton.Click += OkButton_Click;
 
-            var cancelButton = new Button
-            {
-                Text = "Cancel",
-                Size = new Size(75, 23),
-                Location = new Point(270, 170),
-                DialogResult = DialogResult.Cancel,
-                Font = font
-            };
+            cancelButton.Location = new Point(270, 170);
 
             // Event handlers for radio buttons
             completedTopRadio.CheckedChanged += (s, e) => { if (completedTopRadio.Checked) selectedSortingMode = SortingMode.CompletedAtTop; };

@@ -131,16 +131,34 @@ namespace Route_Tracker
         }
 
         // ==========MY NOTES==============
-        // Updates the grid with the sorted entries
+        // Updates the grid with sorted entries using virtual mode for optimal performance
         private static void UpdateGridWithSortedEntries(DataGridView routeGrid, List<RouteEntry> sortedEntries)
         {
-            routeGrid.Rows.Clear();
-
-            foreach (var entry in sortedEntries)
+            if (routeGrid.VirtualMode)
             {
-                string completionMark = entry.IsCompleted ? "X" : "";
-                int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
-                routeGrid.Rows[rowIndex].Tag = entry;
+                // For virtual mode, update the underlying data source
+                if (routeGrid.FindForm() is MainForm mainForm && mainForm.GetRouteManager() is RouteManager routeManager)
+                {
+                    // Update the route manager's internal entries using reflection
+                    var routeEntriesField = typeof(RouteManager).GetField("routeEntries",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    routeEntriesField?.SetValue(routeManager, sortedEntries);
+
+                    // Update virtual grid display
+                    routeGrid.RowCount = sortedEntries.Count;
+                    routeGrid.Invalidate();
+                }
+            }
+            else
+            {
+                // Traditional mode fallback
+                routeGrid.Rows.Clear();
+                foreach (var entry in sortedEntries)
+                {
+                    string completionMark = entry.IsCompleted ? "X" : "";
+                    int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                    routeGrid.Rows[rowIndex].Tag = entry;
+                }
             }
         }
 

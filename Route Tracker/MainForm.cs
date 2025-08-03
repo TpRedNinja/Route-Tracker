@@ -223,15 +223,11 @@ namespace Route_Tracker
             this.MainMenuStrip = menuStrip;
 
             // Connect button
-            var connectButton = new Button
-            {
-                Text = "Connect to Game",
-                MinimumSize = new Size(100, 25),
-                AutoSize = true,
-                ForeColor = AppTheme.TextColor,
-                Font = AppTheme.DefaultFont,
-                Margin = new Padding(5, 2, 5, 2)
-            };
+            var connectButton = UIControlFactory.CreateThemedButton("Connect to Game", 100, 25);
+            connectButton.MinimumSize = new Size(100, 25);
+            connectButton.AutoSize = true;
+            connectButton.Margin = new Padding(5, 2, 5, 2);
+
             connectButton.Click += async (s, e) =>
             {
                 using var connectionWindow = new ConnectionWindow(gameConnectionManager, settingsManager);
@@ -489,10 +485,7 @@ namespace Route_Tracker
             UpdateHelpShortcutLabel();
             topBar.Controls.Add(helpShortcutLabel);
 
-            AppTheme.ApplyToButton(connectButton);
-            AppTheme.ApplyToButton(showStatsButton);
-            AppTheme.ApplyToButton(showCompletionButton);
-            AppTheme.ApplyToButton(clearFiltersButton);
+            AppTheme.ApplyToControls(showStatsButton, showCompletionButton, clearFiltersButton);
 
             var toolTip = new ToolTip();
             toolTip.SetToolTip(connectButton, "Connect to the selected game. If not running, you can auto-start it in the settings panel.");

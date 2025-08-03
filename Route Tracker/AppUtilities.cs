@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Route_Tracker
 {
@@ -11,7 +12,7 @@ namespace Route_Tracker
     public static class AppTheme
     {
         #region App Information (from AppTheme.cs)
-        public const string Version = "v1.02";
+        public const string Version = "v1.03";
         public const string GitHubRepo = "TpRedNinja/Route-Tracker";
         #endregion
 
@@ -38,12 +39,38 @@ namespace Route_Tracker
         public const int StandardMargin = 5;
 
         // ==========MY NOTES==============
+        // Standard form sizes for consistency
+        public static class FormSizes
+        {
+            public static readonly Size Small = new(350, 200);
+            public static readonly Size Medium = new(500, 400);
+            public static readonly Size Large = new(700, 600);
+            public static readonly Size Settings = new(400, 300);
+        }
+
+        // ==========MY NOTES==============
         // One method to make any control match our dark theme
         public static void ApplyTo(Control control)
         {
             control.BackColor = BackgroundColor;
             control.ForeColor = TextColor;
             control.Font = DefaultFont;
+        }
+
+        // ==========MY NOTES==============
+        // Apply theme to multiple controls at once
+        public static void ApplyToControls(params Control[] controls)
+        {
+            foreach (var control in controls)
+            {
+                switch (control)
+                {
+                    case Button btn: ApplyToButton(btn); break;
+                    case TextBox txt: ApplyToTextBox(txt); break;
+                    case ComboBox cmb: ApplyToComboBox(cmb); break;
+                    default: ApplyTo(control); break;
+                }
+            }
         }
 
         // ==========MY NOTES==============
@@ -109,6 +136,126 @@ namespace Route_Tracker
             {
                 ApplyTo(control);
             }
+        }
+    }
+
+    // ==========MY NOTES==============
+    // Factory methods for creating themed UI controls with consistent styling
+    public static class UIControlFactory
+    {
+        public static Button CreateThemedButton(string text, int width = 100, int height = 25)
+        {
+            var button = new Button
+            {
+                Text = text,
+                Size = new Size(width, height),
+                Font = AppTheme.DefaultFont
+            };
+            AppTheme.ApplyToButton(button);
+            return button;
+        }
+
+        public static Label CreateThemedLabel(string text, bool autoSize = true)
+        {
+            return new Label
+            {
+                Text = text,
+                AutoSize = autoSize,
+                ForeColor = AppTheme.TextColor,
+                Font = AppTheme.DefaultFont
+            };
+        }
+
+        public static TextBox CreateThemedTextBox(int width = 200, string placeholder = "")
+        {
+            var textBox = new TextBox
+            {
+                Width = width,
+                PlaceholderText = placeholder,
+                Font = AppTheme.DefaultFont
+            };
+            AppTheme.ApplyToTextBox(textBox);
+            return textBox;
+        }
+
+        public static ComboBox CreateThemedComboBox(int width = 200)
+        {
+            var comboBox = new ComboBox
+            {
+                Width = width,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = AppTheme.DefaultFont
+            };
+            AppTheme.ApplyToComboBox(comboBox);
+            return comboBox;
+        }
+
+        public static Form CreateThemedForm(string title, int width = 400, int height = 300)
+        {
+            var form = new Form
+            {
+                Text = title,
+                Size = new Size(width, height),
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                StartPosition = FormStartPosition.CenterParent
+            };
+            AppTheme.ApplyTo(form);
+            return form;
+        }
+
+        public static (Button okButton, Button cancelButton) CreateOkCancelButtons()
+        {
+            var okButton = CreateThemedButton("OK", 75, 25);
+            var cancelButton = CreateThemedButton("Cancel", 75, 25);
+
+            okButton.DialogResult = DialogResult.OK;
+            cancelButton.DialogResult = DialogResult.Cancel;
+
+            return (okButton, cancelButton);
+        }
+    }
+
+    // ==========MY NOTES==============
+    // Extension methods for common form layout operations
+    public static class FormExtensions
+    {
+        public static void AddButtonRow(this Form form, params Button[] buttons)
+        {
+            int buttonY = form.Height - 60;
+            int spacing = 10;
+            int totalWidth = buttons.Sum(b => b.Width) + (spacing * (buttons.Length - 1));
+            int startX = (form.Width - totalWidth) / 2;
+
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                buttons[i].Location = new Point(startX, buttonY);
+                startX += buttons[i].Width + spacing;
+                form.Controls.Add(buttons[i]);
+            }
+        }
+
+        public static void AddLabeledControl(this Form form, string labelText, Control control, int y)
+        {
+            var label = UIControlFactory.CreateThemedLabel(labelText);
+            label.Location = new Point(20, y);
+
+            control.Location = new Point(130, y - 2);
+
+            form.Controls.Add(label);
+            form.Controls.Add(control);
+        }
+
+        public static void SetupAsSettingsForm(this Form form, string title)
+        {
+            form.Text = title;
+            form.Size = AppTheme.FormSizes.Settings;
+            form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            form.MaximizeBox = false;
+            form.MinimizeBox = false;
+            form.StartPosition = FormStartPosition.CenterParent;
+            AppTheme.ApplyTo(form);
         }
     }
 

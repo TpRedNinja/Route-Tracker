@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -66,7 +67,7 @@ namespace Route_Tracker
             [LayoutSettingsForm.LayoutMode.Normal] = new LayoutConfig
             {
                 Size = new Size(800, 600),
-                MinSize = new Size(600, 200),
+                MinSize = new Size(400, 200),
                 FontScale = 1.0f,
                 BorderStyle = FormBorderStyle.Sizable,
                 ShowAllControls = true,
@@ -79,7 +80,7 @@ namespace Route_Tracker
                 FontScale = 0.9f,
                 BorderStyle = FormBorderStyle.Sizable,
                 ShowAllControls = true,
-                HideControls = new[] { "searchTextBox", "typeFilterCheckedListBox", "clearFiltersButton" }
+                HideControls = new[] { "searchTextBox", "typeFilterPanel", "clearFiltersButton" }  // Hide the panel instead
             },
             [LayoutSettingsForm.LayoutMode.Mini] = new LayoutConfig
             {
@@ -92,12 +93,12 @@ namespace Route_Tracker
             },
             [LayoutSettingsForm.LayoutMode.Overlay] = new LayoutConfig
             {
-                Size = new Size(300, 800),
-                MinSize = new Size(100, 400),
-                FontScale = 0.7f,
+                Size = new Size(280, 800),  // Reduced width for better overlay fit
+                MinSize = new Size(200, 400),  // Reduced minimum width
+                FontScale = 0.8f,  // Smaller font scale for overlay mode
                 BorderStyle = FormBorderStyle.SizableToolWindow,
                 ShowAllControls = false,
-                HideControls = Array.Empty<string>()
+                HideControls = new[] { "searchTextBox", "typeFilterPanel", "clearFiltersButton" }  // Hide the panel instead
             }
         };
 
@@ -136,6 +137,7 @@ namespace Route_Tracker
             ApplyFormSettings(mainForm, config, currentLayoutMode);
             ApplyControlVisibility(mainForm, config);
             ApplyFontScaling(mainForm, config.FontScale);
+            ApplyLabelPositioning(mainForm, currentLayoutMode);
         }
         #endregion
 
@@ -153,16 +155,33 @@ namespace Route_Tracker
                 mainForm.clearFiltersButton
             };
 
-            _controlGroups["filters"] = new Control[]
-            {
-                mainForm.searchTextBox,
-                mainForm.typeFilterCheckedListBox
-            };
+            // Find the typeFilterPanel (parent of typeFilterCheckedListBox)
+            var typeFilterPanel = mainForm.typeFilterCheckedListBox?.Parent;
+
+            // Create filters array with only non-null controls
+            var filterControls = new List<Control>();
+
+            if (mainForm.searchTextBox != null)
+                filterControls.Add(mainForm.searchTextBox);
+
+            if (typeFilterPanel != null)
+                filterControls.Add(typeFilterPanel);
+            else if (mainForm.typeFilterCheckedListBox != null)
+                filterControls.Add(mainForm.typeFilterCheckedListBox);
+
+            _controlGroups["filters"] = filterControls.ToArray();
 
             _controlGroups["essential"] = new Control[]
             {
                 mainForm.completionLabel,
+                mainForm.currentLocationLabel,
                 mainForm.routeGrid
+            };
+
+            _controlGroups["labels"] = new Control[]
+            {
+                mainForm.completionLabel,
+                mainForm.currentLocationLabel
             };
         }
 
@@ -206,7 +225,14 @@ namespace Route_Tracker
                 {
                     var control = GetControlByName(mainForm, controlName);
                     if (control != null)
+                    {
                         control.Visible = false;
+                        Debug.WriteLine($"Hiding control: {controlName} (Type: {control.GetType().Name})");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Control not found: {controlName}");
+                    }
                 }
             }
             else
@@ -215,6 +241,21 @@ namespace Route_Tracker
                 SetControlGroupVisibility(_controlGroups["buttons"], false);
                 SetControlGroupVisibility(_controlGroups["filters"], false);
                 SetControlGroupVisibility(_controlGroups["essential"], true);
+
+                // Explicitly hide any controls specified in HideControls (for overlay mode)
+                foreach (string controlName in config.HideControls)
+                {
+                    var control = GetControlByName(mainForm, controlName);
+                    if (control != null)
+                    {
+                        control.Visible = false;
+                        Debug.WriteLine($"Explicitly hiding control: {controlName} (Type: {control.GetType().Name})");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Control not found for explicit hiding: {controlName}");
+                    }
+                }
             }
         }
 
@@ -236,10 +277,13 @@ namespace Route_Tracker
             return name switch
             {
                 "searchTextBox" => mainForm.searchTextBox,
-                "typeFilterCheckedListBox" => mainForm.typeFilterCheckedListBox,
+                "typeFilterCheckedListBox" => mainForm.typeFilterCheckedListBox?.Parent ?? mainForm.typeFilterCheckedListBox, // Return the panel instead
+                "typeFilterPanel" => mainForm.typeFilterCheckedListBox?.Parent,
                 "clearFiltersButton" => mainForm.clearFiltersButton,
                 "showStatsButton" => mainForm.showStatsButton,
                 "showCompletionButton" => mainForm.showCompletionButton,
+                "completionLabel" => mainForm.completionLabel,
+                "currentLocationLabel" => mainForm.currentLocationLabel,
                 _ => null
             };
         }
@@ -258,6 +302,10 @@ namespace Route_Tracker
             // Apply to completion label with header font
             if (mainForm.completionLabel != null)
                 mainForm.completionLabel.Font = scaledHeaderFont;
+
+            // Apply to current location label with header font (FIXED)
+            if (mainForm.currentLocationLabel != null)
+                mainForm.currentLocationLabel.Font = scaledHeaderFont;
 
             // Apply to route grid with optimized settings
             if (mainForm.routeGrid != null)
@@ -315,5 +363,62 @@ namespace Route_Tracker
             }
         }
         #endregion
+
+        // ==========MY NOTES==============
+        // Apply layout-specific positioning for labels in different modes
+        private static void ApplyLabelPositioning(MainForm mainForm, LayoutSettingsForm.LayoutMode currentLayoutMode)
+        {
+            if (mainForm.completionLabel == null || mainForm.currentLocationLabel == null)
+                return;
+
+            // Get the parent panel
+            var labelPanel = mainForm.completionLabel.Parent;
+            if (labelPanel == null)
+                return;
+
+            switch (currentLayoutMode)
+            {
+                case LayoutSettingsForm.LayoutMode.Overlay:
+                    // For overlay mode, use tight vertical stacking with minimal spacing
+                    mainForm.completionLabel.Location = new Point(5, 2);  // Closer to edge, minimal top padding
+
+                    // Calculate actual text height instead of full control height
+                    int textHeight = (int)(mainForm.completionLabel.Font.Height);
+                    mainForm.currentLocationLabel.Location = new Point(0, 2 + textHeight + 1);  // Just 1px gap between text lines
+
+                    // Make panel just tall enough for both labels with minimal padding
+                    if (labelPanel is Panel panel)
+                    {
+                        panel.Height = (textHeight * 2) + 6;  // Just enough space for both lines + small padding
+                    }
+                    break;
+
+                case LayoutSettingsForm.LayoutMode.Mini:
+                    // For mini mode, stack vertically but with slightly more breathing room
+                    mainForm.completionLabel.Location = new Point(10, 0);
+                    mainForm.currentLocationLabel.Location = new Point(10, mainForm.completionLabel.Height + 2);
+
+                    if (labelPanel is Panel miniPanel)
+                    {
+                        miniPanel.Height = (mainForm.completionLabel.Height * 2) + 8;
+                    }
+                    break;
+
+                case LayoutSettingsForm.LayoutMode.Compact:
+                    // For compact mode, reduce spacing between labels
+                    mainForm.completionLabel.Location = new Point(10, 0);
+                    mainForm.currentLocationLabel.Location = new Point(mainForm.completionLabel.Right + 15, 0);
+                    break;
+
+                case LayoutSettingsForm.LayoutMode.Normal:
+                default:
+                    // Default horizontal positioning with generous spacing
+                    mainForm.completionLabel.Location = new Point(10, 0);
+                    mainForm.currentLocationLabel.Location = new Point(mainForm.completionLabel.Right + 30, 0);
+                    break;
+            }
+
+            Debug.WriteLine($"Applied label positioning for {currentLayoutMode} mode - Completion: {mainForm.completionLabel.Location}, Current: {mainForm.currentLocationLabel.Location}");
+        }
     }
 }
