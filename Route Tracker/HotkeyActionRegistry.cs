@@ -17,7 +17,7 @@ namespace Route_Tracker
         {
             ["Load"] = (form) => MainFormHelpers.LoadRouteFile(form),
             ["Save"] = (form) => form.routeManager?.SaveProgress(form),
-            ["LoadProgress"] = (form) => MainFormHelpers.LoadProgress(form),
+            ["LoadProgress"] = (form) => HandleLoadProgress(form), // Enhanced to support autosave
             ["ResetProgress"] = (form) => MainFormHelpers.ResetProgress(form, form.GetRouteManager()),
             ["Refresh"] = (form) => form.LoadRouteDataPublicManager(),
             ["Help"] = (form) => {
@@ -50,7 +50,8 @@ namespace Route_Tracker
             ["GlobalTog"] = (form) => HandleGlobalToggle(form),
             ["SortingUp"] = (form) => form.CycleSorting(true),
             ["SortingDown"] = (form) => form.CycleSorting(false),
-            ["GameDirect"] = (form) => form.OpenGameDirectory()
+            ["GameDirect"] = (form) => form.OpenGameDirectory(),
+            ["LoadAutoSave"] = (form) => MainFormHelpers.LoadAutoSave(form) // New autosave action
         };
 
         // ==========MY NOTES==============
@@ -110,6 +111,34 @@ namespace Route_Tracker
         #region Helper Methods for Complex Actions
         // ==========MY NOTES==============
         // Helper methods for actions that need more complex logic
+
+        private static void HandleLoadProgress(MainForm form)
+        {
+            // Show a dialog to choose between manual save and autosave
+            var result = MessageBox.Show(
+                "Load Progress Options:\n\n" +
+                "Yes - Load from file (manual save)\n" +
+                "No - Load autosave\n" +
+                "Cancel - Cancel loading",
+                "Load Progress",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question);
+
+            switch (result)
+            {
+                case DialogResult.Yes:
+                    // Load manual save
+                    MainFormHelpers.LoadProgress(form);
+                    break;
+                case DialogResult.No:
+                    // Load autosave
+                    MainFormHelpers.LoadAutoSave(form);
+                    break;
+                case DialogResult.Cancel:
+                    // Do nothing
+                    break;
+            }
+        }
 
         private static void HandleRestore(MainForm form)
         {

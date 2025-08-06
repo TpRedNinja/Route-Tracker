@@ -12,6 +12,8 @@ namespace Route_Tracker
 {
     public static class RouteHelpers
     {
+        private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
         #region Route Data Management (from RouteDataManager.cs)
         // ==========MY NOTES==============
         // Fills the route grid with actual data or shows a message
@@ -59,12 +61,7 @@ namespace Route_Tracker
                     else
                         mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
 
-                    // SUCCESS: Show popup notification
-                    string routeFileName = System.IO.Path.GetFileName(routeManager.GetRouteFilePath());
-                    MessageBox.Show($"Route loaded successfully!\n\nFile: {routeFileName}",
-                        "Route Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    LoggingSystem.LogInfo($"Route loaded successfully: {routeFileName} with {entries.Count} entries");
+                    LoggingSystem.LogInfo($"Route loaded successfully: {Path.GetFileName(routeManager.GetRouteFilePath())} with {entries.Count} entries");
                 }
                 else
                 {
@@ -197,8 +194,6 @@ namespace Route_Tracker
         // Rotates through numbered backups (1-10) and cycles back to 1
         private static void CreateCyclingAutoSave(string saveDir, string gameAbbreviation, string routeType, Dictionary<string, (bool IsCompleted, bool IsSkipped)> entryStatus)
         {
-            var JsonOptions = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
-
             // Create file names
             string baseFileName = $"{gameAbbreviation}AutoSave{routeType}.json";
             string mainAutosaveFile = Path.Combine(saveDir, baseFileName);
@@ -452,19 +447,30 @@ namespace Route_Tracker
                     }
                 }
 
-                // Update UI
-                routeGrid.Rows.Clear();
+                // Update UI - handle both virtual and traditional modes
                 bool anyChanges = false;
 
-                foreach (var entry in routeEntries)
+                if (routeGrid.VirtualMode)
                 {
-                    if (entry.IsSkipped)
-                        continue;
-
-                    string completionMark = entry.IsCompleted ? "X" : "";
-                    int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
-                    routeGrid.Rows[rowIndex].Tag = entry;
+                    // For virtual mode, just refresh the display
+                    routeGrid.RowCount = routeEntries.Count(e => !e.IsSkipped);
+                    routeGrid.Invalidate();
                     anyChanges = true;
+                }
+                else
+                {
+                    // Traditional mode - rebuild rows
+                    routeGrid.Rows.Clear();
+                    foreach (var entry in routeEntries)
+                    {
+                        if (entry.IsSkipped)
+                            continue;
+
+                        string completionMark = entry.IsCompleted ? "X" : "";
+                        int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                        routeGrid.Rows[rowIndex].Tag = entry;
+                        anyChanges = true;
+                    }
                 }
 
                 if (anyChanges)
@@ -570,6 +576,7 @@ namespace Route_Tracker
 
         // Lets you pick any saved file to load progress from
         // Updates the display to show loaded completion status
+        // FIXED: Now supports both manual save format and autosave format
         public static bool LoadProgressFromFile(RouteManager routeManager, DataGridView routeGrid, Form parentForm)
         {
             var routeEntries = routeManager.GetRouteEntries();
@@ -600,37 +607,78 @@ namespace Route_Tracker
                 if (openDialog.ShowDialog(parentForm) != DialogResult.OK)
                     return false;
 
-                // Load and apply saved data
+                // Load and apply saved data - handle both formats
                 string json = File.ReadAllText(openDialog.FileName);
-                var completionStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, bool>>(json);
 
-                if (completionStatus == null || completionStatus.Count == 0)
-                    return false;
-
-                // Apply saved completion status
                 bool anyChanges = false;
-                foreach (var entry in routeEntries)
+
+                try
                 {
-                    string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
-                    if (completionStatus.TryGetValue(key, out bool isCompleted))
+                    // Try autosave format first (tuple format)
+                    var entryStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, (bool IsCompleted, bool IsSkipped)>>(json);
+
+                    if (entryStatus != null && entryStatus.Count > 0)
                     {
-                        if (entry.IsCompleted != isCompleted)
+                        foreach (var entry in routeEntries)
                         {
-                            entry.IsCompleted = isCompleted;
-                            anyChanges = true;
+                            string key = $"{entry.Id}_{entry.Name}_{entry.Type}_{entry.Condition}";
+                            if (entryStatus.TryGetValue(key, out var status))
+                            {
+                                if (entry.IsCompleted != status.IsCompleted || entry.IsSkipped != status.IsSkipped)
+                                {
+                                    entry.IsCompleted = status.IsCompleted;
+                                    entry.IsSkipped = status.IsSkipped;
+                                    anyChanges = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Fallback to manual save format (boolean format)
+                    var completionStatus = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, bool>>(json);
+
+                    if (completionStatus != null && completionStatus.Count > 0)
+                    {
+                        foreach (var entry in routeEntries)
+                        {
+                            string key = $"{entry.Name}_{entry.Type}_{entry.Condition}";
+                            if (completionStatus.TryGetValue(key, out bool isCompleted))
+                            {
+                                if (entry.IsCompleted != isCompleted)
+                                {
+                                    entry.IsCompleted = isCompleted;
+                                    entry.IsSkipped = false; // Manual saves don't track skipped status
+                                    anyChanges = true;
+                                }
+                            }
                         }
                     }
                 }
 
-                // Update UI if needed
+                // Update UI if needed - handle both virtual and traditional modes
                 if (anyChanges)
                 {
-                    routeGrid.Rows.Clear();
-                    foreach (var entry in routeEntries)
+                    if (routeGrid.VirtualMode)
                     {
-                        string completionMark = entry.IsCompleted ? "X" : "";
-                        int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
-                        routeGrid.Rows[rowIndex].Tag = entry;
+                        // For virtual mode, just refresh the display
+                        routeGrid.RowCount = routeEntries.Count(e => !e.IsSkipped);
+                        routeGrid.Invalidate();
+                    }
+                    else
+                    {
+                        // Traditional mode - rebuild rows
+                        routeGrid.Rows.Clear();
+                        foreach (var entry in routeEntries)
+                        {
+                            if (entry.IsSkipped)
+                                continue;
+
+                            string completionMark = entry.IsCompleted ? "X" : "";
+                            int rowIndex = routeGrid.Rows.Add(entry.DisplayText, completionMark);
+                            routeGrid.Rows[rowIndex].Tag = entry;
+                        }
                     }
 
                     RouteManager.SortRouteGridByCompletion(routeGrid);
@@ -769,6 +817,10 @@ namespace Route_Tracker
 
         // ==========MY NOTES==============
         // Helper methods for reset progress to determine autosave file names
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1847",
+        Justification = "NO")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079",
+        Justification = "NO")]
         private static string GetGameAbbreviationForReset(RouteManager routeManager)
         {
             string routeFilePath = routeManager.GetRouteFilePath();
@@ -1313,5 +1365,79 @@ namespace Route_Tracker
             }
         }
         #endregion
+
+        // ==========MY NOTES==============
+        // NEW: Simple auto-connect on startup - tries once, no retries, no multiple game handling
+        // If exactly one supported game is running, tries to connect once and that's it
+        public static async Task TryAutoConnectOnStartup(MainForm mainForm, GameConnectionManager gameConnectionManager, SettingsManager settingsManager)
+        {
+            try
+            {
+                // DetectRunningGame returns the first supported game it finds, or empty string
+                string detectedGame = gameConnectionManager.DetectRunningGame();
+
+                // If no supported games detected, skip
+                if (string.IsNullOrEmpty(detectedGame))
+                {
+                    LoggingSystem.LogInfo("No supported games detected running - skipping auto-connect");
+                    return;
+                }
+
+                // Check if we have multiple games running by checking processes directly
+                var supportedGameProcesses = new Dictionary<string, string>
+                {
+                    { "AC4BFSP", "Assassin's Creed 4" },
+                    { "GoW", "God of War 2018" }
+                };
+
+                int runningCount = 0;
+                foreach (var game in supportedGameProcesses)
+                {
+                    if (GameConnectionManager.IsProcessRunning(game.Key + ".exe"))
+                    {
+                        runningCount++;
+                    }
+                }
+
+                // If multiple supported games are running, don't bother
+                if (runningCount > 1)
+                {
+                    LoggingSystem.LogInfo($"Multiple supported games running ({runningCount}) - skipping auto-connect");
+                    return;
+                }
+
+                LoggingSystem.LogInfo($"Found exactly 1 supported game running: {detectedGame} - attempting auto-connect");
+
+                // Check if game directory is set
+                string gameDirectory = settingsManager.GetGameDirectory(detectedGame);
+                if (string.IsNullOrEmpty(gameDirectory))
+                {
+                    LoggingSystem.LogInfo($"Game directory not set for {detectedGame} - skipping auto-connect");
+                    return;
+                }
+
+                // Try to connect exactly once - no retries
+                bool connected = await gameConnectionManager.ConnectToGameAsync(detectedGame, false);
+
+                if (connected)
+                {
+                    LoggingSystem.LogInfo($"Successfully auto-connected to {detectedGame} on startup");
+
+                    // Update UI to show connection
+                    if (mainForm.MainMenuStrip?.Items.OfType<ToolStripComboBox>().FirstOrDefault() is ToolStripComboBox gameDropdown)
+                    {
+                        gameDropdown.SelectedItem = detectedGame;
+                    }
+                }
+                else
+                {
+                    LoggingSystem.LogInfo($"Failed to auto-connect to {detectedGame} on startup - skipping");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingSystem.LogError($"Error during startup auto-connect: {ex.Message}", ex);
+            }
+        }
     }
 }

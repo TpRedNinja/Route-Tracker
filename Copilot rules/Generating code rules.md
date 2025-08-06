@@ -34,3 +34,7 @@
 12. if a function isnt in a region and you think u can add it to a new region then do so and say so
 13. NEVER generate a single if statement without braces.
     - Always use braces `{}` for clarity and maintainability.
+14. If you generate code or regenerate code that does something with JsonSerializerOptions
+    - Be sure to avoid creating a new instance of JsonSerializerOptions
+    - cache and reuse instances instead.
+    - So to summarize: just make sure you avoid message CA1869: "Avoid creating a new 'JsonSerializerOptions' instance for every serialization operation. Cache and reuse instances instead."

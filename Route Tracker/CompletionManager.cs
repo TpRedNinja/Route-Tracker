@@ -74,7 +74,7 @@ namespace Route_Tracker
                 bool result = locationChecker(ac4Stats, entry.Location, entry.LocationCondition);
                 if (!result)
                 {
-                    Debug.WriteLine($"Location '{entry.Location}' check failed for {normalizedType} '{entry.Name}' - needed: {entry.LocationCondition}");
+                    //Debug.WriteLine($"Location '{entry.Location}' check failed for {normalizedType} '{entry.Name}' - needed: {entry.LocationCondition}");
                 }
                 return result;
             }

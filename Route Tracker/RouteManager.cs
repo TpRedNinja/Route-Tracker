@@ -417,7 +417,13 @@ namespace Route_Tracker
                     if (routeGrid.VirtualMode)
                     {
                         routeGrid.Invalidate();
-                        routeGrid.FirstDisplayedScrollingRowIndex = 0;
+
+                        // Apply current sorting mode and scroll to first incomplete
+                        if (routeGrid.FindForm() is MainForm mainForm)
+                        {
+                            mainForm.ApplyCurrentSorting();
+                        }
+                        SortingManager.ScrollToFirstIncomplete(routeGrid);
                     }
 
                     Debug.WriteLine("Game at 100% completion - marked all route entries as complete");
@@ -452,12 +458,26 @@ namespace Route_Tracker
                 }
             }
 
-            // If changes were made, refresh virtual grid and auto-save
+            // If changes were made, refresh virtual grid, apply sorting, and scroll to first incomplete
             if (anyChanges)
             {
                 if (routeGrid.VirtualMode)
                 {
                     routeGrid.Invalidate(); // Refresh virtual mode display
+
+                    // Apply current sorting mode and scroll to first incomplete
+                    if (routeGrid.FindForm() is MainForm mainForm)
+                    {
+                        mainForm.ApplyCurrentSorting();
+                    }
+                    else
+                    {
+                        // Fallback to default sorting
+                        SortRouteGridByCompletion(routeGrid);
+                    }
+
+                    // Always scroll to first incomplete after automatic completion
+                    SortingManager.ScrollToFirstIncomplete(routeGrid);
                 }
                 AutoSaveProgress();
             }
@@ -781,6 +801,14 @@ namespace Route_Tracker
         public void SetWasPreviouslyInNonGameplay(bool value)
         {
             wasPreviouslyInNonGameplay = value;
+        }
+
+        // ==========MY NOTES==============
+        // Gets the complete original route entries including completed and skipped ones
+        // Used when switching sorting modes to ensure all entries are available
+        public List<RouteEntry> GetAllOriginalEntries()
+        {
+            return routeEntries;
         }
         #endregion
     }

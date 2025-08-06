@@ -445,5 +445,51 @@ namespace Route_Tracker
             ProcessHotkeyAction(mainForm, routeManager, keyPressed, hotkeySettings);
         }
         #endregion
+
+        public static void LoadAutoSave(MainForm mainForm)
+        {
+            if (mainForm.GetRouteManager() is RouteManager routeManager)
+            {
+                try
+                {
+                    bool loaded = RouteHelpers.LoadAutoSave(routeManager, mainForm.routeGrid);
+
+                    if (loaded)
+                    {
+                        // Update completion stats
+                        var (percentage, completed, total) = routeManager.CalculateCompletionStats();
+                        if (Math.Round(percentage, 2) >= 100.0f)
+                            mainForm.completionLabel.Text = "Completion: 100%";
+                        else
+                            mainForm.completionLabel.Text = $"Completion: {percentage:F2}%";
+
+                        // Update current location
+                        mainForm.UpdateCurrentLocationLabel();
+
+                        // Apply current sorting
+                        mainForm.ApplyCurrentSorting();
+
+                        MessageBox.Show("Autosave loaded successfully!", "Load Complete",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("No autosave found or autosave is corrupted.", "No Autosave",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LoggingSystem.LogError($"Error loading autosave: {ex.Message}", ex);
+                    MessageBox.Show($"Error loading autosave: {ex.Message}", "Load Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("No route loaded. Please load a route first.", "No Route",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
     }
 }

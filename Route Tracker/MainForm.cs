@@ -127,6 +127,9 @@ namespace Route_Tracker
             settingsManager.CheckFirstRun();
             SettingsMenuManager.RefreshAutoStartDropdown(this, settingsManager);
 
+            // register global hotkeys if enabled
+            UpdateGlobalHotkeys();
+
             // Load last search term
             LoadLastSearchTerm();
 
@@ -721,8 +724,49 @@ namespace Route_Tracker
                 var (CompleteHotkey, SkipHotkey, UndoHotkey, GlobalHotkeys, AdvancedHotkeys) = settingsManager.GetAllHotkeySettings();
                 if (GlobalHotkeys)
                 {
-                    Keys keyPressed = (Keys)((m.LParam.ToInt32() >> 16) & 0xFFFF);
-                    MainFormHelpers.ProcessGlobalHotkey(this, settingsManager, routeManager, keyPressed);
+                    int hotkeyId = m.WParam.ToInt32();
+
+                    // Handle main hotkeys (Complete, Skip, Undo)
+                    Keys keyPressed = hotkeyId switch
+                    {
+                        1 => CompleteHotkey,   // HOTKEY_ID_COMPLETE
+                        2 => SkipHotkey,       // HOTKEY_ID_SKIP  
+                        3 => UndoHotkey,       // HOTKEY_ID_UNDO
+                        _ => Keys.None
+                    };
+
+                    if (keyPressed != Keys.None)
+                    {
+                        MainFormHelpers.ProcessGlobalHotkey(this, settingsManager, routeManager, keyPressed);
+                        base.WndProc(ref m);
+                        return;
+                    }
+
+                    // Handle shortcuts (ID 100+)
+                    if (hotkeyId >= 100)
+                    {
+                        var shortcuts = settingsManager.GetShortcuts();
+                        var shortcutKeys = new Keys[]
+                        {
+                    shortcuts.Load, shortcuts.Save, shortcuts.LoadProgress, shortcuts.ResetProgress,
+                    shortcuts.Refresh, shortcuts.Help, shortcuts.FilterClear, shortcuts.Connect,
+                    shortcuts.GameStats, shortcuts.RouteStats, shortcuts.LayoutUp, shortcuts.LayoutDown,
+                    shortcuts.BackupFolder, shortcuts.BackupNow, shortcuts.Restore, shortcuts.SetFolder,
+                    shortcuts.AutoTog, shortcuts.TopTog, shortcuts.AdvTog, shortcuts.GlobalTog,
+                    shortcuts.SortingUp, shortcuts.SortingDown, shortcuts.GameDirect
+                        };
+
+                        int shortcutIndex = hotkeyId - 100;
+                        if (shortcutIndex >= 0 && shortcutIndex < shortcutKeys.Length)
+                        {
+                            Keys shortcutKey = shortcutKeys[shortcutIndex];
+                            if (shortcutKey != Keys.None)
+                            {
+                                // Use HotkeyActionRegistry to handle the shortcut
+                                HotkeyActionRegistry.HandleHotkey(this, shortcutKey);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -737,13 +781,61 @@ namespace Route_Tracker
 
             if (hotkeySettings.GlobalHotkeys && !globalHotkeysRegistered)
             {
-                RegisterGlobalHotkeys(hotkeySettings);
+                // Use the new low-level hook system and pass the main form reference
+                GlobalHotkeyManager.Install(this);
+                RegisterLowLevelHotkeys(hotkeySettings);
                 globalHotkeysRegistered = true;
             }
             else if (!hotkeySettings.GlobalHotkeys && globalHotkeysRegistered)
             {
-                UnregisterGlobalHotkeys();
+                GlobalHotkeyManager.Uninstall();
                 globalHotkeysRegistered = false;
+            }
+        }
+
+        // ==========MY NOTES==============
+        // Registers hotkeys using the low-level hook system
+        private void RegisterLowLevelHotkeys((Keys CompleteHotkey, Keys SkipHotkey, Keys UndoHotkey, bool GlobalHotkeys, bool AdvancedHotkeys) settings)
+        {
+            // Register main hotkeys
+            if (settings.CompleteHotkey != Keys.None)
+            {
+                GlobalHotkeyManager.RegisterHotkey(settings.CompleteHotkey, () =>
+                    MainFormHelpers.ProcessGlobalHotkey(this, settingsManager, routeManager, settings.CompleteHotkey));
+            }
+
+            if (settings.SkipHotkey != Keys.None)
+            {
+                GlobalHotkeyManager.RegisterHotkey(settings.SkipHotkey, () =>
+                    MainFormHelpers.ProcessGlobalHotkey(this, settingsManager, routeManager, settings.SkipHotkey));
+            }
+
+            if (settings.UndoHotkey != Keys.None)
+            {
+                GlobalHotkeyManager.RegisterHotkey(settings.UndoHotkey, () =>
+                    MainFormHelpers.ProcessGlobalHotkey(this, settingsManager, routeManager, settings.UndoHotkey));
+            }
+
+            // Register all shortcuts
+            var shortcuts = settingsManager.GetShortcuts();
+            var shortcutKeys = new Keys[]
+            {
+        shortcuts.Load, shortcuts.Save, shortcuts.LoadProgress, shortcuts.ResetProgress,
+        shortcuts.Refresh, shortcuts.Help, shortcuts.FilterClear, shortcuts.Connect,
+        shortcuts.GameStats, shortcuts.RouteStats, shortcuts.LayoutUp, shortcuts.LayoutDown,
+        shortcuts.BackupFolder, shortcuts.BackupNow, shortcuts.Restore, shortcuts.SetFolder,
+        shortcuts.AutoTog, shortcuts.TopTog, shortcuts.AdvTog, shortcuts.GlobalTog,
+        shortcuts.SortingUp, shortcuts.SortingDown, shortcuts.GameDirect
+            };
+
+            foreach (var shortcutKey in shortcutKeys)
+            {
+                if (shortcutKey != Keys.None)
+                {
+                    Keys capturedKey = shortcutKey; // Capture for closure
+                    GlobalHotkeyManager.RegisterHotkey(capturedKey, () =>
+                        HotkeyActionRegistry.HandleHotkey(this, capturedKey));
+                }
             }
         }
 
@@ -773,14 +865,67 @@ namespace Route_Tracker
             const int HOTKEY_ID_SKIP = 2;
             const int HOTKEY_ID_UNDO = 3;
 
+            // Start IDs for shortcuts at 100 to avoid conflicts
+            int shortcutIdBase = 100;
+
+            // Helper method to convert Keys to modifier and virtual key
+            static (int modifiers, int vkey) ConvertKeys(Keys keys)
+            {
+                int modifiers = 0;
+                int vkey = (int)(keys & Keys.KeyCode);
+
+                if ((keys & Keys.Control) == Keys.Control)
+                    modifiers |= 0x0002; // MOD_CONTROL
+                if ((keys & Keys.Alt) == Keys.Alt)
+                    modifiers |= 0x0001; // MOD_ALT
+                if ((keys & Keys.Shift) == Keys.Shift)
+                    modifiers |= 0x0004; // MOD_SHIFT
+
+                return (modifiers, vkey);
+            }
+
+            // Register the main hotkeys
             if (settings.CompleteHotkey != Keys.None)
-                RegisterHotKey(this.Handle, HOTKEY_ID_COMPLETE, 0, (int)settings.CompleteHotkey);
+            {
+                var (modifiers, vkey) = ConvertKeys(settings.CompleteHotkey);
+                RegisterHotKey(this.Handle, HOTKEY_ID_COMPLETE, modifiers, vkey);
+            }
 
             if (settings.SkipHotkey != Keys.None)
-                RegisterHotKey(this.Handle, HOTKEY_ID_SKIP, 0, (int)settings.SkipHotkey);
+            {
+                var (modifiers, vkey) = ConvertKeys(settings.SkipHotkey);
+                RegisterHotKey(this.Handle, HOTKEY_ID_SKIP, modifiers, vkey);
+            }
 
             if (settings.UndoHotkey != Keys.None)
-                RegisterHotKey(this.Handle, HOTKEY_ID_UNDO, 0, (int)settings.UndoHotkey);
+            {
+                var (modifiers, vkey) = ConvertKeys(settings.UndoHotkey);
+                RegisterHotKey(this.Handle, HOTKEY_ID_UNDO, modifiers, vkey);
+            }
+
+            // Register ALL shortcuts globally
+            var shortcuts = settingsManager.GetShortcuts();
+
+            // Create array of all shortcut keys for easier processing
+            var shortcutKeys = new Keys[]
+            {
+        shortcuts.Load, shortcuts.Save, shortcuts.LoadProgress, shortcuts.ResetProgress,
+        shortcuts.Refresh, shortcuts.Help, shortcuts.FilterClear, shortcuts.Connect,
+        shortcuts.GameStats, shortcuts.RouteStats, shortcuts.LayoutUp, shortcuts.LayoutDown,
+        shortcuts.BackupFolder, shortcuts.BackupNow, shortcuts.Restore, shortcuts.SetFolder,
+        shortcuts.AutoTog, shortcuts.TopTog, shortcuts.AdvTog, shortcuts.GlobalTog,
+        shortcuts.SortingUp, shortcuts.SortingDown, shortcuts.GameDirect
+            };
+
+            // Register each shortcut with a unique ID
+            for (int i = 0; i < shortcutKeys.Length; i++)
+            {
+                if (shortcutKeys[i] != Keys.None)
+                {
+                    var (modifiers, vkey) = ConvertKeys(shortcutKeys[i]);
+                    RegisterHotKey(this.Handle, shortcutIdBase + i, modifiers, vkey);
+                }
+            }
         }
 
         private void UnregisterGlobalHotkeys()
@@ -789,9 +934,16 @@ namespace Route_Tracker
             const int HOTKEY_ID_SKIP = 2;
             const int HOTKEY_ID_UNDO = 3;
 
+            // Unregister main hotkeys
             UnregisterHotKey(this.Handle, HOTKEY_ID_COMPLETE);
             UnregisterHotKey(this.Handle, HOTKEY_ID_SKIP);
             UnregisterHotKey(this.Handle, HOTKEY_ID_UNDO);
+
+            // Unregister all shortcuts (IDs 100-122)
+            for (int i = 0; i < 23; i++) // 23 shortcuts total
+            {
+                UnregisterHotKey(this.Handle, 100 + i);
+            }
         }
         #endregion
 
@@ -938,10 +1090,12 @@ namespace Route_Tracker
             // Cleanup global hotkeys
             if (globalHotkeysRegistered)
             {
-                UnregisterGlobalHotkeys();
+                GlobalHotkeyManager.Uninstall();
             }
 
             RouteHelpers.CleanupGameStats(gameConnectionManager);
+
+            SettingsLifecycleManager.StopBackgroundAutoConnection();
 
             // Cleanup layout manager cache to prevent memory leaks
             LayoutManager.DisposeCache();

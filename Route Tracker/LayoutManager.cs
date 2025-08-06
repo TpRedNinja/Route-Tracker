@@ -13,11 +13,11 @@ namespace Route_Tracker
         // ==========MY NOTES==============
         // Font cache to prevent memory leaks and improve performance
         // Reuses font objects instead of creating new ones every time
-        private static readonly Dictionary<float, Font> _fontCache = new();
-        private static readonly Dictionary<float, Font> _headerFontCache = new();
+        private static readonly Dictionary<float, Font> _fontCache = [];
+        private static readonly Dictionary<float, Font> _headerFontCache = [];
 
         // Control group cache for faster visibility switching
-        private static readonly Dictionary<string, Control[]> _controlGroups = new();
+        private static readonly Dictionary<string, Control[]> _controlGroups = [];
 
         // ==========MY NOTES==============
         // Gets or creates a cached font for the given scale factor
@@ -71,7 +71,7 @@ namespace Route_Tracker
                 FontScale = 1.0f,
                 BorderStyle = FormBorderStyle.Sizable,
                 ShowAllControls = true,
-                HideControls = Array.Empty<string>()
+                HideControls = []
             },
             [LayoutSettingsForm.LayoutMode.Compact] = new LayoutConfig
             {
@@ -80,7 +80,7 @@ namespace Route_Tracker
                 FontScale = 0.9f,
                 BorderStyle = FormBorderStyle.Sizable,
                 ShowAllControls = true,
-                HideControls = new[] { "searchTextBox", "typeFilterPanel", "clearFiltersButton" }  // Hide the panel instead
+                HideControls = ["searchTextBox", "typeFilterPanel", "clearFiltersButton"]  // Hide the panel instead
             },
             [LayoutSettingsForm.LayoutMode.Mini] = new LayoutConfig
             {
@@ -89,7 +89,7 @@ namespace Route_Tracker
                 FontScale = 0.8f,
                 BorderStyle = FormBorderStyle.Sizable,
                 ShowAllControls = false,
-                HideControls = Array.Empty<string>()
+                HideControls = []
             },
             [LayoutSettingsForm.LayoutMode.Overlay] = new LayoutConfig
             {
@@ -98,7 +98,7 @@ namespace Route_Tracker
                 FontScale = 0.8f,  // Smaller font scale for overlay mode
                 BorderStyle = FormBorderStyle.SizableToolWindow,
                 ShowAllControls = false,
-                HideControls = new[] { "searchTextBox", "typeFilterPanel", "clearFiltersButton" }  // Hide the panel instead
+                HideControls = ["searchTextBox", "typeFilterPanel", "clearFiltersButton"]  // Hide the panel instead
             }
         };
 
@@ -111,7 +111,7 @@ namespace Route_Tracker
             public float FontScale { get; set; }
             public FormBorderStyle BorderStyle { get; set; }
             public bool ShowAllControls { get; set; }
-            public string[] HideControls { get; set; } = Array.Empty<string>();
+            public string[] HideControls { get; set; } = [];
         }
         #endregion
 
@@ -148,12 +148,12 @@ namespace Route_Tracker
         {
             if (_controlGroups.Count > 0) return; // Already cached
 
-            _controlGroups["buttons"] = new Control[]
-            {
+            _controlGroups["buttons"] =
+            [
                 mainForm.showStatsButton,
                 mainForm.showCompletionButton,
                 mainForm.clearFiltersButton
-            };
+            ];
 
             // Find the typeFilterPanel (parent of typeFilterCheckedListBox)
             var typeFilterPanel = mainForm.typeFilterCheckedListBox?.Parent;
@@ -169,20 +169,20 @@ namespace Route_Tracker
             else if (mainForm.typeFilterCheckedListBox != null)
                 filterControls.Add(mainForm.typeFilterCheckedListBox);
 
-            _controlGroups["filters"] = filterControls.ToArray();
+            _controlGroups["filters"] = [.. filterControls];
 
-            _controlGroups["essential"] = new Control[]
-            {
+            _controlGroups["essential"] =
+            [
                 mainForm.completionLabel,
                 mainForm.currentLocationLabel,
                 mainForm.routeGrid
-            };
+            ];
 
-            _controlGroups["labels"] = new Control[]
-            {
+            _controlGroups["labels"] =
+            [
                 mainForm.completionLabel,
                 mainForm.currentLocationLabel
-            };
+            ];
         }
 
         // ==========MY NOTES==============

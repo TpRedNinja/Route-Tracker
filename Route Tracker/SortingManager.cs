@@ -16,13 +16,7 @@ namespace Route_Tracker
         // Handles all different sorting modes and updates the display
         public static void ApplySorting(DataGridView routeGrid, SortingOptionsForm.SortingMode sortingMode)
         {
-            if (routeGrid?.FindForm() is not MainForm mainForm)
-                return;
-
-            LoadingHelper.ExecuteWithSpinner(mainForm, () =>
-            {
-                ApplySortingInternal(routeGrid, sortingMode);
-            }, "Applying Sorting...");
+            ApplySortingInternal(routeGrid, sortingMode);
         }
 
         // ==========MY NOTES==============

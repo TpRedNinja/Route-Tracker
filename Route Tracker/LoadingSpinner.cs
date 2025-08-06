@@ -90,7 +90,7 @@ namespace Route_Tracker
 
             // Draw spinning circle
             int radius = 30;
-            using (Pen pen = new Pen(Color.White, 4))
+            using (Pen pen = new(Color.White, 4))
             {
                 // Save the current transform
                 Matrix? originalTransform = g.Transform.Clone();
@@ -101,7 +101,7 @@ namespace Route_Tracker
                 g.TranslateTransform(-centerX, -centerY);
 
                 // Draw the arc (3/4 circle for spinner effect)
-                Rectangle rect = new Rectangle(centerX - radius, centerY - radius, radius * 2, radius * 2);
+                Rectangle rect = new(centerX - radius, centerY - radius, radius * 2, radius * 2);
                 g.DrawArc(pen, rect, 0, 270);
 
                 // Restore the original transform

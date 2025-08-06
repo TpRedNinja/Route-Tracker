@@ -7,6 +7,10 @@ namespace Route_Tracker
     public static class SettingsLifecycleManager
     {
         // ==========MY NOTES==============
+        // Background auto-connection manager - static so it persists for the app lifetime
+        private static AutoConnectionManager? autoConnectionManager;
+
+        // ==========MY NOTES==============
         // Gets all the saved settings when the app starts up
         [SupportedOSPlatform("windows6.1")]
         public static void LoadSettings(MainForm mainForm, SettingsManager settingsManager, TextBox gameDirectoryTextBox)
@@ -80,9 +84,58 @@ namespace Route_Tracker
                     });
                 }
             }
+            else
+            {
+                // if not auto-starting try connecting once on startup
+                await RouteHelpers.TryAutoConnectOnStartup(mainForm, gameConnectionManager, settingsManager);
+            }
+
+            // START BACKGROUND AUTO-CONNECTION SYSTEM
+            // This runs on a separate thread and won't slow down the main app
+            StartBackgroundAutoConnection(mainForm, gameConnectionManager, settingsManager);
 
             // Check for updates separately (doesn't need delay)
             await UpdateManager.CheckForUpdatesAsync();
         }
+
+        // ==========MY NOTES==============
+        // NEW: Starts the background auto-connection system
+        // Runs on a separate thread every 10 seconds looking for supported games
+        [SupportedOSPlatform("windows6.1")]
+        private static void StartBackgroundAutoConnection(MainForm mainForm, GameConnectionManager gameConnectionManager, SettingsManager settingsManager)
+        {
+            try
+            {
+                // Create and start the background auto-connection manager
+                autoConnectionManager = new AutoConnectionManager(mainForm, gameConnectionManager, settingsManager);
+                autoConnectionManager.StartAutoConnection();
+
+                LoggingSystem.LogInfo("Background auto-connection system started successfully");
+            }
+            catch (Exception ex)
+            {
+                LoggingSystem.LogError($"Failed to start background auto-connection system: {ex.Message}", ex);
+            }
+        }
+
+        // ==========MY NOTES==============
+        // NEW: Stops the background auto-connection system (called on app shutdown)
+        public static void StopBackgroundAutoConnection()
+        {
+            try
+            {
+                autoConnectionManager?.Dispose();
+                autoConnectionManager = null;
+                LoggingSystem.LogInfo("Background auto-connection system stopped");
+            }
+            catch (Exception ex)
+            {
+                LoggingSystem.LogError($"Error stopping background auto-connection system: {ex.Message}", ex);
+            }
+        }
+
+        // ==========MY NOTES==============
+        // NEW: Gets the status of the background auto-connection system
+        public static bool IsBackgroundAutoConnectionRunning => autoConnectionManager?.IsRunning ?? false;
     }
 }
