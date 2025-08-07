@@ -54,7 +54,7 @@ namespace Route_Tracker
 
             // Other menu items
             ToolStripMenuItem gameDirectoryMenuItem = new("Game Directory");
-            gameDirectoryMenuItem.Click += (s, e) => GameDirectoryMenuItem_Click(mainForm);
+            gameDirectoryMenuItem.Click += (s, e) => GameDirectoryMenuItem_Click(mainForm, settingsManager);
 
             ToolStripMenuItem alwaysOnTopMenuItem = new("Always On Top")
             {
@@ -273,7 +273,7 @@ namespace Route_Tracker
         }
 
         [SupportedOSPlatform("windows6.1")]
-        private static void GameDirectoryMenuItem_Click(MainForm mainForm)
+        private static void GameDirectoryMenuItem_Click(MainForm mainForm, SettingsManager settingsManager)
         {
             bool wasTopMost = mainForm.TopMost;
             if (wasTopMost)
@@ -281,7 +281,7 @@ namespace Route_Tracker
 
             try
             {
-                GameDirectoryForm gameDirectoryForm = new()
+                GameDirectoryForm gameDirectoryForm = new(settingsManager)
                 {
                     Owner = mainForm,
                     StartPosition = FormStartPosition.CenterParent

@@ -46,7 +46,8 @@ namespace Route_Tracker
                 Width = 200,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            gameDropdown.Items.AddRange(["", "Assassin's Creed 4", "God of War 2018"]);
+            gameDropdown.Items.Add("");
+            gameDropdown.Items.AddRange([.. SupportedGames.GameList.Values.Select(g => g.DisplayName)]);
             gameDropdown.SelectedIndex = 0;
             this.Controls.Add(gameDropdown);
 

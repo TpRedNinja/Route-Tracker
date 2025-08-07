@@ -1162,7 +1162,8 @@ namespace Route_Tracker
             menuStrip.Items.Add(connectionLabel);
 
             ToolStripComboBox gameDropdown = new();
-            gameDropdown.Items.AddRange(["", "Assassin's Creed 4", "God of War 2018"]);
+            gameDropdown.Items.Add("");
+            gameDropdown.Items.AddRange([.. SupportedGames.GameList.Values.Select(g => g.DisplayName)]);
             gameDropdown.SelectedIndex = 0;
             menuStrip.Items.Add(gameDropdown);
 

@@ -4,23 +4,17 @@ using Route_Tracker.Properties;
 
 namespace Route_Tracker
 {
-    // ==========FORMAL COMMENT=========
-    // Form for configuring game directory locations
-    // Allows users to select and set paths for different Assassin's Creed games
     // ==========MY NOTES==============
     // This window lets the user pick where each game is installed
     // Used for the auto-start feature to know where to find the games
     public partial class GameDirectoryForm : Form
     {
         public event EventHandler? DirectoryChanged;
+        private readonly SettingsManager settingsManager;
 
-        // ==========FORMAL COMMENT=========
-        // Initializes a new game directory configuration form
-        // Sets up the UI and prepares the form for user interaction
-        // ==========MY NOTES==============
-        // Creates the game directory settings window
-        public GameDirectoryForm()
+        public GameDirectoryForm(SettingsManager settingsManager)
         {
+            this.settingsManager = settingsManager;
             InitializeComponent();
             InitializeCustomComponents();
         }
@@ -30,9 +24,8 @@ namespace Route_Tracker
         private TextBox directoryTextBox = null!;
         private Button browseButton = null!;
 
-        // ==========FORMAL COMMENT=========
-        // UI control fields for the game directory form
-        // Stores references to key interactive elements
+        public SettingsManager? SettingsManager => settingsManager;
+
         // ==========MY NOTES==============
         // These are the main controls we need to access in our code
         private void InitializeCustomComponents()
@@ -49,7 +42,8 @@ namespace Route_Tracker
             this.Controls.Add(gameLabel);
 
             gameDropdown = new ComboBox();
-            gameDropdown.Items.AddRange(["Assassin's Creed 4", "God of War 2018"]);
+            gameDropdown.Items.Add("");
+            gameDropdown.Items.AddRange([.. SupportedGames.GameList.Values.Select(g => g.DisplayName)]);
             gameDropdown.Location = new System.Drawing.Point(120, 20);
             gameDropdown.SelectedIndexChanged += GameDropdown_SelectedIndexChanged;
             this.Controls.Add(gameDropdown);
@@ -83,22 +77,14 @@ namespace Route_Tracker
 
         }
 
-        // ==========FORMAL COMMENT=========
-        // Creates and configures all UI components for the form
-        // Sets up labels, dropdowns, textboxes, and buttons with event handlers
         // ==========MY NOTES==============
         // Builds all the UI elements for selecting and setting game directories
         private void GameDropdown_SelectedIndexChanged(object? sender, EventArgs e)
         {
             string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
-            if (selectedGame == "Assassin's Creed 4")
-            {
-                directoryTextBox.Text = Settings.Default.AC4Directory;
-            }
-            else if (selectedGame == "God of War 2018")
-            {
-                directoryTextBox.Text = Settings.Default.Gow2018Directory;
-            }
+
+            // Use SettingsManager to get the directory (it handles the mapping internally)
+            directoryTextBox.Text = SettingsManager?.GetGameDirectory(selectedGame);
         }
 
         // ==========FORMAL COMMENT=========
@@ -135,17 +121,13 @@ namespace Route_Tracker
             try
             {
                 string selectedGame = gameDropdown.SelectedItem?.ToString() ?? string.Empty;
-                if (selectedGame == "Assassin's Creed 4")
-                {
-                    Settings.Default.AC4Directory = directoryTextBox.Text;
-                }
-                else if (selectedGame == "God of War 2018")
-                {
-                    Settings.Default.Gow2018Directory = directoryTextBox.Text;
-                }
-                Settings.Default.Save();
+
+                // Use SettingsManager to save the directory (it handles the mapping internally)
+                SettingsManager?.SaveDirectory(selectedGame, directoryTextBox.Text);
 
                 DirectoryChanged?.Invoke(this, EventArgs.Empty);
+
+                LoggingSystem.LogInfo($"Game directory set for {selectedGame}: {directoryTextBox.Text}");
             }
             catch (Exception ex)
             {

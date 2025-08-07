@@ -11,9 +11,6 @@ using Route_Tracker.Properties;
 
 namespace Route_Tracker
 {
-    // ==========FORMAL COMMENT=========
-    // Manages application settings and game directories
-    // Handles loading, saving, and providing access to configuration values
     // ==========MY NOTES==============
     // This centralizes all settings-related code in one place
     // Makes it easier to access and update settings from anywhere
@@ -362,16 +359,24 @@ namespace Route_Tracker
         [SupportedOSPlatform("windows6.1")]
         public void SaveDirectory(string selectedGame, string directory)
         {
-            if (selectedGame == "Assassin's Creed 4")
+            // Map display name to exe name to determine which setting to use
+            string? exeName = SupportedGames.GameList
+                .FirstOrDefault(kvp => kvp.Value.DisplayName == selectedGame).Key;
+
+            switch (exeName)
             {
-                Settings.Default.AC4Directory = directory;
+                case "AC4BFSP":
+                    Settings.Default.AC4Directory = directory;
+                    break;
+                case "GoW":
+                    Settings.Default.Gow2018Directory = directory;
+                    break;
             }
-            else if (selectedGame == "God of War 2018")
-            {
-                Settings.Default.Gow2018Directory = directory;
-            }
+
             Settings.Default.Save();
-            BackupSettings(); // Auto-backup after saving
+
+            // Enhanced: Automatically create backup after saving
+            BackupSettings();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
@@ -381,11 +386,16 @@ namespace Route_Tracker
         [SupportedOSPlatform("windows6.1")]
         public string GetGameDirectory(string game)
         {
-            if (game == "Assassin's Creed 4")
-                return Settings.Default.AC4Directory;
-            else if (game == "God of War 2018")
-                return Settings.Default.Gow2018Directory;
-            return string.Empty;
+            // Map display name to exe name to determine which setting to use
+            string? exeName = SupportedGames.GameList
+                .FirstOrDefault(kvp => kvp.Value.DisplayName == game).Key;
+
+            return exeName switch
+            {
+                "AC4BFSP" => Settings.Default.AC4Directory,
+                "GoW" => Settings.Default.Gow2018Directory,
+                _ => string.Empty
+            };
         }
         #endregion
 
@@ -542,12 +552,16 @@ namespace Route_Tracker
         public List<string> GetGamesWithDirectoriesSet()
         {
             var games = new List<string>();
-            var supportedGames = new[] { "Assassin's Creed 4", "God of War 2018" };
-            foreach (var game in supportedGames)
+
+            // Check all supported games from our centralized list
+            foreach (var game in SupportedGames.GameList)
             {
-                if (!string.IsNullOrEmpty(GetGameDirectory(game)))
-                    games.Add(game);
+                if (!string.IsNullOrEmpty(GetGameDirectory(game.Value.DisplayName)))
+                {
+                    games.Add(game.Value.DisplayName);
+                }
             }
+
             return games;
         }
 

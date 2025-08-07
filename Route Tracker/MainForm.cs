@@ -666,7 +666,7 @@ namespace Route_Tracker
 
             try
             {
-                GameDirectoryForm gameDirectoryForm = new()
+                GameDirectoryForm gameDirectoryForm = new(settingsManager)
                 {
                     Owner = this,
                     StartPosition = FormStartPosition.CenterParent

@@ -12,7 +12,7 @@ namespace Route_Tracker
     public static class AppTheme
     {
         #region App Information (from AppTheme.cs)
-        public const string Version = "v1.04";
+        public const string Version = "v1.05";
         public const string GitHubRepo = "TpRedNinja/Route-Tracker";
         #endregion
 
@@ -326,5 +326,25 @@ namespace Route_Tracker
         public override Color ToolStripGradientBegin => AppTheme.MenuBackgroundColor;
         public override Color ToolStripGradientEnd => AppTheme.MenuBackgroundColor;
         public override Color ToolStripGradientMiddle => AppTheme.MenuBackgroundColor;
+    }
+
+    // ==========MY NOTES==============
+    // Central place to store supported games, their exe names, display names, and bitness
+    public static class SupportedGames
+    {
+        // Key: exe name (without .exe), Value: (DisplayName, Bitness)
+        public static readonly Dictionary<string, (string DisplayName, int Bitness)> GameList = new()
+        {
+            { "AC4BFSP", ("Assassin's Creed 4", 32) },
+            { "GoW", ("God of War 2018", 64) }
+            // Add more games as needed
+        };
+
+        // Optional: Helper to enumerate all games
+        public static IEnumerable<(string ExeName, string DisplayName, int Bitness)> GetAll()
+        {
+            foreach (var kvp in GameList)
+                yield return (kvp.Key, kvp.Value.DisplayName, kvp.Value.Bitness);
+        }
     }
 }

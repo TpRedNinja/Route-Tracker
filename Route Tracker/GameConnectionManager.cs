@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Route_Tracker.Properties;
 
 namespace Route_Tracker
 {
-    // ==========FORMAL COMMENT=========
-    // Manages connection to game processes and coordinates game statistics access
-    // Provides high-level operations for game launching, connection, and memory reading
-    // Handles initialization and cleanup of game-specific statistics objects
     // ==========MY NOTES==============
     // This is the main connection manager that bridges the UI and game memory
     // It handles finding, starting, and connecting to games
@@ -37,10 +37,6 @@ namespace Route_Tracker
         public IntPtr BaseAddress => baseAddress;
 
         #region Process Management
-        // ==========FORMAL COMMENT=========
-        // Establishes connection to the game process
-        // Finds the specified process, gets handle and base address for memory access
-        // ==========MY NOTES==============
         // Finds the game in running processes and gets access to its memory
         // Sets up everything needed to read values from the game
         [SupportedOSPlatform("windows6.1")]
@@ -83,9 +79,6 @@ namespace Route_Tracker
             }
         }
 
-        // ==========FORMAL COMMENT=========
-        // Checks if a specific process is currently running
-        // Returns true if the process is found, false otherwise
         // ==========MY NOTES==============
         // Just checks if the game is already running or not
         [SupportedOSPlatform("windows6.1")]
@@ -101,9 +94,6 @@ namespace Route_Tracker
         #endregion
 
         #region Game Launching
-        // ==========FORMAL COMMENT=========
-        // Launches the specified game executable from its directory
-        // Handles cases where directory or executable file is not found
         // ==========MY NOTES==============
         // Tries to start the game and shows error messages if it can't
         [SupportedOSPlatform("windows6.1")]
@@ -147,9 +137,6 @@ namespace Route_Tracker
             }
         }
 
-        // ==========FORMAL COMMENT=========
-        // Waits for the game process to start with a timeout
-        // Shows custom dialog with options if game fails to start within time limit
         // ==========MY NOTES==============
         // Waits up to 10 seconds for the game to start
         // If it takes too long, gives you options like retry, wait longer, etc.
@@ -201,31 +188,23 @@ namespace Route_Tracker
         }
 
         [SupportedOSPlatform("windows6.1")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CA1822:",
         Justification = "it breaks shit")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079:R",
         Justification = "it breaks shit")]
         public string DetectRunningGame()
         {
-            // Define known game processes and their friendly names
-            Dictionary<string, string> gameProcessMap = new()
-            {
-                { "AC4BFSP", "Assassin's Creed 4" },
-                { "GoW", "God of War 2018" }
-                // Add more games here as needed
-            };
-
             // Check for running processes that match our supported games
             foreach (var process in Process.GetProcesses())
             {
                 try
                 {
                     // Check if this process name matches any of our supported games
-                    foreach (var game in gameProcessMap)
+                    foreach (var game in SupportedGames.GameList)
                     {
                         if (process.ProcessName.Contains(game.Key, StringComparison.OrdinalIgnoreCase))
                         {
-                            return game.Value; // Return the friendly game name
+                            return game.Value.DisplayName; // Return the friendly game name
                         }
                     }
                 }
@@ -241,10 +220,6 @@ namespace Route_Tracker
         #endregion
 
         #region Game Statistics
-        // ==========FORMAL COMMENT=========
-        // Creates the appropriate game statistics handler based on the connected game
-        // Initializes and configures the statistics object with process handle and address
-        // Sets up event forwarding and begins automatic stats updates
         // ==========MY NOTES==============
         // Creates the right stats reader for the specific game we're connected to
         // Sets up event handling so stats updates get passed to the UI
@@ -266,10 +241,6 @@ namespace Route_Tracker
             }
         }
 
-        // ==========FORMAL COMMENT=========
-        // Event handler that forwards statistics updates from the game-specific handler
-        // Acts as a bridge between game stats objects and UI subscribers
-        // Ensures proper event propagation with null-conditional operator
         // ==========MY NOTES==============
         // Passes stats updates from the game reader to whoever's listening
         // Simple relay that forwards events without changing them
@@ -279,10 +250,6 @@ namespace Route_Tracker
             StatsUpdated?.Invoke(this, e);
         }
 
-        // ==========FORMAL COMMENT=========
-        // Performs cleanup operations for game statistics resources
-        // Unsubscribes from events and stops background updates to prevent memory leaks
-        // Called when disconnecting or closing the application
         // ==========MY NOTES==============
         // Properly disconnects and shuts down the stats system
         // Makes sure we don't leave any timers or events running
@@ -300,9 +267,6 @@ namespace Route_Tracker
         #endregion
 
         #region Connection Orchestration
-        // ==========FORMAL COMMENT=========
-        // High-level method that orchestrates the game connection process
-        // Handles game selection, auto-starting if needed, and statistics initialization
         // ==========MY NOTES==============
         // One-stop method for connecting to a game - handles all the connection steps
         // Returns success/failure so the UI can update accordingly
@@ -313,16 +277,18 @@ namespace Route_Tracker
             {
                 LoggingSystem.LogInfo($"Attempting to connect to game: {gameName} (AutoStart: {autoStart})");
 
-                // Set the correct process name based on game selection
-                if (gameName == "Assassin's Creed 4")
-                    currentProcess = "AC4BFSP.exe";
-                else if (gameName == "God of War 2018")
-                    currentProcess = "GoW.exe";
-                else
+                // Get exe name from display name using SupportedGames dictionary
+                string? exeName = SupportedGames.GameList
+                    .FirstOrDefault(kvp => kvp.Value.DisplayName == gameName).Key;
+
+                if (string.IsNullOrEmpty(exeName))
                 {
                     LoggingSystem.LogError($"Invalid game selection: {gameName}");
                     return false; // Invalid game selection
                 }
+
+                // Set the correct process name based on game selection
+                currentProcess = $"{exeName}.exe";
 
                 // Auto-start the game if requested and not already running
                 if (autoStart)
@@ -330,7 +296,7 @@ namespace Route_Tracker
                     if (gameName == "God of War 2018")
                     {
                         LoggingSystem.LogWarning("Auto-start not supported for God of War 2018");
-                        return false; // Auto-start not supported for Syndicate
+                        return false; // Auto-start not supported for GOW
                     }
 
                     if (!IsProcessRunning(currentProcess))
@@ -370,10 +336,10 @@ namespace Route_Tracker
         #endregion
 
         #region external API Imports
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "SYSLIB1054:",
-        Justification = "Using ReadProcessMemory for direct memory reading in unsafe context")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
-        Justification = "Required for unsafe memory operations")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("style", "SYSLIB1054:",
+        Justification = "because i said so")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0079:",
+        Justification = "because i said so")]
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
         #endregion
