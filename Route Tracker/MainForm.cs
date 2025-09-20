@@ -17,11 +17,7 @@ namespace Route_Tracker
     // to showing the stats and managing settings
     public partial class MainForm : Form
     {
-
         #region Fields and Properties
-        // ==========MY NOTES==============
-        // All the important variables that keep track of the app's state
-
         // Game connection and management
         private readonly string currentProcess = string.Empty;
         public RouteManager? routeManager;

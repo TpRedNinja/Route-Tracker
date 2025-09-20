@@ -6,10 +6,6 @@ using System.Runtime.InteropServices;
 
 namespace Route_Tracker
 {
-    // ==========FORMAL COMMENT=========
-    // Class that interfaces with game memory to read player statistics
-    // Handles memory calculation, data extraction, and real-time updates for all tracked stats
-    // Supports both individual collectibles and range-based collectible counting with auto-refreshing
     // ==========MY NOTES==============
     // This reads all the game stats from memory using addresses and offsets
     // It updates automatically every second to keep the UI in sync with the game
@@ -243,9 +239,6 @@ namespace Route_Tracker
         #endregion
 
         #region Update System
-        // ==========FORMAL COMMENT=========
-        // Timer-based auto-update system for game statistics
-        // Periodically reads memory and notifies listeners when values change
         // ==========MY NOTES==============
         // Automatically refreshes stats every second without manual button clicks
         public void StartUpdating()
@@ -260,8 +253,6 @@ namespace Route_Tracker
             _updateTimer.Start();
         }
 
-        // ==========FORMAL COMMENT=========
-        // Detects changes in game statistics compared to previous readings
         // ==========MY NOTES==============
         // Compares new stats with previous ones to see if anything changed
         private bool HasStatsChanged(Dictionary<string, object> currentStats)
