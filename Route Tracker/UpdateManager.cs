@@ -1,11 +1,7 @@
-using System;
 using System.Diagnostics;
 using System.IO.Compression;
-using System.IO;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+
 
 namespace Route_Tracker
 {
@@ -20,24 +16,24 @@ namespace Route_Tracker
                 return;
 
             string apiUrl = $"https://api.github.com/repos/{AppTheme.GitHubRepo}/releases";
-            using var client = new HttpClient();
+            HttpClient client = new();
             client.DefaultRequestHeaders.UserAgent.ParseAdd("RouteTrackerUpdater");
 
             try
             {
-                var response = await client.GetStringAsync(apiUrl);
-                using var doc = JsonDocument.Parse(response);
+                string response = await client.GetStringAsync(apiUrl);
+                JsonDocument doc = JsonDocument.Parse(response);
 
                 JsonElement? latestRelease = null;
                 DateTime latestDate = DateTime.MinValue;
 
-                foreach (var release in doc.RootElement.EnumerateArray())
+                foreach (JsonElement release in doc.RootElement.EnumerateArray())
                 {
                     if (release.GetProperty("draft").GetBoolean())
                         continue;
 
-                    if (release.TryGetProperty("published_at", out var publishedAtProp) &&
-                        DateTime.TryParse(publishedAtProp.GetString(), out var publishedAt))
+                    if (release.TryGetProperty("published_at", out JsonElement publishedAtProp) &&
+                        DateTime.TryParse(publishedAtProp.GetString(), out DateTime publishedAt))
                     {
                         if (publishedAt > latestDate)
                         {
@@ -49,16 +45,14 @@ namespace Route_Tracker
 
                 if (latestRelease == null)
                 {
-                    MessageBox.Show("Could not find any releases on GitHub.", "Update Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Trace.WriteLine("Could not find any releases on GitHub.");
                     return;
                 }
 
                 string? latestVersion = latestRelease.Value.GetProperty("tag_name").GetString();
                 if (string.IsNullOrEmpty(latestVersion))
                 {
-                    MessageBox.Show("Could not determine the latest version from GitHub.", "Update Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Trace.WriteLine("Could not determine the latest version from GitHub.");
                     return;
                 }
 
@@ -69,55 +63,48 @@ namespace Route_Tracker
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Update check failed: {ex.Message}");
+                Trace.WriteLine($"Update check failed: {ex.Message}");
             }
         }
 
         private static async Task HandleUpdateFound(string latestVersion, JsonElement release, HttpClient client)
         {
-            var result = MessageBox.Show(
+            DialogResult result = MessageBox.Show(
                 $"A new version is available!\n\nCurrent: {AppTheme.Version}\nLatest: {latestVersion}\n\nDo you want to download and install it?",
                 "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
-            if (result == DialogResult.Yes)
-            {
-                await DownloadAndInstallUpdate(release, client);
-            }
+            if (result == DialogResult.Yes) await DownloadAndInstallUpdate(release, client);
         }
 
         private static async Task DownloadAndInstallUpdate(JsonElement release, HttpClient client)
         {
-            var assets = release.GetProperty("assets");
+            JsonElement assets = release.GetProperty("assets");
             if (assets.GetArrayLength() == 0)
             {
-                MessageBox.Show("No downloadable asset found in the latest release.", "Update Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Trace.WriteLine("No downloadable asset found in the latest release.");
                 return;
             }
 
             // Prompt for download folder BEFORE showing the form
             string downloadFolder = "";
-            using (var fbd = new FolderBrowserDialog())
+            using (FolderBrowserDialog fbd = new())
             {
                 fbd.Description = "Select folder to download the update files to.";
-                if (fbd.ShowDialog() == DialogResult.OK)
-                {
-                    downloadFolder = fbd.SelectedPath;
-                }
-                else
-                {
-                    return; // User cancelled
-                }
+                if (fbd.ShowDialog() != DialogResult.OK)
+                    return;
+                downloadFolder = fbd.SelectedPath;
             }
 
-            using var progressForm = new UpdateProgressForm();
-            progressForm.TopMost = true;
-            progressForm.LaunchNewVersionCheckBox.Enabled = false;
-            progressForm.ContinueButton.Enabled = false;
-            progressForm.StatusLabel.Text = "Downloading update...";
-            progressForm.DownloadProgressBar.Value = 0;
-            progressForm.ExtractProgressBar.Value = 0;
-            progressForm.DownloadPathBox.Text = downloadFolder;
+            UpdateProgressForm progressForm = new()
+            {
+                TopMost = true,
+                LaunchNewVersionCheckBox = { Enabled = false },
+                ContinueButton = { Enabled = false },
+                StatusLabel = { Text = "Downloading update..." },
+                DownloadProgressBar = { Value = 0 },
+                ExtractProgressBar = { Value = 0 },
+                DownloadPathBox = { Text = downloadFolder }
+            };
 
             string? zipFilePath = null;
             string? zipFileNameNoExt = null;
@@ -126,7 +113,7 @@ namespace Route_Tracker
             int assetCount = assets.GetArrayLength();
             int assetIndex = 0;
             bool downloadError = false;
-            foreach (var asset in assets.EnumerateArray())
+            foreach (JsonElement asset in assets.EnumerateArray())
             {
                 assetIndex++;
                 string? assetName = asset.GetProperty("name").GetString();
@@ -145,12 +132,12 @@ namespace Route_Tracker
                         progressForm.DownloadProgressBar.Value = (int)((assetIndex - 1) * 100.0 / assetCount);
                         Application.DoEvents();
 
-                        using (var response = await client.GetAsync(assetUrl, HttpCompletionOption.ResponseHeadersRead))
+                        using (HttpResponseMessage response = await client.GetAsync(assetUrl, HttpCompletionOption.ResponseHeadersRead))
                         {
                             response.EnsureSuccessStatusCode();
-                            using var assetStream = await response.Content.ReadAsStreamAsync();
+                            Stream assetStream = await response.Content.ReadAsStreamAsync();
                             Directory.CreateDirectory(Path.GetDirectoryName(localPath)!);
-                            using var fileStream = File.Create(localPath);
+                            FileStream fileStream = File.Create(localPath);
                             await assetStream.CopyToAsync(fileStream);
                         }
                         downloaded = true;
@@ -158,17 +145,16 @@ namespace Route_Tracker
                     catch (DirectoryNotFoundException)
                     {
                         MessageBox.Show($"Failed to download {assetName} because the folder does not exist.", "Download Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        using var fbd = new FolderBrowserDialog();
-                        fbd.Description = $"Select folder to save {assetName} to.";
-                        if (fbd.ShowDialog(progressForm) == DialogResult.OK)
+                        FolderBrowserDialog fbd = new()
                         {
-                            localPath = Path.Combine(fbd.SelectedPath, assetName);
-                        }
-                        else
+                            Description = $"Select folder to save {assetName} to."
+                        };
+                        if (fbd.ShowDialog(progressForm) != DialogResult.OK)
                         {
                             downloadError = true;
                             break;
                         }
+                        localPath = Path.Combine(fbd.SelectedPath, assetName);
                     }
                     catch (Exception ex)
                     {
@@ -202,14 +188,9 @@ namespace Route_Tracker
 
             // Prompt for extract folder after download
             string extractFolder = "";
-            using (var fbd = new FolderBrowserDialog())
+            using (FolderBrowserDialog fbd = new() { Description = "Select folder to extract the update ZIP file to." })
             {
-                fbd.Description = "Select folder to extract the update ZIP file to.";
-                if (fbd.ShowDialog(progressForm) == DialogResult.OK)
-                {
-                    extractFolder = fbd.SelectedPath;
-                }
-                else
+                if (fbd.ShowDialog(progressForm) != DialogResult.OK)
                 {
                     progressForm.StatusLabel.Text = "Extraction cancelled.";
                     progressForm.LaunchNewVersionCheckBox.Enabled = true;
@@ -217,6 +198,7 @@ namespace Route_Tracker
                     progressForm.ShowDialog();
                     return;
                 }
+                extractFolder = fbd.SelectedPath;
             }
 
             bool extractionError = false;
@@ -231,10 +213,10 @@ namespace Route_Tracker
 
                     await Task.Run(() =>
                     {
-                        using var archive = ZipFile.OpenRead(zipFilePath);
+                        ZipArchive archive = ZipFile.OpenRead(zipFilePath);
                         int totalEntries = archive.Entries.Count;
                         int currentEntry = 0;
-                        foreach (var entry in archive.Entries)
+                        foreach (ZipArchiveEntry entry in archive.Entries)
                         {
                             if (string.IsNullOrEmpty(entry.Name))
                             {
@@ -264,12 +246,11 @@ namespace Route_Tracker
                                             $"Failed to extract {entry.FullName} because the folder does not exist.",
                                             "Extraction Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                                        using var fbd = new FolderBrowserDialog();
-                                        fbd.Description = $"Select folder to extract {entry.FullName} to.";
-                                        if (fbd.ShowDialog(progressForm) == DialogResult.OK)
+                                        FolderBrowserDialog fbd = new()
                                         {
-                                            newFolder = fbd.SelectedPath;
-                                        }
+                                            Description = $"Select folder to extract {entry.FullName} to."
+                                        };
+                                        if (fbd.ShowDialog(progressForm) == DialogResult.OK) newFolder = fbd.SelectedPath;
                                     }));
 
                                     if (!string.IsNullOrEmpty(newFolder))
@@ -277,10 +258,7 @@ namespace Route_Tracker
                                         currentExtractTo = newFolder;
                                         destinationPath = Path.Combine(currentExtractTo, entry.FullName);
                                     }
-                                    else
-                                    {
-                                        extracted = true;
-                                    }
+                                    else extracted = true;
                                 }
                                 catch (Exception ex)
                                 {
@@ -297,42 +275,42 @@ namespace Route_Tracker
 
                             currentEntry++;
                             int percent = (int)(currentEntry * 100 / totalEntries);
-                            progressForm.Invoke((Action)(() =>
+                            progressForm.Invoke(() =>
                             {
                                 progressForm.ExtractProgressBar.Value = Math.Min(percent, 100);
                                 progressForm.StatusLabel.Text = $"Extracting update... {percent}%";
-                            }));
+                            });
                         }
                     });
 
-                    progressForm.Invoke((Action)(() =>
+                    progressForm.Invoke(() =>
                     {
                         progressForm.StatusLabel.Text = extractionError ? "Extraction failed." : "Update complete!";
                         progressForm.ExtractProgressBar.Value = extractionError ? 0 : 100;
                         progressForm.LaunchNewVersionCheckBox.Enabled = true;
                         progressForm.ContinueButton.Enabled = true;
-                    }));
+                    });
                 }
                 catch (Exception ex)
                 {
-                    progressForm.Invoke((Action)(() =>
+                    progressForm.Invoke(() =>
                     {
                         MessageBox.Show($"Extraction failed: {ex.Message}", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         progressForm.StatusLabel.Text = "Extraction failed.";
                         progressForm.LaunchNewVersionCheckBox.Enabled = true;
                         progressForm.ContinueButton.Enabled = true;
-                    }));
+                    });
                     extractionError = true;
                 }
             }
             else
             {
-                progressForm.Invoke((Action)(() =>
+                progressForm.Invoke(() =>
                 {
                     progressForm.StatusLabel.Text = "No ZIP file extracted.";
                     progressForm.LaunchNewVersionCheckBox.Enabled = true;
                     progressForm.ContinueButton.Enabled = true;
-                }));
+                });
                 extractionError = true;
             }
 
@@ -355,10 +333,7 @@ namespace Route_Tracker
                         MessageBox.Show($"Failed to launch new version: {ex.Message}", "Launch Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-                else
-                {
-                    MessageBox.Show("New executable not found. Please launch manually.", "Launch Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                else MessageBox.Show("New executable not found. Please launch manually.", "Launch Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -375,50 +350,6 @@ namespace Route_Tracker
                 Properties.Settings.Default.Save();
             };
             settingsMenuItem.DropDownItems.Add(checkForUpdatesMenuItem);
-        }
-
-        public static void AddDevModeMenuItem(ToolStripMenuItem settingsMenuItem)
-        {
-            var devModeMenuItem = new ToolStripMenuItem("Enable Dev Mode")
-            {
-                CheckOnClick = true,
-                Checked = Properties.Settings.Default.DevMode
-            };
-            devModeMenuItem.CheckedChanged += (s, e) =>
-            {
-                if (devModeMenuItem.Checked)
-                {
-                    using var passForm = new DevPasscodeForm();
-                    if (passForm.ShowDialog() == DialogResult.OK)
-                    {
-                        if (passForm.Passcode == "1289")
-                        {
-                            Properties.Settings.Default.DevMode = true;
-                            Properties.Settings.Default.Save();
-                            MessageBox.Show("Dev Mode enabled. Update checks will be skipped.", "Dev Mode",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            devModeMenuItem.Checked = false;
-                            MessageBox.Show("Incorrect passcode.", "Dev Mode",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                    else
-                    {
-                        devModeMenuItem.Checked = false;
-                    }
-                }
-                else
-                {
-                    Properties.Settings.Default.DevMode = false;
-                    Properties.Settings.Default.Save();
-                    MessageBox.Show("Dev Mode disabled.", "Dev Mode",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            };
-            settingsMenuItem.DropDownItems.Add(devModeMenuItem);
         }
     }
 }

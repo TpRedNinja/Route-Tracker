@@ -1,31 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace Route_Tracker
+﻿namespace Route_Tracker
 {
-    // ==========FORMAL COMMENT=========
-    // Responsible for loading route data from TSV files
-    // Parses file content into structured RouteEntry objects
-    // Provides access to available route files in the Routes directory
-    // ==========MY NOTES==============
-    // This loads the route files and converts them to route entries
-    // Handles reading the TSV format and finding available route files
     public class RouteLoader
     {
-        // ==========FORMAL COMMENT=========
-        // Loads and parses a specific route file into RouteEntry objects
-        // Processes tab-delimited data with display text, collectible type, and condition values
-        // Validates entries and logs diagnostic information during loading
-        // ==========MY NOTES==============
-        // Reads a TSV file and creates RouteEntry objects from each line
-        // Expects each line to have at least 3 columns with the right data
-        // Logs diagnostic info to help troubleshoot issues
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822",
-        Justification = "it breaks everything")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
-        Justification = "it breaks everything")]
         public List<RouteEntry> LoadRoute(string filename)
         {
             List<RouteEntry> entries = [];
@@ -92,18 +68,6 @@ namespace Route_Tracker
             return entries;
         }
 
-        // ==========FORMAL COMMENT=========
-        // Retrieves a list of available route files in the Routes directory
-        // Returns filenames of all TSV files that can be loaded as routes
-        // Handles missing directories and access errors gracefully
-        // ==========MY NOTES==============
-        // Finds all the TSV files in the Routes folder
-        // Returns just the filenames without the full path
-        // Returns an empty array if the folder doesn't exist or can't be accessed
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0305",
-        Justification = "it breaks everything")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
-        Justification = "it breaks everything")]
         public static string[] GetAvailableRoutes()
         {
             string routeDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Routes");
@@ -113,9 +77,7 @@ namespace Route_Tracker
 
             try
             {
-                return Directory.GetFiles(routeDirectory, "*.tsv")
-       .Select(path => Path.GetFileName(path) ?? string.Empty)
-       .ToArray();
+                return [.. Directory.GetFiles(routeDirectory, "*.tsv").Select(path => Path.GetFileName(path) ?? string.Empty)];
             }
             catch
             {

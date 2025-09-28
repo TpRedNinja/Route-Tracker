@@ -1,20 +1,9 @@
-﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Runtime.Versioning;
 using Route_Tracker.Properties;
-using System.Net.Http;
-using System.Text.Json;
-using System.IO.Compression;
+
 
 namespace Route_Tracker
 {
-    // ==========MY NOTES==============
-    // This is the main window of the app - it does everything from connecting to the game
-    // to showing the stats and managing settings
     public partial class MainForm : Form
     {
         #region Fields and Properties
@@ -60,9 +49,7 @@ namespace Route_Tracker
         public HashSet<string> selectedTypes = [];
 
         //search history controls
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044",
-        Justification = "NO")]
-        private SearchHistoryManager searchHistoryManager = null!;
+        private readonly SearchHistoryManager searchHistoryManager = null!;
         private ListBox searchHistoryListBox = null!;
         private bool isSearchHistoryVisible = false;
         private string lastSearchTerm = string.Empty;
@@ -73,7 +60,6 @@ namespace Route_Tracker
 
         // global hotkey support
         private bool globalHotkeysRegistered = false;
-
         #endregion
 
         #region Constructor and Initialization

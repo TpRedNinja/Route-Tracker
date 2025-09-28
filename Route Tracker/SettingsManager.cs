@@ -1,45 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.Versioning;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Route_Tracker.Properties;
 
 namespace Route_Tracker
 {
-    // ==========MY NOTES==============
-    // This centralizes all settings-related code in one place
-    // Makes it easier to access and update settings from anywhere
     public class SettingsManager
     {
-        private bool isLoadingSettings = false;
-        public bool IsLoadingSettings => isLoadingSettings;
+        public bool IsLoadingSettings = false;
 
-        // ==========MY NOTES==============
-        // Settings backup location that survives version updates and uninstalls
         private static readonly string BackupFolder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "RouteTracker",
             "Settings"
         );
         private static readonly string BackupFilePath = Path.Combine(BackupFolder, "settings_backup.json");
-
-        // ==========MY NOTES==============
-        // Cached JsonSerializerOptions to avoid recreating on every backup
         private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
-        // ==========MY NOTES==============
-        // Data model for all settings we want to backup
         public class SettingsBackup
         {
-            public string GameDirectory { get; set; } = string.Empty;
-            public string AutoStart { get; set; } = string.Empty;
-            public string AC4Directory { get; set; } = string.Empty;
-            public string Gow2018Directory { get; set; } = string.Empty;
             public int CompleteHotkey { get; set; } = 0;
             public int SkipHotkey { get; set; } = 0;
             public int UndoHotkey { get; set; } = 0;
@@ -71,18 +50,12 @@ namespace Route_Tracker
             public int AdvTog { get; set; } = (int)(Keys.Shift | Keys.A);
             public int GlobalTog { get; set; } = (int)(Keys.Control | Keys.G);
             public int SortingMode { get; set; } = 0;
-            public int SortingUp { get; set; } = 262212; // Alt+D
-            public int SortingDown { get; set; } = 196676; // Shift+D
-            public int GameDirect { get; set; } = 131140; // Ctrl+D
+            public int SortingUp { get; set; } = (int)(Keys.Alt | Keys.D);
+            public int SortingDown { get; set; } = (int)(Keys.Shift | Keys.D);
+            public int GameDirect { get; set; } = (int)(Keys.Control | Keys.D);
         }
 
         #region Backup/Restore Settings
-        // ==========MY NOTES==============
-        // Creates a backup of all current settings to AppData
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
-        Justification = "it breaks shit")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
-        Justification = "it breaks shit")]
         public void BackupSettings()
         {
             try
@@ -90,12 +63,8 @@ namespace Route_Tracker
                 if (!Directory.Exists(BackupFolder))
                     Directory.CreateDirectory(BackupFolder);
 
-                var backup = new SettingsBackup
+                SettingsBackup backup = new()
                 {
-                    GameDirectory = Settings.Default.GameDirectory,
-                    AutoStart = Settings.Default.AutoStart,
-                    AC4Directory = Settings.Default.AC4Directory,
-                    Gow2018Directory = Settings.Default.Gow2018Directory,
                     CompleteHotkey = Settings.Default.CompleteHotkey,
                     SkipHotkey = Settings.Default.SkipHotkey,
                     UndoHotkey = Settings.Default.UndoHotkey,
@@ -132,7 +101,7 @@ namespace Route_Tracker
                     GameDirect = Settings.Default.GameDirect
                 };
 
-                string json = System.Text.Json.JsonSerializer.Serialize(backup, JsonOptions);
+                string json = JsonSerializer.Serialize(backup, JsonOptions);
                 File.WriteAllText(BackupFilePath, json);
             }
             catch (Exception ex)
@@ -141,12 +110,6 @@ namespace Route_Tracker
             }
         }
 
-        // ==========MY NOTES==============
-        // Restores settings from backup if it exists
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
-        Justification = "it breaks shit")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
-        Justification = "it breaks shit")]
         public bool RestoreFromBackup()
         {
             try
@@ -160,10 +123,6 @@ namespace Route_Tracker
                 if (backup == null)
                     return false;
 
-                Settings.Default.GameDirectory = backup.GameDirectory;
-                Settings.Default.AutoStart = backup.AutoStart;
-                Settings.Default.AC4Directory = backup.AC4Directory;
-                Settings.Default.Gow2018Directory = backup.Gow2018Directory;
                 Settings.Default.CompleteHotkey = backup.CompleteHotkey;
                 Settings.Default.SkipHotkey = backup.SkipHotkey;
                 Settings.Default.UndoHotkey = backup.UndoHotkey;
@@ -195,7 +154,6 @@ namespace Route_Tracker
                 Settings.Default.SortingMode = backup.SortingMode;
                 Settings.Default.SortingUp = backup.SortingUp;
                 Settings.Default.SortingDown = backup.SortingDown;
-                Settings.Default.GameDirectory = backup.GameDirectory;
 
                 Settings.Default.Save();
                 return true;
@@ -300,17 +258,11 @@ namespace Route_Tracker
         #endregion
 
         #region Settings Loading/Saving
-        // ==========FORMAL COMMENT=========
-        // Loads user settings into UI controls
-        // Uses a flag to prevent change events during loading
-        // ==========MY NOTES==============
-        // Fills UI controls with saved settings when app starts
-        [SupportedOSPlatform("windows6.1")]
         public void LoadSettings(TextBox gameDirectoryTextBox)
         {
-            isLoadingSettings = true;
+            IsLoadingSettings = true;
             gameDirectoryTextBox.Text = Settings.Default.GameDirectory;
-            isLoadingSettings = false;
+            IsLoadingSettings = false;
         }
 
         // ==========MY NOTES==============
@@ -320,7 +272,7 @@ namespace Route_Tracker
         {
             Settings.Default.AlwaysOnTop = alwaysOnTop;
             Settings.Default.Save();
-            BackupSettings(); // Auto-backup after saving
+            BackupSettings();
         }
 
         [SupportedOSPlatform("windows6.1")]
@@ -400,9 +352,6 @@ namespace Route_Tracker
         #endregion
 
         #region Hotkey Settings
-        // ==========MY NOTES==============
-        // Enhanced save method that also creates backup
-        [SupportedOSPlatform("windows6.1")]
         public void SaveHotkeys(Keys completeHotkey, Keys skipHotkey)
         {
             Settings.Default.CompleteHotkey = (int)completeHotkey;
@@ -411,11 +360,6 @@ namespace Route_Tracker
             BackupSettings(); // Auto-backup after saving
         }
 
-        [SupportedOSPlatform("windows6.1")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1822:",
-        Justification = "it breaks shit")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "IDE0079:Remove unnecessary suppression",
-        Justification = "it breaks shit")]
         public (Keys CompleteHotkey, Keys SkipHotkey) GetHotkeys()
         {
             return ((Keys)Settings.Default.CompleteHotkey, (Keys)Settings.Default.SkipHotkey);
@@ -548,7 +492,7 @@ namespace Route_Tracker
         }
         #endregion
 
-        #region misc settings
+        #region Misc settings
         public List<string> GetGamesWithDirectoriesSet()
         {
             var games = new List<string>();

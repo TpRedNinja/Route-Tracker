@@ -13,7 +13,7 @@ namespace Route_Tracker
     {
         #region App Information (from AppTheme.cs)
         public const string Version = "v1.05";
-        public const string GitHubRepo = "TpRedNinja/Route-Tracker";
+        public const string GitHubRepo = "Speedrun-Route-Tracker/Route-Tracker";
         #endregion
 
         // Colors
